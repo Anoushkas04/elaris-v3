@@ -1,0 +1,3999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Last Trip to Elaris Island — Game Console</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Special+Elite&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ━━━━━━━━━━━━━━━━━━━━ CSS VARIABLES ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    :root {
+      --gold:   #c4a465;
+      --gold-l: #f0e2b8;
+      --gold-d: #7a5e30;
+      --ink:    #050508;
+      --ink-m:  #0a0a14;
+      --ink-ss: rgba(10, 10, 20, 0.9);
+      --rust:   #c0471f;
+      --teal:   #2e9a78;
+      --teal-d: #1d6650;
+      --text-p: #d8cbb5;
+      --text-d: #a2917a;
+      --text-dm:#6e5e4d;
+      
+      --ff-t:   'Cinzel', serif;
+      --ff-b:   'Crimson Text', serif;
+      --ff-m:   'Special Elite', cursive;
+
+      --glass-bg:     rgba(10, 10, 20, 0.78);
+      --glass-border: rgba(196, 164, 101, 0.22);
+      --input-bg:     rgba(255, 255, 255, 0.03);
+      --input-border: rgba(196, 164, 101, 0.25);
+      --shadow-gold:  0 0 35px rgba(196, 164, 101, 0.15), 0 0 90px rgba(196, 164, 101, 0.05);
+      --radius:       10px;
+      --transition:   0.24s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ RESET / BASE ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--ink);
+      color: var(--text-p);
+      font-family: var(--ff-b);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ CANVAS BACKGROUND ━━━━━━━━━━━━━━━━━━━━━━ */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ SCREEN MANAGER ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .screen {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .screen.on { display: flex; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ GLASS PANEL / CARD ━━━━━━━━━━━━━━━━━━━━━ */
+    .glass-panel {
+      width: 100%;
+      max-width: 580px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      box-shadow: var(--shadow-gold), 0 24px 60px rgba(0,0,0,0.8);
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1, h2, h3, .tt {
+      font-family: var(--ff-t);
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 10px rgba(196, 164, 101, 0.4);
+    }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    h2 { font-size: 1.4rem; margin-bottom: 16px; }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-d);
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .divider {
+      margin: 16px auto;
+      height: 1px;
+      width: 160px;
+      background: linear-gradient(90deg, transparent, var(--gold-d), var(--gold), var(--gold-d), transparent);
+    }
+
+    /* Button Styling */
+    .btn-main {
+      font-family: var(--ff-t);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--gold);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(196,164,101,0.25);
+    }
+    .btn-main:hover:not(:disabled) {
+      background: var(--gold-l);
+      box-shadow: 0 0 20px rgba(196,164,101,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-main:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      font-family: var(--ff-t);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid var(--gold);
+      padding: 8px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-secondary:hover {
+      background: rgba(196, 164, 101, 0.12);
+      text-shadow: 0 0 8px var(--gold-l);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ HOME SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .home-banner {
+      width: 100%;
+      height: 200px;
+      margin-bottom: 24px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(196,164,101,0.15);
+      position: relative;
+    }
+    .home-banner svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ HUD LAYOUT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      min-height: 60px;
+      height: auto;
+      background: rgba(5, 5, 8, 0.85);
+      border-bottom: 1px solid rgba(196, 164, 101, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 20px;
+    }
+    #hud.on { display: flex; }
+
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud-btn {
+      font-size: 1.3rem;
+      background: transparent;
+      border: 1px solid rgba(196,164,101,0.2);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--gold);
+      transition: var(--transition);
+    }
+    .hud-btn:hover {
+      border-color: var(--gold);
+      background: rgba(196,164,101,0.12);
+    }
+
+    .hud-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #hud-module {
+      font-family: var(--ff-m);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--text-d);
+    }
+    #map-loc {
+      font-family: var(--ff-t);
+      font-size: 0.9rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Progress Bar (Global Tracker) */
+    #progress-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 99;
+      display: none;
+    }
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-d), var(--gold), var(--gold-l));
+      width: 0%;
+      transition: width 0.6s cubic-bezier(.4, 0, .2, 1);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    /* Score Flash Overlay */
+    #score-flash {
+      position: fixed;
+      top: 95px; left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(196, 164, 101, 0.95);
+      color: var(--ink);
+      font-family: var(--ff-t);
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      z-index: 110;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #score-flash.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ CHARACTERS STAGE ━━━━━━━━━━━━━━━━━━━━━━━ */
+    #char-stage {
+      position: fixed;
+      inset: 60px 0 160px;
+      z-index: 10;
+      pointer-events: none;
+      display: none;
+    }
+    #char-stage.on { display: block; }
+
+    .char-wrap {
+      position: absolute;
+      bottom: 0;
+      width: 140px;
+      height: 210px;
+      transition: transform 0.55s cubic-bezier(.175, .885, .32, 1.15), opacity 0.55s;
+      transform: translateY(180px);
+      opacity: 0;
+    }
+    .char-wrap.enter {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .char-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .char-bubble {
+      position: absolute;
+      bottom: 105%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink-ss);
+      border: 1px solid var(--gold-d);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      width: 190px;
+      font-size: 0.8rem;
+      color: var(--text-p);
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      pointer-events: auto;
+    }
+    .char-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--gold-d);
+    }
+    .char-name {
+      display: block;
+      font-family: var(--ff-t);
+      font-size: 0.72rem;
+      color: var(--gold);
+      margin-bottom: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ DIALOG BOX ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #dialog-box {
+      position: fixed;
+      bottom: 16px; left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      width: 92%;
+      max-width: 720px;
+      min-height: 120px;
+      height: auto;
+      background: var(--ink-ss);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(15px);
+      z-index: 90;
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+    }
+    #dialog-box.on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #dialog-speaker {
+      font-family: var(--ff-t);
+      font-size: 0.8rem;
+      color: var(--gold-l);
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    #dialog-text {
+      font-size: 0.95rem;
+      color: var(--text-p);
+      line-height: 1.45;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    #dialog-cursor {
+      display: inline-block;
+      width: 6px; height: 12px;
+      background: var(--gold);
+      margin-left: 2px;
+      animation: blink 0.8s infinite;
+    }
+
+    #dialog-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-choice {
+      font-family: var(--ff-b);
+      font-size: 0.88rem;
+      color: var(--text-p);
+      background: rgba(196,164,101,0.06);
+      border: 1px solid rgba(196,164,101,0.3);
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+    }
+    .btn-choice:hover {
+      background: rgba(196,164,101,0.15);
+      border-color: var(--gold);
+    }
+    .btn-choice.picked {
+      background: rgba(46,154,120,0.15);
+      border-color: var(--teal);
+    }
+
+    #dialog-next {
+      position: absolute;
+      bottom: 8px; right: 14px;
+      font-size: 0.72rem;
+      font-family: var(--ff-m);
+      color: var(--text-d);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+    #dialog-next:hover { color: var(--gold); }
+
+    @keyframes blink { 0%, 100% { opacity:0 } 50% { opacity:1 } }
+
+
+
+    /* ━━━━━━━━━━━━━━━━━━━━ MEMORY FRAGMENT DOTS ━━━━━━━━━━━━━━━━━━ */
+    #fragment-display {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+      pointer-events: auto;
+    }
+    #fragment-display.on { display: flex; }
+
+    #frag-dots {
+      display: flex;
+      gap: 7px;
+      pointer-events: auto;
+    }
+    .frag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(196, 164, 101, 0.2);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .frag-dot.lit {
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold), 0 0 16px var(--gold-l);
+      border-color: var(--gold-l);
+    }
+
+    /* Fragment Details Overlay */
+    #frag-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(5,5,8,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #frag-overlay.on { display: flex; }
+
+    .frag-card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--ink-ss);
+      border: 2px solid var(--gold-d);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: 0 0 50px rgba(196,164,101,0.22);
+      position: relative;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ MODALS SYSTEM ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: rgba(5,5,8,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+    .modal.on { display: flex; }
+
+    .modal-content {
+      width: 100%;
+      max-width: 520px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-gold), 0 20px 50px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text-d);
+    }
+    .modal-close:hover { color: var(--gold); }
+
+    /* Map Design */
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: rgba(10,10,15,0.8);
+      border: 1px solid rgba(196,164,101,0.2);
+      border-radius: 4px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    .map-node {
+      position: absolute;
+      width: 52px; height: 52px;
+      background: #0d0d14;
+      border: 2px solid var(--text-dm);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      font-family: var(--ff-m);
+      color: var(--text-d);
+      transition: all 0.3s;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+    }
+    .map-node.active {
+      border-color: var(--gold);
+      color: var(--gold-l);
+      box-shadow: 0 0 15px var(--gold);
+      animation: pulse-active 1.5s infinite alternate;
+    }
+    @keyframes pulse-active {
+      from { box-shadow: 0 0 4px var(--gold); }
+      to { box-shadow: 0 0 18px var(--gold); }
+    }
+    .map-node-label {
+      position: absolute;
+      top: 104%;
+      white-space: nowrap;
+      font-size: 0.58rem;
+      color: var(--text-d);
+    }
+
+    /* Page-Flipping Dossier */
+    .book-container {
+      width: 100%;
+      height: 360px;
+      perspective: 1000px;
+      margin-top: 15px;
+    }
+    .book-card {
+      width: 100%;
+      height: 100%;
+      background: #111014;
+      border: 1px solid rgba(196,164,101,0.3);
+      border-radius: 6px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+    }
+    .book-card::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(196,164,101,0.08);
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .book-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: calc(100% - 40px);
+    }
+    .book-page-left {
+      border-right: 1px dashed rgba(196,164,101,0.1);
+      padding-right: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .book-page-right {
+      padding-left: 8px;
+      font-size: 0.8rem;
+      color: var(--text-p);
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .book-page-right::-webkit-scrollbar {
+      display: none;
+    }
+    .scroll-arrow-down {
+      position: absolute;
+      bottom: 25px;
+      right: 25px;
+      color: var(--gold);
+      font-size: 0.75rem;
+      cursor: pointer;
+      animation: arrowBounce 1.5s infinite;
+      z-index: 100;
+      opacity: 0.8;
+      transition: opacity 0.3s, visibility 0.3s;
+      background: rgba(17,16,20,0.9);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(196,164,101,0.35);
+    }
+    .scroll-arrow-down:hover {
+      opacity: 1;
+      color: var(--gold-l);
+      border-color: var(--gold);
+    }
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+    .book-portrait {
+      width: 90px;
+      height: 110px;
+      border: 1px solid rgba(196,164,101,0.25);
+      border-radius: 4px;
+      background: #09090c;
+      object-fit: cover;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+    .book-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .book-nav-btn {
+      background: transparent;
+      border: 1px solid rgba(196,164,101,0.25);
+      color: var(--gold);
+      font-family: var(--ff-t);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .book-nav-btn:hover {
+      background: rgba(196, 164, 101, 0.12);
+      border-color: var(--gold);
+    }
+
+    /* Field Manual Sidebar Design */
+    .screen.game-screen {
+      flex-direction: row !important;
+      gap: 32px !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding-top: 80px !important;
+    }
+
+    .field-manual-sidebar {
+      width: 290px;
+      flex-shrink: 0;
+      background: #fffae8;
+      color: #3b3021;
+      border: 1px solid #d4c4a8;
+      border-radius: var(--radius);
+      padding: 24px;
+      font-family: 'Crimson Text', serif;
+      box-shadow: inset 0 0 30px rgba(138,109,70,0.15), 0 8px 25px rgba(0,0,0,0.5);
+      text-align: left;
+      height: 480px; /* matches center panels height */
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fmsFadeIn 0.5s ease-out;
+    }
+
+    @keyframes fmsFadeIn {
+      from { opacity: 0; transform: translateX(-15px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .field-manual-sidebar h3 {
+      font-family: var(--ff-t);
+      font-size: 1.2rem;
+      color: var(--gold-d);
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid rgba(138,109,70,0.25);
+      padding-bottom: 6px;
+      margin: 0;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .field-manual-sidebar .section-title {
+      font-family: var(--ff-m);
+      font-size: 0.72rem;
+      color: var(--text-dm);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .field-manual-sidebar p {
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: #4a3c2b;
+      margin: 0;
+    }
+
+    .field-manual-sidebar label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #3b3021;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .field-manual-sidebar input[type="checkbox"] {
+      accent-color: var(--gold-d);
+      cursor: pointer;
+      width: 15px;
+      height: 15px;
+    }
+
+    .field-manual-sidebar input[type="checkbox"]:checked + span {
+      text-decoration: line-through;
+      color: #8c7a65;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 800px) {
+      .screen.game-screen {
+        flex-direction: column !important;
+        align-items: center !important;
+        overflow-y: auto !important;
+      }
+      .field-manual-sidebar {
+        width: 100% !important;
+        max-width: 580px !important;
+        height: auto !important;
+      }
+    }
+
+    /* Evidence List Modal */
+    #evidence-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+    .evidence-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(196,164,101,0.15);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-align: left;
+    }
+    .evidence-item h4 {
+      font-family: var(--ff-t);
+      color: var(--gold-l);
+      font-size: 0.72rem;
+      margin-bottom: 2px;
+    }
+
+    /* Exit Confirm Modal */
+    .exit-choice-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ GAME MODULE SCREENS ━━━━━━━━━━━━━━━━━━━━ */
+    .game-panel {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(20px);
+      padding: 24px;
+      box-shadow: var(--shadow-gold), 0 16px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .game-panel.on { display: block; }
+
+    /* Beach Cleanup Panel */
+    .clue-img {
+      pointer-events: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.6));
+    }
+    .clue-img:hover {
+      transform: scale(1.15) !important;
+      filter: drop-shadow(0 0 8px var(--gold)) !important;
+    }
+
+    /* Lighthouse Screen Background */
+    #lh-screen-view {
+      position: relative;
+      width: 100%;
+      margin: 15px 0;
+      border: 1px solid rgba(196,164,101,0.15);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    }
+    .lh-aspect-ratio {
+      position: relative;
+      width: 100%;
+      padding-bottom: 60%;
+      overflow: hidden;
+    }
+    .lh-bg-img {
+      position: absolute;
+      top: -15%;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+    .lh-tower-container {
+      position: absolute;
+      bottom: -5%;
+      left: 36%;
+      width: 28%;
+      z-index: 10;
+    }
+    .lh-tower-img {
+      width: 100%;
+      display: block;
+      filter: drop-shadow(0 15px 15px rgba(0,0,0,0.8));
+    }
+    #lh-bulb {
+      position: absolute;
+      top: 17%;
+      left: 50%;
+      margin-left: -10px;
+      margin-top: -10px;
+      width: 20px;
+      height: 20px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+    }
+    .lh-beam-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      z-index: -1;
+    }
+    .lh-beam {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      width: 250px;
+      height: 60px;
+      background: linear-gradient(90deg, currentColor, transparent);
+      transform-origin: 0% 50%;
+      opacity: 0;
+      filter: blur(4px);
+      pointer-events: none;
+    }
+    #lh-bulb.lit {
+      box-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+      background: currentColor;
+    }
+    #lh-bulb.lit .lh-beam {
+      opacity: 0.6;
+      animation: sweep 1.5s linear infinite;
+    }
+    @keyframes sweep {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .lh-btns {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 15px;
+    }
+    .lb-btn {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .lb-btn[data-c="red"] { background: #cc3333; border-color: rgba(204,51,51,0.4); }
+    .lb-btn[data-c="blue"] { background: #4488ee; border-color: rgba(68,136,238,0.4); }
+    .lb-btn[data-c="green"] { background: #2e9a78; border-color: rgba(46,154,120,0.4); }
+    .lb-btn:hover { transform: translateY(-2px); }
+
+    /* Bonfire Options */
+    .bon-opts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    /* Lost Baggage Sorting */
+    .bag-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .bag-col-head {
+      font-family: var(--ff-t);
+      font-size: 0.72rem;
+      color: var(--gold-l);
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    /* Karaoke Wave */
+    #kara-wave {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      height: 60px;
+      margin: 15px 0;
+    }
+    .kara-opt {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(196,164,101,0.2);
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .kara-opt:hover {
+      background: rgba(196,164,101,0.08);
+      border-color: var(--gold);
+    }
+    .kara-opt.correct {
+      background: rgba(46,154,120,0.15);
+      border-color: var(--teal);
+    }
+    .kara-opt.wrong {
+      background: rgba(192,71,31,0.15);
+      border-color: var(--rust);
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    @keyframes eviScan {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+    @keyframes eviGlitch {
+      0% { opacity: 0.1; transform: skewX(-5deg) scale(0.95); }
+      30% { opacity: 0.3; transform: skewX(0deg) scale(1); }
+      50% { opacity: 0.05; transform: skewX(10deg) scale(1.05); }
+      80% { opacity: 0.4; transform: skewX(-15deg) scale(0.98); }
+      100% { opacity: 0.2; transform: skewX(5deg) scale(1.02); }
+    }
+
+    /* CCTV clips */
+    .cctv-area {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    #cctv-track {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cctv-clip {
+      padding: 8px 12px;
+      background: #111;
+      border: 1px solid rgba(196,164,101,0.3);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cctv-clip.dragging { opacity: 0.5; border-style: dashed; }
+    .cctv-clip.placed { border-color: var(--teal); background: rgba(46,154,120,0.1); }
+    .cctv-clip.wrong { border-color: var(--rust); }
+    
+    #cctv-slots {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .cctv-slot {
+      height: 68px;
+      border: 1px dashed rgba(196,164,101,0.25);
+      border-radius: 4px;
+      background: rgba(0,0,0,0.3);
+      font-size: 0.65rem;
+      color: var(--text-dm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Storm Alarm Grid */
+    #alarm-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .alarm {
+      background: rgba(192,71,31,0.06);
+      border: 1px solid rgba(192,71,31,0.3);
+      border-radius: 6px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.25s;
+    }
+    .alarm span:first-child { font-size: 1.8rem; margin-bottom: 4px; }
+    .alarm span:last-child { font-size: 0.72rem; font-family: var(--ff-m); color: var(--rust); }
+    .alarm:hover {
+      background: rgba(192,71,31,0.18);
+      border-color: var(--rust);
+    }
+    .alarm.done {
+      border-color: var(--teal);
+      background: rgba(46,154,120,0.1);
+      opacity: 0.4;
+      cursor: default;
+    }
+    .alarm.done span:last-child { color: var(--teal); }
+
+    /* Pathfinder Trail Making */
+    #pf-board {
+      position: relative;
+      margin: 15px auto 0;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(196,164,101,0.25);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #pf-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .pf-node {
+      position: absolute;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #111;
+      border: 1px solid var(--gold-d);
+      color: var(--text-d);
+      font-family: var(--ff-m);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      transform: translate(-50%, -50%);
+      transition: all 0.2s;
+    }
+    .pf-node:hover {
+      /* Hover disabled to prevent pre-cueing as per methodology */
+    }
+    .pf-node.done {
+      background: var(--gold-d);
+      color: var(--ink);
+      border-color: var(--gold);
+      cursor: default;
+    }
+    .pf-node.err {
+      border-color: var(--rust);
+      animation: shake 0.4s;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ DEDUCTION GRID ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #deduction-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    @media (min-width: 500px) {
+      #deduction-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .clue-card {
+      font-size: 0.8rem;
+      color: var(--text-p);
+      background: rgba(255,255,255,0.01);
+      border: 1px dashed rgba(196,164,101,0.18);
+      border-radius: 4px;
+      padding: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .clue-card:hover {
+      border-color: var(--gold-d);
+      background: rgba(196,164,101,0.04);
+    }
+    .clue-card.connected {
+      border-color: var(--gold);
+      background: rgba(196,164,101,0.08);
+      border-style: solid;
+      box-shadow: inset 0 0 10px rgba(196,164,101,0.08);
+    }
+    .clue-cat {
+      font-family: var(--ff-m);
+      font-size: 0.58rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+    .clue-card.connected::after {
+      content: '📌';
+      position: absolute;
+      top: 6px; right: 8px;
+      font-size: 0.65rem;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ RESULTS PANEL ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #res-player {
+      font-family: var(--ff-t);
+      font-size: 1.15rem;
+      color: var(--gold-l);
+      margin-bottom: 12px;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+    .stat-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(196,164,101,0.12);
+      border-radius: 4px;
+      padding: 10px;
+    }
+    .stat-label {
+      font-size: 0.62rem;
+      color: var(--text-d);
+      font-family: var(--ff-m);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .stat-val {
+      font-family: var(--ff-t);
+      font-size: 1.2rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* Bar Graph styling */
+    #domain-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 15px 0;
+      text-align: left;
+    }
+    .result-bar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+    }
+    .result-bar-label {
+      width: 110px;
+      color: var(--text-d);
+      font-weight: 600;
+    }
+    .result-bar-track {
+      flex-grow: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+      margin: 0 10px;
+      overflow: hidden;
+    }
+    .result-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .result-val {
+      width: 36px;
+      text-align: right;
+      color: var(--gold-l);
+      font-family: var(--ff-m);
+    }
+
+    /* Risk Badges */
+    .risk-badge {
+      font-family: var(--ff-m);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .risk-low { background: rgba(46,154,120,0.15); color: #4ecda8; border: 1px solid rgba(46,154,120,0.3); }
+    .risk-med { background: rgba(212,160,23,0.15); color: #e5b02b; border: 1px solid rgba(212,160,23,0.3); }
+    .risk-hi  { background: rgba(192,71,31,0.15); color: #ff5e4d; border: 1px solid rgba(192,71,31,0.3); }
+
+    #res-accusation {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      padding: 14px;
+      border-radius: 4px;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    #res-epilogue {
+      font-size: 0.88rem;
+      color: var(--text-p);
+      line-height: 1.5;
+      font-style: italic;
+      background: rgba(0,0,0,0.2);
+      border: 1px dashed rgba(196,164,101,0.15);
+      padding: 14px;
+      border-radius: 4px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background canvas stars / waves -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- HUD overlay (visible once in-island) -->
+  <div id="hud">
+    <div class="hud-left">
+      <button class="hud-btn" id="evidence-btn" title="Evidence Log" onclick="showEvidenceModal()">🔍</button>
+      <div id="hud-frags" style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--text-d);">Fragments: 0 / 10</div>
+    </div>
+    <div class="hud-center">
+      <div id="hud-module">MODULE 1 / 10</div>
+      <div id="map-loc">Loading...</div>
+      <div id="fragment-display">
+        <div id="frag-dots"></div>
+      </div>
+    </div>
+    <div class="hud-right">
+      <button class="hud-btn" id="map-btn" title="Island Map">🗺️</button>
+      <button class="hud-btn" id="cf-btn" title="Character Files">📂</button>
+      <button class="hud-btn" id="exit-btn" title="Exit Assessment" onclick="confirmExit()" style="border-color: rgba(192,71,31,0.35); color: var(--rust);">🚪</button>
+    </div>
+    <!-- Progress bar -->
+    <div id="progress-bar">
+      <div id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Global Score Floating flash -->
+  <div id="score-flash">+15</div>
+
+  <!-- Character Presentation Layer -->
+  <div id="char-stage"></div>
+
+  <!-- Narrative dialog text box -->
+  <div id="dialog-box">
+    <div id="dialog-speaker">ROWAN ASHFORD</div>
+    <div style="flex-grow:1; display:flex; align-items:flex-start; overflow-y:auto; margin: 8px 0;">
+      <div id="dialog-text" style="display:inline;">Loading...</div>
+      <span id="dialog-cursor"></span>
+    </div>
+    <div id="dialog-choices"></div>
+    <div id="dialog-next" onclick="dialogNext()">CONTINUE ⏎</div>
+  </div>
+
+
+
+
+
+  <!-- Fragment Details Overlay popup -->
+  <div id="frag-overlay">
+    <div class="frag-card">
+      <h3 style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--text-dm); letter-spacing: 0.15em;">MEMORY FRAGMENT <span id="frag-num">#1</span></h3>
+      <div class="divider"></div>
+      <p id="frag-body" style="font-size: 1rem; margin: 16px 0; white-space: pre-wrap; font-style: italic; color: var(--text-p);"></p>
+      <p id="frag-clue" style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--gold); margin-bottom: 24px; text-transform: uppercase;"></p>
+      <p id="frag-reveal" style="font-family: var(--ff-m); font-size: 0.8rem; color: #ff6b6b; margin-bottom: 24px; display: none; border-top: 1px dashed rgba(255,107,107,0.3); padding-top: 12px;"></p>
+      <button class="btn-main" onclick="closeFrag()">Store Memory</button>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN 1: HOME ━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <div class="screen on" id="sc-home">
+    <div class="glass-panel">
+      <div class="invite-label" style="font-family: var(--ff-m); font-size: 0.65rem; color: var(--text-d); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px;">Pre-Assessment Clearance</div>
+      <h1 class="hero-title" style="font-family: var(--ff-t); font-size: clamp(1.8rem, 5vw, 2.6rem); color: var(--gold); letter-spacing: 0.04em;">Elaris Island</h1>
+      <div class="subtitle" style="font-size: 0.9rem; color: var(--text-dm); margin-bottom: 18px;">“A weekend designed to help you escape stress forever.”</div>
+      
+      <!-- Cozy Hand Drawn Island SVG -->
+      <div class="home-banner">
+        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sky Gradient -->
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0a0a14"/>
+              <stop offset="60%" stop-color="#18182b"/>
+              <stop offset="100%" stop-color="#2c2436"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="200" fill="url(#skyGrad)" />
+          <!-- Stars -->
+          <circle cx="60" cy="30" r="1" fill="#fff" opacity="0.6"/>
+          <circle cx="180" cy="20" r="0.8" fill="#fffae8" opacity="0.8"/>
+          <circle cx="290" cy="45" r="1.2" fill="#fff" opacity="0.5"/>
+          <circle cx="340" cy="25" r="0.8" fill="#fff" opacity="0.7"/>
+          
+          <!-- Distant Mountains/Islands -->
+          <path d="M 0 160 Q 50 140 100 160 L 100 200 L 0 200 Z" fill="#0d0c16" />
+          <path d="M 300 170 Q 350 150 400 170 L 400 200 L 300 200 Z" fill="#0d0c16" />
+
+          <!-- Main Island (Hungry Hearts cozy hand-drawn layout) -->
+          <!-- Soft glow of resort -->
+          <ellipse cx="200" cy="155" rx="110" ry="32" fill="#d4af37" opacity="0.06" filter="blur(8px)"/>
+          <path d="M 90 170 C 130 145, 270 145, 310 170 C 310 185, 90 185, 90 170 Z" fill="#1b1722" stroke="#4a3b32" stroke-width="2" />
+          
+          <!-- Cozy Resort Silhouettes with warm glowing windows -->
+          <rect x="160" y="125" width="45" height="30" rx="3" fill="#120e17" stroke="#4a3b32" stroke-width="1.5" />
+          <polygon points="155,125 210,125 182,108" fill="#241b2a" stroke="#4a3b32" stroke-width="1.5" />
+          <!-- Window glow -->
+          <rect x="170" y="135" width="8" height="8" rx="1.5" fill="#f3c258" opacity="0.9" />
+          <rect x="188" y="135" width="8" height="8" rx="1.5" fill="#f3c258" opacity="0.9" />
+
+          <!-- Smaller Cabins -->
+          <rect x="120" y="140" width="22" height="18" rx="2" fill="#120e17" stroke="#4a3b32" stroke-width="1" />
+          <polygon points="117,140 145,140 131,131" fill="#241b2a" stroke="#4a3b32" stroke-width="1" />
+          <circle cx="131" cy="146" r="2.5" fill="#f3c258" />
+
+          <rect x="255" y="138" width="24" height="20" rx="2" fill="#120e17" stroke="#4a3b32" stroke-width="1" />
+          <polygon points="252,138 281,138 267,129" fill="#241b2a" stroke="#4a3b32" stroke-width="1" />
+          <circle cx="267" cy="145" r="2.5" fill="#f3c258" />
+
+          <!-- Lighthouse on cliff -->
+          <path d="M 285 170 L 295 170 L 295 105 L 285 105 Z" fill="#120e17" stroke="#4a3b32" stroke-width="1.5" />
+          <polygon points="282,105 298,105 290,95" fill="#241b2a" stroke="#4a3b32" stroke-width="1.5" />
+          <!-- Light rays -->
+          <polygon points="290,100 120,60 120,110" fill="#f3c258" opacity="0.12" />
+          <circle cx="290" cy="100" r="4" fill="#fffae8" />
+
+          <!-- Pier/Dock -->
+          <path d="M 190 175 L 190 195 L 205 195 L 205 175 Z" fill="#2e2118" stroke="#4a3b32" stroke-width="1" />
+          <line x1="193" y1="175" x2="193" y2="195" stroke="#120e17" stroke-width="1" />
+          <line x1="202" y1="175" x2="202" y2="195" stroke="#120e17" stroke-width="1" />
+
+          <!-- Water -->
+          <path d="M 0 178 C 100 172, 300 172, 400 178 L 400 200 L 0 200 Z" fill="#080710" />
+          <!-- Waves details -->
+          <path d="M 50 188 Q 120 183 190 188" fill="none" stroke="#222b40" stroke-width="1"/>
+          <path d="M 220 192 Q 290 187 360 192" fill="none" stroke="#222b40" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn-main" onclick="enterIsland()">Enter Island</button>
+        <button id="btn-home-progress" class="btn-secondary" onclick="window.location.href='admin.html'" style="display: none; background:rgba(196,164,101,0.08); border:1px solid rgba(196,164,101,0.25); color:var(--gold);">My Progress & Past Records</button>
+        <button class="btn-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN 3: NARRATIVE ━━━━━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-narrative">
+    <img src="assets/cozy_sunset_beach.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.22; pointer-events: none; z-index: -1;">
+    <div id="proj-flash" style="position: absolute; inset: 0; background: #fff; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.15s ease;"></div>
+    <div id="proj-screen" style="width: 100%; max-width: 580px; text-align: center;">
+      <div id="proj-text" style="font-family: var(--ff-m); font-size: 1.4rem; color: var(--rust); letter-spacing: 0.08em; text-transform: uppercase; margin: 40px 0; text-shadow: 0 0 15px rgba(192,71,31,0.5);"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: BEACH Mini-game ━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-beach">
+    <div class="game-panel on">
+      <h3>Beach Cleanup Panic</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 12px; color: var(--text-d);">
+        Clues remaining to collect: <span id="beach-left" style="color:var(--gold); font-weight:700;">5</span>
+      </p>
+      <div id="beach-area"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: LIGHTHOUSE Mini-game ━━━━━━━━━ -->
+  <div class="screen" id="sc-lighthouse">
+    <div class="game-panel on">
+      <h3>Lighthouse Signal Puzzle</h3>
+      <div class="divider"></div>
+      <p id="lh-inst" style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d); font-style: italic;">Watch the sequence...</p>
+      <div style="font-size: 0.75rem; color: var(--text-dm); margin-bottom: 10px;">
+        Progress: <span id="lh-step" style="color:var(--gold);">0</span> / <span id="lh-total">5</span> | Attempt: <span id="lh-attempt">1</span>
+      </div>
+      
+      <div id="lh-screen-view">
+        <div class="lh-aspect-ratio">
+          <img src="assets/bg_cliff.png" class="lh-bg-img" alt="Cliff at night">
+          <div class="lh-tower-container">
+            <img src="assets/item_lighthouse.png" class="lh-tower-img" alt="Lighthouse">
+            <div id="lh-bulb">
+              <div class="lh-beam-container">
+                <div class="lh-beam"></div>
+                <div class="lh-beam" style="animation-delay: -0.75s; transform: rotate(180deg);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lh-btns">
+        <button class="lb-btn" data-c="red"></button>
+        <button class="lb-btn" data-c="blue"></button>
+        <button class="lb-btn" data-c="green"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: CABIN ROOM Mini-game ━━━━━━━━━━ -->
+  <div class="screen" id="sc-room">
+    <div class="game-panel on">
+      <h3>Cabin 7 Investigation</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Find the item that does NOT belong. Planted evidence. (Attempt: <span id="room-attempt" style="color:var(--gold)">1</span>)
+      </p>
+      <div id="room-grid"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: BONFIRE Mini-game ━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-bonfire">
+    <div class="game-panel on">
+      <h3>The Bonfire Contradiction</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Spot the discrepancy in <span id="bonfire-npc" style="color:var(--gold); font-weight:600;">Someone</span>'s statement. (Attempt: <span id="bonfire-attempt">1</span>)
+      </p>
+      <div id="bonfire-dialogue" style="font-style: italic; margin: 18px 0; font-size: 0.95rem; color: var(--text-p); border-left: 3px solid var(--gold-d); padding-left: 14px; text-align: left;"></div>
+      <div class="bon-opts" id="bonfire-opts"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: BAGGAGE SORTING Mini-game ━━━━━━ -->
+  <div class="screen" id="sc-baggage">
+    <div class="game-panel on">
+      <h3>Baggage Sorting</h3>
+      <div class="divider"></div>
+      <p id="baggage-status" style="font-size: 0.85rem; margin-bottom: 12px; color: var(--text-d); font-style: italic;">Select owner, then select their item.</p>
+      <div id="baggage-area"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: FOREST MAZE Mini-game ━━━━━━━━━━ -->
+  <div class="screen" id="sc-forest">
+    <div class="game-panel on">
+      <h3>Forest Trail Maze</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Follow the signals. Maze Step: <span id="maze-step" style="color:var(--gold)">0/5</span> | Attempt: <span id="forest-attempt">1</span>
+      </p>
+      <canvas id="maze-canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: EVIDENCE CHALLENGE ━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-evidence">
+    <div class="game-panel on">
+      <h3>Evidence Challenge</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Identify the correct timeline matching the evidence cue. (Attempt: <span id="evi-attempt">1</span>)
+      </p>
+      <div id="evi-cue" style="font-family: var(--ff-t); color: var(--gold-l); font-size: 0.92rem; margin-top: 10px; padding: 10px; border: 1px solid rgba(196,164,101,.3); background: rgba(0,0,0,0.5);"></div>
+      <div id="evi-distraction-area" style="position:relative; width:100%; height:120px; overflow:hidden; margin: 15px 0; border-radius: 4px; background: repeating-linear-gradient(45deg, #111, #111 10px, #1a1a1a 10px, #1a1a1a 20px);">
+        <!-- Clutter will be animated here -->
+      </div>
+      <div class="bon-opts" id="evi-opts" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: CCTV Mini-game ━━━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-cctv">
+    <div class="game-panel on">
+      <h3>CCTV Server Reconstruction</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Drag and drop clips to rebuild the timeline chronologically.
+      </p>
+      <div id="cctv-status" style="font-family: var(--ff-m); font-size: 0.75rem; color: #ff6b6b; margin-bottom: 10px; text-align: center; display: none;"></div>
+      <div class="cctv-area">
+        <div id="cctv-track"></div>
+        <div id="cctv-slots"></div>
+      </div>
+      <button class="btn-main" id="cctv-check" style="margin-top: 18px; width: 100%;">Verify Timeline</button>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: STORM SHELTER Mini-game ━━━━━━━━━ -->
+  <div class="screen" id="sc-storm">
+    <div class="game-panel on">
+      <h3>The Storm Shelter</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Decode the password and input it. (Attempt: <span id="storm-attempt" style="color:var(--gold); font-weight:700;">1</span>/2)
+      </p>
+      <div id="storm-clue" style="font-family:var(--ff-m); color:var(--gold-l); letter-spacing:0.1em; margin-bottom:15px; font-size: 1.1rem;"></div>
+      <div id="storm-display" style="background:#111; border:1px solid #333; padding:10px; font-size:1.5rem; letter-spacing:8px; height:50px; display:flex; justify-content:center; align-items:center; margin-bottom:15px; border-radius:4px; font-family:monospace; color:var(--rust);"></div>
+      <div id="storm-keypad" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; max-width:240px; margin:0 auto;">
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: PATHFINDER Mini-game ━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-pathfinder">
+    <div class="game-panel on">
+      <h3>The Dock Escape Lock</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
+        Connect elements in order. <span id="pf-next" style="display:none;">1</span> (Errors: <span id="pf-errors">0</span> | Attempt: <span id="pf-attempt">1</span>)
+      </p>
+      <div id="pf-board">
+        <canvas id="pf-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: DEDUCTION BOARD ━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-deduction">
+    <div class="glass-panel" style="max-width: 660px;">
+      <h3>Deduction Board</h3>
+      <div class="divider"></div>
+      <p class="subtitle" style="margin-bottom: 15px;">Connect items that form contradictions or links. Choose a suspect to confront.</p>
+      
+      <div id="deduction-grid"></div>
+      
+      <button class="btn-main" id="accuse-btn" style="width: 100%;">Confront Suspect</button>
+      
+      <div id="accuse-form" style="display: none; margin-top: 20px;">
+        <h4 style="font-family: var(--ff-t); font-size: 0.85rem; color: var(--gold); margin-bottom: 10px;">Select Suspect</h4>
+        <div id="accuse-opts" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: RESULTS ━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-results">
+    <div class="glass-panel" style="max-width: 580px;">
+      <h3>Psychological Clearance Report</h3>
+      <div class="divider"></div>
+      
+      <div id="res-player">Dr. Priya Sharma</div>
+      
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Cognitive Accuracy</div>
+          <div class="stat-val" id="res-acc">0%</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Overall Index</div>
+          <div class="stat-val" id="res-score">0/100</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Mean Reaction</div>
+          <div class="stat-val" id="res-rt">0ms</div>
+        </div>
+      </div>
+
+      <h4 style="font-family: var(--ff-t); font-size: 0.85rem; color: var(--gold); margin-top: 15px; text-align: left;">Cognitive Profile</h4>
+      <div id="domain-bars"></div>
+
+      <h4 style="font-family: var(--ff-t); font-size: 0.85rem; color: var(--gold); margin-top: 15px; text-align: left;">Clinical Markers</h4>
+      <div id="risk-section" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;"></div>
+
+      <div id="res-accusation" style="display: none;"></div>
+      <div id="res-epilogue"></div>
+
+      <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-main" onclick="window.location.href='admin.html'">My Progress & Past Records</button>
+        <button class="btn-secondary" onclick="logout()">Log Out</button>
+        <button class="btn-secondary" onclick="resetToHome()" style="background: transparent; border: 1px solid rgba(196,164,101,0.2); color: var(--gold-d);">Re-Board Vessel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ MODAL: MAP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <div class="modal" id="modal-map">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('modal-map')">×</span>
+      <h3>Resort Node Map</h3>
+      <div class="divider"></div>
+      <div class="map-container">
+        <!-- Render Map Nodes -->
+        <!-- Center (Resort) -->
+        <div class="map-node" id="mn-Resort" style="left: 50%; top: 50%;" onclick="mapClick('Resort')">
+          🏨<span class="map-node-label">Resort</span>
+        </div>
+        <!-- Top (Cabins) -->
+        <div class="map-node" id="mn-Cabins" style="left: 50%; top: 20%;" onclick="mapClick('Cabins')">
+          🛖<span class="map-node-label">Cabins</span>
+        </div>
+        <!-- Right (Lighthouse) -->
+        <div class="map-node" id="mn-Lighthouse" style="left: 80%; top: 35%;" onclick="mapClick('Lighthouse')">
+          🔦<span class="map-node-label">Lighthouse</span>
+        </div>
+        <!-- Bottom Right (Beach) -->
+        <div class="map-node" id="mn-Beach" style="left: 75%; top: 75%;" onclick="mapClick('Beach')">
+          🏖️<span class="map-node-label">Beach</span>
+        </div>
+        <!-- Bottom Left (Dock) -->
+        <div class="map-node" id="mn-Dock" style="left: 25%; top: 75%;" onclick="mapClick('Dock')">
+          🚤<span class="map-node-label">Dock</span>
+        </div>
+        <!-- Left (Forest) -->
+        <div class="map-node" id="mn-Forest" style="left: 20%; top: 38%;" onclick="mapClick('Forest')">
+          🌲<span class="map-node-label">Forest</span>
+        </div>
+        <!-- Top Left (Shelter) -->
+        <div class="map-node" id="mn-Shelter" style="left: 20%; top: 15%;" onclick="mapClick('Shelter')">
+          🚨<span class="map-node-label">Shelter</span>
+        </div>
+        
+        <!-- SVG lines to draw links between nodes -->
+        <svg style="width:100%; height:100%; position:absolute; inset:0; pointer-events:none; z-index:0;">
+          <line x1="50%" y1="50%" x2="50%" y2="20%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="50%" y1="50%" x2="80%" y2="35%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="50%" y1="50%" x2="75%" y2="75%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="50%" y1="50%" x2="25%" y2="75%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="50%" y1="50%" x2="20%" y2="38%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="20%" y1="38%" x2="20%" y2="15%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="50%" y1="20%" x2="20%" y2="15%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="80%" y1="35%" x2="75%" y2="75%" stroke="rgba(196,164,101,0.18)" stroke-width="1.5" stroke-dasharray="4,4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ MODAL: FILES DOSSIER ━━━━━━━━━━━━━━━━━━ -->
+  <div class="modal" id="modal-cf">
+    <div class="modal-content" style="max-width: 580px;">
+      <span class="modal-close" onclick="closeModal('modal-cf')">×</span>
+      <h3>Case File Dossier</h3>
+      <div class="divider"></div>
+      
+      <div class="book-container">
+        <div class="book-card" id="cf-book-card">
+          <!-- Dynamically populated via JS page-flipping -->
+        </div>
+      </div>
+      
+      <div class="book-nav">
+        <button class="book-nav-btn" onclick="prevDossierPage()">← Previous Profile</button>
+        <div style="font-family: var(--ff-m); font-size: 0.7rem; color: var(--text-d);"><span id="cf-page-num">1</span> / <span id="cf-page-total">10</span></div>
+        <button class="book-nav-btn" onclick="nextDossierPage()">Next Profile →</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ MODAL: EVIDENCE ━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <div class="modal" id="modal-evidence">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('modal-evidence')">×</span>
+      <h3>Evidence Bag</h3>
+      <div class="divider"></div>
+      <div id="evidence-list">
+        <!-- Evidence populated here dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ MODAL: EXIT CONFIRM ━━━━━━━━━━━━━━━━━━━ -->
+  <div class="modal" id="modal-exit-confirm">
+    <div class="modal-content" style="max-width: 420px;">
+      <h3>Board Return Vessel?</h3>
+      <div class="divider"></div>
+      <p style="font-size: 0.9rem; margin-bottom: 20px; color: var(--text-d);">
+        Are you sure you want to exit the assessment mid-way? Your withdrawal will be noted in clinical profiles.
+      </p>
+      <div class="exit-choice-row">
+        <button class="btn-main" onclick="exitConfirmed()" style="background: var(--rust); color: #fff;">Yes, Flee Island</button>
+        <button class="btn-secondary" onclick="closeModal('modal-exit-confirm')">Abort Escape</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCRIPTS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      const errStr = `ERROR: ${message} at ${source}:${lineno}:${colno}\n${error ? error.stack : ''}`;
+      fetch('/api/log-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: errStr })
+      }).catch(e => {});
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    //   ELARIS ISLAND — FULL GAME ENGINE v2
+    //   "And Then There Were None" × Cognitive Assessment
+    // ═══════════════════════════════════════════════════════════════
+
+    const $ = id => document.getElementById(id);
+    const SFX = (() => {
+      let ctx = null;
+      const init = () => { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); };
+      const tone = (freq, type='sine', dur=0.18, vol=0.22, delay=0) => {
+        init();
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(0, ctx.currentTime + delay);
+        g.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+        o.start(ctx.currentTime + delay);
+        o.stop(ctx.currentTime + delay + dur + 0.05);
+      };
+      const noise = (dur=0.1, vol=0.15) => {
+        init();
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i=0;i<data.length;i++) data[i]=Math.random()*2-1;
+        const s = ctx.createBufferSource(), g = ctx.createGain();
+        s.buffer = buf; s.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(vol, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        s.start();
+      };
+      return {
+        success: () => { tone(440,'sine',.1,.2); tone(660,'sine',.15,.18,.1); },
+        fail:    () => { tone(200,'sawtooth',.25,.2); },
+        click:   () => tone(800,'sine',.06,.1),
+        pickup:  () => { tone(600,'sine',.08,.15); tone(900,'sine',.1,.12,.07); },
+        horror:  () => { tone(80,'sawtooth',.8,.25); tone(60,'sawtooth',.9,.2,.1); },
+        ambient: () => { for(let i=0;i<4;i++) tone(220+i*30,'sine',1.5,.04,i*.4); },
+        scream:  () => { noise(.3,.3); tone(300,'sawtooth',.5,.2,.1); },
+        fragment:() => { tone(523,'sine',.2,.15); tone(659,'sine',.25,.12,.15); tone(784,'sine',.3,.1,.3); },
+        morse:   () => tone(800,'square',.08,.15),
+        drag:    () => tone(400,'sine',.05,.08),
+        alarm:   () => { tone(880,'square',.1,.2); tone(660,'square',.1,.2,.12); }
+      };
+    })();
+
+    const TTS = (() => {
+      return {
+        say: (text, pitch=1, rate=0.88) => { /* AI disabled per user request */ },
+        stop: () => { /* AI disabled */ }
+      };
+    })();
+
+    // ─ GAME STATE ─────────────────────────────────────────────────
+    const GS = {
+      playerName:'', playerRole:'', playerIcon:'',
+      score:0, rtSamples:[], correctCount:0, attemptCount:0,
+      domains:{ attention:0, recognition:0, processingSpeed:0, workingMemory:0, decisionMaking:0, cognitiveFlexibility:0, errorMonitoring:0, persistence:0, distractionResistance:0, multitasking:0 },
+      telemetry: { hesitanceIndex: 0, timelineReferenceRate: 0, sequenceDistanceError: 0, targetFilterEfficiency: 0, matchErrorRate: 0 },
+      fragments:Array(10).fill(false),
+      dass:{ depression:[], anxiety:[], stress:[] },
+      dassRaw:[], // stores {q,val,scale}
+      murderer:'', victim:'',
+      npcs:[],
+      moduleIdx:0,
+      moduleScores:Array(10).fill(0),
+      sessionStart: Math.floor(Date.now() / 1000),
+      gameActive: false
+    };
+
+    // ─ DATA ───────────────────────────────────────────────────────
+    const IDENTITIES = [
+      {id:'doctor',  icon:'🩺', name:'Dr. Priya Sharma',   role:'Burned-out Cardiologist', trait:'Methodical · Overworked', pitch:1.1, rate:.86, details:'Dr. Priya Sharma, cardiologist. Hired to consult on pilot health studies. Overworked, methodical, carrying deep-seated anxiety about a past clinical failure.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Attended welcome dinner.<br>• <strong>8:45 PM - 10:15 PM:</strong> Logged into medical portal from Cabin 3 (Verified by router connection log).<br>• <strong>10:30 PM - Midnight:</strong> Reviewing offline patient case records in Cabin 3 (Confirmed by local file-open timestamp).</div>', image:'assets/portrait_emily_1780832277768.png'},
+      {id:'ceo',     icon:'💼', name:'Marcus Chen',        role:'Workaholic Tech CEO',     trait:'Decisive · Under Pressure', pitch:.95, rate:.92, details:'Marcus Chen, tech company executive. Decisive, aggressive under investor pressure. Hired resort for private research trials.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Welcome dinner in Main Dining Hall.<br>• <strong>8:45 PM - 10:30 PM:</strong> Sent 14 emails from the lobby lounge (Verified by corporate mail server timestamp).<br>• <strong>10:45 PM:</strong> Returned to Cabin 1 (Verified by electronic door lock).</div>', image:'assets/portrait_philip_1780832251248.png'},
+      {id:'musician',icon:'🎵', name:'Elena Voss',         role:'Grieving Musician',       trait:'Perceptive · Emotional', pitch:1.15, rate:.84, details:'Elena Voss, classical violinist. Perceptive and highly emotional. Investigating the circumstances surrounding her sister\'s sudden withdrawal from an island project.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Left welcome dinner early.<br>• <strong>8:30 PM - 9:45 PM:</strong> Walked along South Cliffs (Witnessed by security patrol officer).<br>• <strong>10:00 PM:</strong> Returned to Cabin 5 (Verified by entrance lock registry).</div>', image:'assets/portrait_vera_1780832238588.png'},
+      {id:'student', icon:'📚', name:'Zara Okonkwo',       role:'Perfectionist Student',   trait:'Detail-Oriented · Anxious', pitch:1.2, rate:.9, details:'Zara Okonkwo, postgraduate research student. Highly anxious, obsessive attention to detail. Searching for unpublished papers from a previous study.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Welcome dinner (Left dining hall at 8:15 PM).<br>• <strong>8:30 PM - 10:30 PM:</strong> In resort Library room reading reference logs (Verified by library surveillance check).<br>• <strong>10:45 PM:</strong> Returned to Cabin 6.</div>', image:'assets/portrait_general_1780832290626.png'},
+      {id:'comedian',icon:'🎤', name:'Rory Walsh',         role:'Nervous Comedian',        trait:'Quick Wit · Distracted', pitch:1.05, rate:.95, details:'Rory Walsh, stand-up comedian. Anxious and easily startled. Uses comedy to mask panic. Admits to seeing someone near the server room.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Main welcome dinner.<br>• <strong>8:45 PM - 10:30 PM:</strong> Played arcade games in the resort lounge (Verified by high-score server logs).<br>• <strong>10:45 PM:</strong> Returned to Cabin 8.</div>', image:'assets/portrait_general_1780832290626.png'},
+      {id:'detective',icon:'🔍',name:'Ret. Det. Frank Silva',role:'Retired Detective',     trait:'Sharp · Methodical', pitch:.9, rate:.85, details:'Ret. Det. Frank Silva, investigator. Cynical and extremely observant. Noted suspicious digital server activities prior to the power outage.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:00 PM:</strong> Briefly attended welcome dinner.<br>• <strong>8:15 PM - 10:00 PM:</strong> Checked security perimeter gates (Confirmed by staff radio log).<br>• <strong>10:15 PM:</strong> Returned to Cabin 9 (Verified by security cabin badge logs).</div>', image:'assets/portrait_william_1780832265198.png'}
+    ];
+
+    const NPCS_BASE = [
+      {id:'rowan', icon:'🛎️', name:'Rowan Ashford', role:'Resort Host · Ex-Researcher', color:'#c4a465', x:'12%', alive:true, speak_pitch:.9, speak_rate:.82, details:'Rowan Ashford, resort host. Ex-Researcher who left the mainland three years ago after a confidential experiment was shut down.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>6:30 PM - 8:00 PM:</strong> Hosted dinner service.<br>• <strong>8:15 PM - 9:30 PM:</strong> Conducted inventory audit in main pantry (Verified by kitchen assistant sign-off sheet).<br>• <strong>10:00 PM:</strong> Closed main office (Verified by office card lock).</div>', image:'assets/portrait_rowan_1780832160368.png'},
+      {id:'mia',   icon:'📱', name:'Mia Lacroix',  role:'Social Media Influencer',     color:'#c0471f', x:'72%', alive:true, speak_pitch:1.2, speak_rate:.95, details:'Mia Lacroix, social media influencer. Perceptive but self-centered, constantly filming. Verified device logs show her phone battery depleted completely at 9:30 PM; no charger was found in her belongings.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Took photos at the beach dock.<br>• <strong>9:00 PM - 9:30 PM:</strong> Started livestream from room (Verified by bandwidth spike).<br>• <strong>9:30 PM:</strong> Phone battery died (Zero connection logs or data packets after 9:40 PM).</div>', image:'assets/portrait_mia_1780832174257.png'},
+      {id:'james', icon:'🧠', name:'Dr. James Okoro', role:'Neuropsychologist',        color:'#3a6fbf', x:'22%', alive:true, speak_pitch:1.0, speak_rate:.86, details:'Dr. James Okoro, neuropsychologist. Methodical, strict, researching cognitive degradation under stress. Signed a confidentiality agreement with Rowan Ashford before arriving.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:00 PM:</strong> Spa room meditation session (Verified by Spa electronic lock log).<br>• <strong>10:17 PM:</strong> Returned to Cabin 4 (RFID badge reader recorded entry tap).<br>• <strong>10:20 PM - Midnight:</strong> Offline inside Cabin 4 (No local network traffic).</div>', image:'assets/portrait_james_1780832187054.png'},
+      {id:'kai',   icon:'🎮', name:'Kai Tanaka',   role:'Game Streamer',               color:'#2e9a78', x:'78%', alive:true, speak_pitch:1.05, speak_rate:.93, details:'Kai Tanaka, game streamer. High energy, loves puzzles, mystery games, and exploring off-limit zones.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:45 PM - 8:45 PM:</strong> Explored the beach perimeter.<br>• <strong>9:00 PM - 10:15 PM:</strong> Inventory audit at the escape vessel dock (Verified by digital dock logs).<br>• <strong>10:30 PM:</strong> Returned to Cabin 2 (Verified by cabin access log).</div>', image:'assets/portrait_kai_1780832200618.png'},
+      {id:'sofia', icon:'🍳', name:'Sofia Reyes',  role:'Resort Chef',                 color:'#6a3a9a', x:'50%', alive:true, speak_pitch:1.1, speak_rate:.88, details:'Sofia Reyes, resort chef. Quiet, works long hours in the kitchen. Staff contract shows hire date: May 12, 2026 (1 month ago). Verified kitchen logs show she cleaned stoves until 9:00 PM.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>May 12, 2026:</strong> Signed 6-month contract.<br>• <strong>7:00 PM - 8:00 PM:</strong> Supervised kitchen dinner service cleanup.<br>• <strong>8:00 PM - 9:00 PM:</strong> Cleaning kitchen stoves (Verified by shift manager log).<br>• <strong>9:15 PM:</strong> Retired to Staff Quarters (Verified by badge reader tap).</div>', image:'assets/portrait_sofia_1780832213248.png'},
+    ];
+
+    const MEMORY_FRAGMENTS = [
+      { text:'"This wasn\'t supposed to happen.\nWe only agreed to collect data."\n\n[Voice recording. Speaker unknown. Dated: 3 years ago.]', clue:'The murder is connected to a past experiment. Not everyone is telling the truth.' },
+      { text:'"Meeting moved to private channel.\nNobody else can know.\n—J.O. / R.A."\n\n[Encrypted email fragment. Two surnames partially visible.]', clue:'Two guests were secretly communicating before arriving on Elaris.' },
+      { text:'"I recognized someone the moment I arrived.\nI don\'t know if they recognised me back."\n\n[Diary page. Handwriting matches the victim.]', clue:'Some guests already knew each other. The connections predate this trip.' },
+      { text:'"You promised nobody would find out."\n"I never promised that. I promised it would be controlled."\n\n[Argument. Voices recorded by resort system.]', clue:'The conspiracy is larger than one person. Multiple parties are implicated.' },
+      { text:'[Suitcase contents: photographs, contracts, prescription bottles.]\n\nOne photograph shows a group of twelve. Five faces match guests here.', clue:'Someone has been stealing evidence — and carrying it.' },
+      { text:'[Security footage: 3:14 AM. A figure deletes files from the data server. The monitor displays: PROJECT ECHO — PARTICIPANT DATA.]', clue:'Evidence was intentionally destroyed. The project name: ECHO.' },
+      { text:'"If the ECHO data gets out, we\'re finished. All of us. Not just you."\n\n[Audio fragment. At least three distinct voices.]', clue:'Multiple people benefited from hiding the ECHO results. Multiple people are at risk.' },
+      { text:'[CCTV reconstruction shows a meeting. Five guests present. Only three admit attending the 11 PM session in the boardroom.]', clue:'Several guests are lying about their whereabouts. Verify the timeline.' },
+      { text:'[Final pages of PROJECT ECHO report]\n\n"Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed. Study was never published."\n\n[Signed: R.A., J.O.]', clue:'The island experiment harmed real people. The initials match two guests here now.' },
+      { text:'"I came back to destroy the evidence.\nBut when I saw who else was here — I realized the evidence is them."\n\n[Final recording. Identity confirmed by voice analysis.]', clue:'The truth was silenced. The killer wanted to bury Project Echo.' }
+    ];
+
+    // DASS-21 Items covertly woven into NPC dialogue choices
+    // Scale: 0=did not apply, 1=sometimes, 2=often, 3=almost always
+    const DASS_ITEMS = [
+      // Depression (D)
+      { scale:'D', q:"How has the island been treating you? Honestly.", opts:["Couldn't find any pleasure in things I used to enjoy","Things felt pointless — hard to get motivated","I felt down, but pushed through","I'm doing all right, actually"], vals:[3,2,1,0] },
+      { scale:'D', q:"This whole situation — do you feel like you can handle it?", opts:["I feel like I'm going under","I can't see a way forward at all","It's hard, but I'm managing","I think I can figure this out"], vals:[3,2,1,0] },
+      { scale:'D', q:"What's your gut feeling about getting off this island?", opts:["I feel like there's no future worth going back to","Honestly, nothing feels real anymore","I'm worried, but I still hope","I believe we'll get out"], vals:[3,2,1,0] },
+      // Anxiety (A)
+      { scale:'A', q:"Have you felt anything physically — tightness, panic?", opts:["My heart was racing for no clear reason","I had trembling or shaking I couldn't explain","I felt tense but nothing physical","I've been okay physically"], vals:[3,2,1,0] },
+      { scale:'A', q:"Walking through this resort — how does it feel?", opts:["I was aware of dryness in my mouth, sweat on my palms","I felt terrifyed without knowing why","On edge, but in control","Cautious — that's all"], vals:[3,2,1,0] },
+      { scale:'A', q:"When something unexpected happens here, what's your reaction?", opts:["I feel like I'm about to fall apart completely","I panic before I can think","I startle, but recover quickly","I take a breath and assess"], vals:[3,2,1,0] },
+      // Stress (S)
+      { scale:'S', q:"How easy is it to wind down after something tense?", opts:["I find it impossible to relax at all","I feel persistently wound up inside","I can relax but it takes a while","I decompress fairly easily"], vals:[3,2,1,0] },
+      { scale:'S', q:"Little things — how are they landing for you?", opts:["I over-react to small things and can't stop it","I feel impatient, irritable — more than usual","Minor frustrations bother me but pass","Small things roll off me mostly"], vals:[3,2,1,0] },
+      { scale:'S', q:"Since arriving, how has your energy and focus been?", opts:["I've been in a state of high-alert the whole time","Hard to wind down — mind keeps racing","I'm fatigued but pushing through","My focus is intact — I'm adapting"], vals:[3,2,1,0] },
+    ];
+
+    const MODULES_DATA = [
+      {id:'beach',      title:'The Shoreline',    icon:'🏖️', loc:'Beach',      intro:'Footprints lead from the body toward the treeline. A storm is coming. Collect the evidence before the tide destroys everything.', task:'Search the shore — react quickly', hint:'Look for 5 clues scattered across the beach sand: a keycard, a footprint, a match, a locket, and a wine bottle. Ignore the other debris. Ensure you only select these specific items.'},
+      {id:'lighthouse', title:'The Lighthouse',   icon:'🔦', loc:'Lighthouse', intro:'The lighthouse is flashing unusual coded signals. The keeper vanished. Someone changed the sequence after the murder.',task:'Decode the pattern — repeat it exactly', hint:'Watch the colored light signals flashing from the lighthouse lantern. Replicate the sequence exactly by tapping the colored buttons below.'},
+      {id:'room',       title:'Cabin 7',          icon:'🚪', loc:'Resort',     intro:"The victim's room has been searched. One object doesn't belong — planted by whoever was here last.", task:'Identify the intruder object', hint:'Investigate the items in the cabin room. One of these items is an intruder that does not belong to the victim. Select it to log as evidence.'},
+      {id:'bonfire',    title:'The Bonfire',      icon:'🔥', loc:'Beach',      intro:"Every guest has a story. At the bonfire, the stories don't match. One person slipped a contradiction into their alibi.", task:'Spot the logical contradiction', hint:'Open the Case Files Dossier (by clicking FILES in the header) to review the suspect\'s verified timeline. Compare their statement at the bonfire to identify and click the phrase that contradicts the official files.'},
+      {id:'baggage',    title:'Lost Baggage',     icon:'🧳', loc:'Dock',       intro:"The storm scattered luggage across the resort. Worse — someone swapped items. Restore order before more evidence is lost.", task:'Match owners to their belongings', hint:'Review character occupations in the Case Files. Select a character owner first, then select their professional belonging to pair them.'},
+      {id:'forest',     title:'The Forest Trail', icon:'🌲', loc:'Forest',     intro:'A witness claims to have seen a figure running through the forest. But the paths keep changing. Someone rerouted them.', task:'Follow the correct path through shifting signs', hint:'To escape the looping trees, follow the path: walk forward to start, turn right at the mossy trunk, head left past the deep roots, turn back when the path darkens, then push forward to the clearing.'},
+      {id:'evidence',   title:'Evidence Challenge', icon:'📂', loc:'Resort',     intro:"The main server contains encrypted timeline fragments corrupted by visual noise. Decrypt the files before they are wiped.", task:'Match glitched logs with FILES Dossier', hint:'Read the corrupted character log. Open the FILES Dossier in the HUD, check the corresponding character\'s verified timeline, and select the option that correctly decrypts the missing value.'},
+      {id:'cctv',       title:'Server Room',      icon:'📼', loc:'Resort',     intro:"The CCTV server was damaged — files scrambled. Piece together the footage timeline to establish who was where.", task:'Restore the footage sequence', hint:'Drag and drop the security clips into chronological order from Dinner (early evening) to Alarms (midnight) to restore the server logs.'},
+      {id:'storm',      title:'The Storm Shelter', icon:'🚨', loc:'Forest',     intro:"The storm is at full strength. Power systems are failing. Decode clues to discover a password, then input the numbers on a server panel to restore the CCTV system under emergency sirens.", task:'Decode password and input on keypad', hint:'Read the decoding clue on the screen. Click on the FILES Dossier in the HUD, navigate to the correct suspect\'s profile to find their verified timeline logs, and enter the MMDD or HHMM code into the security keypad.'},
+      {id:'pathfinder', title:'The Dock',         icon:'🚤', loc:'Dock',       intro:"The escape boat has been found — but the ignition lock is a sequence puzzle. Someone sabotaged it. This is the last chance.", task:'Complete the sequence under pressure', hint:'Tap the nodes in the exact alpha-numeric sequence: 1, 2, 3, A, 4, B, 5, C, 6, D. Avoid errors to unlock the ignition sequence.'},
+    ];
+
+    // ─ BACKGROUND ─────────────────────────────────────────────────
+    function initBG() {
+      const c = $('bg-canvas'), ctx = c.getContext('2d');
+      let W, H, stars=[], frame=0;
+      const resize = () => {
+        W=c.width=window.innerWidth; H=c.height=window.innerHeight;
+        stars = Array.from({length:140}, () => ({x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.6+.2, a:Math.random(), s:Math.random()*.4+.05}));
+      };
+      window.addEventListener('resize', resize); resize();
+      (function loop(){
+        ctx.fillStyle='#050508'; ctx.fillRect(0,0,W,H);
+        const g=ctx.createLinearGradient(0,H*.55,0,H); g.addColorStop(0,'transparent'); g.addColorStop(1,'rgba(15,25,50,.55)');
+        ctx.fillStyle=g; ctx.fillRect(0,H*.55,W,H);
+        for(let i=0;i<3;i++){
+          ctx.beginPath();
+          for(let x=0;x<=W;x++){const y=H*.78+Math.sin((x+frame*(i+1)*.35)*.013)*(7+i*5)+i*14; x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+          ctx.strokeStyle=`rgba(58,111,191,${0.07-i*.015})`; ctx.lineWidth=1.5; ctx.stroke();
+        }
+        stars.forEach(s=>{s.a+=s.s*.01; const a=(Math.sin(s.a)+1)/2; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(240,226,184,${a*.65})`; ctx.fill();});
+        frame++; requestAnimationFrame(loop);
+      })();
+    }
+
+    // ─ CHARACTER RENDERING ────────────────────────────────────────
+    function makeSVGChar(npc, speaking=false) {
+      const c = npc.color || '#c4a465';
+      const lipAnim = speaking ? 'class="lip-anim"' : '';
+      
+      let hair = '';
+      let clothes = '';
+      let skin = '#ffe0cc'; // Nostalgic, warmer skin
+      let stroke = '#4a3b32'; // Soft warm outline
+      
+      if (npc.id === 'rowan') {
+        hair = `<path d="M 25 50 Q 25 25 50 25 Q 75 25 75 50 Z" fill="#e6d5c3" stroke="${stroke}" stroke-width="2"/><path d="M 30 35 Q 50 25 70 35" fill="none" stroke="#d4c0ab" stroke-width="2"/>`;
+        clothes = `<path d="M 30 85 L 35 120 L 65 120 L 70 85 Z" fill="#4a5d4e" stroke="${stroke}" stroke-width="2"/><path d="M 25 120 L 75 120 L 75 130 L 25 130 Z" fill="#e0dac8" stroke="${stroke}" stroke-width="2"/>`;
+      } else if (npc.id === 'mia') {
+        hair = `<path d="M 20 60 Q 20 20 50 20 Q 80 20 80 60 Q 80 80 70 80 Q 75 60 50 30 Q 25 60 30 80 Q 20 80 20 60 Z" fill="#4a2522" stroke="${stroke}" stroke-width="2"/>`;
+        clothes = `<path d="M 35 85 L 30 130 L 70 130 L 65 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 40 85 L 50 110 L 60 85 Z" fill="#fff" stroke="${stroke}" stroke-width="1.5"/>`;
+      } else if (npc.id === 'james') {
+        hair = `<path d="M 25 45 Q 25 25 50 25 Q 75 25 75 45 Q 70 35 50 35 Q 30 35 25 45 Z" fill="#3a3a3a" stroke="${stroke}" stroke-width="2"/>`;
+        clothes = `<path d="M 32 85 L 35 130 L 65 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><circle cx="42" cy="55" r="7" fill="none" stroke="${stroke}" stroke-width="1.5"/><circle cx="58" cy="55" r="7" fill="none" stroke="${stroke}" stroke-width="1.5"/><line x1="49" y1="55" x2="51" y2="55" stroke="${stroke}" stroke-width="1.5"/>`;
+      } else if (npc.id === 'kai') {
+        hair = `<path d="M 25 55 Q 20 20 50 20 Q 80 20 75 55 Q 65 35 50 35 Q 35 35 25 55 Z" fill="#2a2c33" stroke="${stroke}" stroke-width="2"/><path d="M 18 45 A 8 15 0 0 0 28 45 Z" fill="#e84545" stroke="${stroke}" stroke-width="2"/><path d="M 72 45 A 8 15 0 0 1 82 45 Z" fill="#e84545" stroke="${stroke}" stroke-width="2"/><path d="M 23 35 Q 50 10 77 35" fill="none" stroke="#444" stroke-width="4"/>`;
+        clothes = `<path d="M 30 80 Q 25 100 30 130 L 70 130 Q 75 100 70 80 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 40 95 L 60 95 L 50 110 Z" fill="rgba(255,255,255,0.2)"/>`;
+      } else if (npc.id === 'sofia') {
+        hair = `<circle cx="50" cy="25" r="12" fill="#6a4a3a" stroke="${stroke}" stroke-width="2"/><path d="M 25 50 Q 25 20 50 20 Q 75 20 75 50 Z" fill="#6a4a3a" stroke="${stroke}" stroke-width="2"/>`;
+        clothes = `<path d="M 32 85 L 32 130 L 68 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 35 100 L 35 130 L 65 130 L 65 100 Z" fill="#fff" stroke="${stroke}" stroke-width="2"/>`;
+      } else {
+        hair = `<path d="M 25 50 Q 25 25 50 25 Q 75 25 75 50 Z" fill="#4a3520" stroke="${stroke}" stroke-width="2"/>`;
+        clothes = `<path d="M 32 85 L 35 130 L 65 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/>`;
+      }
+
+      return `<svg class="char-svg" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="bg${npc.id}" cx="50%" cy="50%"><stop offset="0%" stop-color="${c}" stop-opacity=".4"/><stop offset="100%" stop-color="${c}" stop-opacity="0"/></radialGradient></defs>
+        
+        <!-- Floor Shadow -->
+        <ellipse cx="50" cy="145" rx="35" ry="10" fill="url(#bg${npc.id})"/>
+        <ellipse cx="50" cy="145" rx="20" ry="6" fill="rgba(0,0,0,0.3)"/>
+
+        <!-- Legs -->
+        <rect x="38" y="125" width="8" height="20" rx="3" fill="#3a2b22" stroke="${stroke}" stroke-width="2"/>
+        <rect x="54" y="125" width="8" height="20" rx="3" fill="#3a2b22" stroke="${stroke}" stroke-width="2"/>
+        <!-- Shoes -->
+        <ellipse cx="42" cy="145" rx="8" ry="6" fill="#221a15" stroke="${stroke}" stroke-width="2"/>
+        <ellipse cx="58" cy="145" rx="8" ry="6" fill="#221a15" stroke="${stroke}" stroke-width="2"/>
+
+        <!-- Body Base (Clothes) -->
+        ${clothes}
+
+        <!-- Arms Outline -->
+        <path d="M 32 85 Q 18 100 24 120" fill="none" stroke="${stroke}" stroke-width="14" stroke-linecap="round"/>
+        <path d="M 68 85 Q 82 100 76 120" fill="none" stroke="${stroke}" stroke-width="14" stroke-linecap="round"/>
+        <!-- Arms Fill -->
+        <path d="M 32 85 Q 18 100 24 120" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+        <path d="M 68 85 Q 82 100 76 120" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+
+        <!-- Hands -->
+        <circle cx="24" cy="120" r="7" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+        <circle cx="76" cy="120" r="7" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+
+        <!-- Neck -->
+        <rect x="44" y="75" width="12" height="15" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+
+        <!-- Head Base -->
+        <ellipse cx="50" cy="55" rx="32" ry="28" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+        
+        <!-- Blush -->
+        <ellipse cx="28" cy="62" rx="5" ry="3" fill="#ff8a8a" opacity="0.45"/>
+        <ellipse cx="72" cy="62" rx="5" ry="3" fill="#ff8a8a" opacity="0.45"/>
+
+        <!-- Eyes (Big Chibi Eyes) -->
+        <ellipse cx="33" cy="55" rx="4.5" ry="6" fill="#1a1510"/>
+        <ellipse cx="67" cy="55" rx="4.5" ry="6" fill="#1a1510"/>
+        <circle cx="34" cy="53" r="1.5" fill="#fff"/>
+        <circle cx="68" cy="53" r="1.5" fill="#fff"/>
+
+        <!-- Mouth & Lip Sync Anim -->
+        <path d="M 46 68 Q 50 71 54 68" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round"/>
+        <g ${lipAnim}><rect x="46" y="69" width="8" height="3" rx="1.5" fill="${speaking?'#c0471f':'transparent'}"/></g>
+
+        <!-- Hair Overlay -->
+        ${hair}
+      </svg>`;
+    }
+
+    let activeChars = {};
+    function showChar(npcId, message, speak=true) {
+      const npc = GS.npcs.find(n=>n.id===npcId) || NPCS_BASE.find(n=>n.id===npcId) || IDENTITIES.find(i=>i.id===npcId);
+      if (!npc) return;
+      const stage = $('char-stage');
+      stage.classList.add('on');
+      // Remove old
+      Object.values(activeChars).forEach(el => { el.classList.remove('enter'); setTimeout(()=>{if(el.parentElement)el.remove();},600); });
+      activeChars = {};
+      const wrap = document.createElement('div');
+      wrap.className = 'char-wrap';
+      wrap.style.left = npc.x || '50%';
+      if(!npc.x) {
+        wrap.style.transform = 'translate(-50%, 180px)';
+      }
+      const bubble = message ? `<div class="char-bubble"><span class="char-name">${npc.name}</span>${message}</div>` : '';
+      
+      // Use sketch image from assets folder instead of SVG
+      const portraitImg = npc.image || 'assets/portrait_general_1780832290626.png';
+      wrap.innerHTML = bubble + `<img class="char-sketch-img" src="${portraitImg}" style="width: 140px; height: 160px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));" onerror="this.src='assets/portrait_general_1780832290626.png'">`;
+      
+      stage.appendChild(wrap);
+      activeChars[npcId] = wrap;
+      requestAnimationFrame(()=>{ 
+        if(!npc.x) {
+          wrap.style.transform = 'translate(-50%, 0)';
+        }
+        wrap.classList.add('enter'); 
+      });
+      if (speak && message) {
+        const plain = message.replace(/<[^>]+>/g,'');
+        TTS.say(plain, npc.speak_pitch || 1, npc.speak_rate || .88);
+      }
+      return wrap;
+    }
+
+    function hideChars() {
+      const stage = $('char-stage');
+      const keys = Object.keys(activeChars);
+      if (keys.length === 0) {
+        if (stage) stage.classList.remove('on');
+      } else {
+        let count = 0;
+        Object.values(activeChars).forEach(el => {
+          el.classList.remove('enter');
+          setTimeout(()=>{
+            if(el.parentElement) el.remove();
+            count++;
+            if (count === keys.length) {
+              if (stage) stage.classList.remove('on');
+            }
+          }, 600);
+        });
+      }
+      activeChars = {};
+      TTS.stop();
+    }
+
+    // ─ DIALOG ENGINE ─────────────────────────────────────────────
+    let dialogQueue = [], dialogCallback = null, dialogTyping = false, dialogFull = '';
+    let typewriteInterval = null;
+    let dialogCooldown = false;
+
+    function typewrite(text, speed=28, cb) {
+      if (typewriteInterval) {
+        clearInterval(typewriteInterval);
+        typewriteInterval = null;
+      }
+      const el = $('dialog-text');
+      $('dialog-cursor').style.display = 'inline-block';
+      dialogFull = text; dialogTyping = true;
+      let i=0; el.textContent='';
+      typewriteInterval = setInterval(()=>{
+        if(!dialogTyping){
+          clearInterval(typewriteInterval);
+          typewriteInterval = null;
+          el.textContent=text;
+          $('dialog-cursor').style.display='none';
+          if(cb) cb();
+          return;
+        }
+        el.textContent += text[i++];
+        if(i>=text.length){
+          clearInterval(typewriteInterval);
+          typewriteInterval = null;
+          $('dialog-cursor').style.display='none';
+          dialogTyping=false;
+          if(cb) cb();
+        }
+      }, speed);
+    }
+
+    function showDialog(speakerName, text, choices, cb, npcId=null) {
+      const hud = $('hud');
+      if (hud) hud.style.pointerEvents = 'auto';
+      document.querySelectorAll('.screen').forEach(s => s.style.pointerEvents = 'none');
+
+      dialogCooldown = true;
+      setTimeout(() => { dialogCooldown = false; }, 300);
+
+      $('dialog-box').classList.add('on');
+      $('dialog-speaker').textContent = speakerName.toUpperCase();
+      $('dialog-next').style.display = choices && choices.length ? 'none' : 'block';
+      $('dialog-choices').innerHTML = '';
+      dialogCallback = cb;
+      if (npcId) showChar(npcId, null, false); // show char without bubble
+      typewrite(text, 26, ()=>{
+        if (choices && choices.length) {
+          choices.forEach((ch, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-choice';
+            btn.textContent = ch.text;
+            btn.onclick = () => {
+              SFX.click();
+              document.querySelectorAll('.btn-choice').forEach(b=>b.style.pointerEvents='none');
+              btn.classList.add('picked');
+              if (ch.dass) recordDASS(ch.dass.scale, ch.dass.val, ch.dass.q);
+              setTimeout(()=>{ closeDialog(); if(ch.cb) ch.cb(); else if(cb) cb(i, ch); }, 500);
+            };
+            $('dialog-choices').appendChild(btn);
+          });
+        }
+      });
+      if (npcId) TTS.say(text, GS.npcs.find(n=>n.id===npcId)?.speak_pitch||1, GS.npcs.find(n=>n.id===npcId)?.speak_rate||.88);
+    }
+
+    function closeDialog() {
+      $('dialog-box').classList.remove('on');
+      $('dialog-next').style.display='none';
+      hideChars();
+      TTS.stop();
+
+      dialogTyping = false;
+      dialogCooldown = false;
+      if (typewriteInterval) {
+        clearInterval(typewriteInterval);
+        typewriteInterval = null;
+      }
+
+      const hud = $('hud');
+      if (hud) hud.style.pointerEvents = 'auto';
+      document.querySelectorAll('.screen').forEach(s => s.style.pointerEvents = 'auto');
+    }
+
+    window.dialogNext = () => {
+      if (dialogCooldown) return;
+      if (dialogTyping) { dialogTyping=false; $('dialog-text').textContent=dialogFull; return; }
+      if (dialogCallback) { const cb=dialogCallback; dialogCallback=null; closeDialog(); cb(); }
+      else closeDialog();
+    };
+
+    // ─ DASS RECORDING ─────────────────────────────────────────────
+    function recordDASS(scale, val, q) {
+      GS.dassRaw.push({scale, val, q});
+      let fullScale = scale;
+      if (scale === 'D' || scale === 'depression') fullScale = 'depression';
+      else if (scale === 'A' || scale === 'anxiety') fullScale = 'anxiety';
+      else if (scale === 'S' || scale === 'stress') fullScale = 'stress';
+
+      if (!GS.dass[fullScale]) GS.dass[fullScale] = [];
+      GS.dass[fullScale].push(val);
+
+      if (scale === 'D' || scale === 'A' || scale === 'S') {
+        if (!GS.dass[scale]) GS.dass[scale] = [];
+        GS.dass[scale].push(val);
+      }
+    }
+
+
+
+    // ─ FRAGMENT SYSTEM ────────────────────────────────────────────
+    function buildFragDots() {
+      const c = $('frag-dots');
+      c.innerHTML = '';
+      for(let i=0;i<10;i++){
+        const d=document.createElement('div');
+        d.className='frag-dot'; d.id='frag-dot-'+i;
+        c.appendChild(d);
+      }
+    }
+
+    function revealFragment(idx, correct, cb) {
+      const hud = $('hud');
+      if (hud) hud.style.pointerEvents = 'none';
+      SFX.fragment();
+      GS.fragments[idx] = true;
+      const dot = $('frag-dot-'+idx);
+      if (dot) { dot.classList.add('lit'); }
+      $('hud-frags').textContent = `Fragments: ${GS.fragments.filter(Boolean).length} / 10`;
+      const f = MEMORY_FRAGMENTS[idx];
+      $('frag-num').textContent = '#' + (idx+1);
+      $('frag-body').textContent = f.text;
+      $('frag-clue').textContent = '⚠ NEW CLUE: ' + f.clue;
+
+      const revealEl = $('frag-reveal');
+      if (revealEl) {
+        if (!correct && [2, 3, 5, 6, 8].includes(idx)) {
+          let msg = '';
+          if (idx === 2) {
+            const roomLabels = {
+              wine: 'Wine Glass',
+              notebook: 'Hidden Notebook',
+              novel: 'Mystery Novel',
+              perfume: 'Perfume Bottle',
+              locket: 'Silver Locket',
+              compass: 'Old Compass',
+              magnifying: 'Magnifying Glass',
+              cross: 'Wooden Cross',
+              medal: 'Military Medal'
+            };
+            const itemLabel = roomLabels[window._testRoomIntruder] || 'Wine Glass';
+            msg = `The correct intruder item was: <strong>${itemLabel}</strong>`;
+          } else if (idx === 3) {
+            msg = `The correct contradiction was: <strong>${window._testBonfireCorrect || ''}</strong>`;
+          } else if (idx === 5) {
+            const pathDirs = (window._testForestPath || []).map(dirIdx => ['Left', 'Right', 'Forward', 'Back'][dirIdx]).join(' ➔ ');
+            msg = `The correct path was: <strong>${pathDirs}</strong>`;
+          } else if (idx === 6) {
+            msg = `The correct timeline decryption was: <strong>${window._testEvidenceCorrectText || ''}</strong>`;
+          } else if (idx === 8) {
+            msg = `The correct passcode was: <strong>${window._testStormCode || ''}</strong>`;
+          }
+          revealEl.innerHTML = msg;
+          revealEl.style.display = 'block';
+        } else {
+          revealEl.style.display = 'none';
+          revealEl.innerHTML = '';
+        }
+      }
+
+      $('frag-overlay').classList.add('on');
+      TTS.say('Memory fragment recovered. ' + f.clue, 0.85, 0.8);
+      window._fragCb = cb;
+    }
+
+    window.closeFrag = () => {
+      $('frag-overlay').classList.remove('on');
+      const hud = $('hud');
+      if (hud) hud.style.pointerEvents = 'auto';
+      if (window._fragCb) { const cb=window._fragCb; window._fragCb=null; cb(); }
+    };
+
+    // ─ SCREEN MANAGER ─────────────────────────────────────────────
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s=>{
+        s.classList.remove('on');
+        s.classList.remove('game-screen');
+        s.style.pointerEvents = 'auto';
+      });
+      document.querySelectorAll('.game-panel').forEach(s=>s.classList.remove('on'));
+      const el = $(id);
+      if (el) {
+        el.classList.add('on');
+        el.style.pointerEvents = 'auto';
+        const gp = el.querySelector('.game-panel');
+        if (gp) gp.classList.add('on');
+
+        const GAME_SCREENS = ['sc-beach', 'sc-lighthouse', 'sc-room', 'sc-bonfire', 'sc-baggage', 'sc-forest', 'sc-evidence', 'sc-cctv', 'sc-storm', 'sc-pathfinder'];
+        if (GAME_SCREENS.includes(id)) {
+          el.classList.add('game-screen');
+          // Inject/update field manual sidebar
+          let sidebar = el.querySelector('.field-manual-sidebar');
+          if (!sidebar) {
+            sidebar = document.createElement('div');
+            sidebar.className = 'field-manual-sidebar';
+            el.insertBefore(sidebar, el.firstChild);
+          }
+          const m = MODULES_DATA[GS.moduleIdx];
+          if (id === 'sc-beach') {
+            sidebar.innerHTML = `
+              <h3>Field Manual</h3>
+              <div class="section-title">${m.title}</div>
+              <div class="section-title">Objective</div>
+              <p style="font-weight: 700; color: #1a150e;">${m.task}</p>
+              <div class="section-title">Evidence Checklist</div>
+              <div id="beach-checklist" style="display: flex; flex-direction: column; gap: 8px; margin: 4px 0;">
+                <label>
+                  <input type="checkbox" id="chk-keycard" disabled />
+                  <span>Keycard</span>
+                </label>
+                <label>
+                  <input type="checkbox" id="chk-footprint" disabled />
+                  <span>Footprint</span>
+                </label>
+                <label>
+                  <input type="checkbox" id="chk-match" disabled />
+                  <span>Matchbox</span>
+                </label>
+                <label>
+                  <input type="checkbox" id="chk-locket" disabled />
+                  <span>Silver Locket</span>
+                </label>
+                <label>
+                  <input type="checkbox" id="chk-wine" disabled />
+                  <span>Wine Bottle</span>
+                </label>
+              </div>
+              <div class="section-title">Manual Notes</div>
+              <p>${m.hint}</p>
+            `;
+          } else {
+            let hintText = m.hint;
+            if (id === 'sc-room') {
+              const killerHints = {
+                rowan: "Clue: The intruder item was likely dropped by someone managing the resort's guest hosting or dining inventory. Check for glassware.",
+                mia: "Clue: The intruder item belongs to a high-profile influencer obsessed with luxury cosmetics and accessories. Check for a beauty item.",
+                james: "Clue: The intruder item belongs to a researcher who keeps methodical logs. Check for personal records.",
+                kai: "Clue: The intruder item belongs to someone checking escape dock gear or sea navigation routes.",
+                sofia: "Clue: The intruder item belongs to someone who reads fictional case logs or recipes in their spare kitchen hours."
+              };
+              hintText = killerHints[GS.murderer] || m.hint;
+            }
+            sidebar.innerHTML = `
+              <h3>Field Manual</h3>
+              <div class="section-title">${m.title}</div>
+              <div class="section-title">Objective</div>
+              <p style="font-weight: 700; color: #1a150e;">${m.task}</p>
+              <div class="section-title">Manual Notes</div>
+              <p>${hintText}</p>
+            `;
+          }
+        }
+      }
+      if (id === 'sc-home') {
+        checkProgressButton();
+      }
+    }
+
+    // ─ HOME SCREEN INTERACTION ────────────────────────────────────
+    function enterIsland() {
+      SFX.click();
+      
+      // Load user identity from LocalStorage
+      const userJson = localStorage.getItem('elaris_user');
+      if (!userJson) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const user = JSON.parse(userJson);
+      const matchedIdentity = IDENTITIES.find(i => i.id === user.identity);
+      if (matchedIdentity) {
+        GS.playerName = matchedIdentity.name;
+        GS.playerRole = matchedIdentity.role;
+        GS.playerIcon = matchedIdentity.icon;
+      } else {
+        GS.playerName = user.name || user.username;
+        GS.playerRole = user.identityName || 'Traveller';
+        GS.playerIcon = '🚤';
+      }
+      
+      GS.npcs = JSON.parse(JSON.stringify(NPCS_BASE));
+      const potentialMurderers = NPCS_BASE.filter(n => n.id !== 'kai');
+      GS.murderer = potentialMurderers[Math.floor(Math.random()*potentialMurderers.length)].id;
+      GS.victim = 'kai';
+      
+      // Let Rowan Ashford greet the player
+      showScreen('sc-narrative');
+      showDialog('Rowan Ashford',
+        `Welcome to Elaris Island, ${GS.playerName}. The weekend is designed to help you relax. Tell me... are you ready to board?`,
+        [
+          { text: "Yes, I am ready", cb: startGame },
+          { text: "No, I need a moment", cb: resetToHome }
+        ],
+        null,
+        'rowan'
+      );
+    }
+
+    function logout() {
+      if (typeof SFX !== 'undefined' && SFX.click) SFX.click();
+      localStorage.removeItem('elaris_user');
+      localStorage.removeItem('elaris_session');
+      sessionStorage.removeItem('elaris_player_user');
+      sessionStorage.removeItem('elaris_admin_token');
+      sessionStorage.removeItem('elaris_admin_user');
+      window.location.href = 'login.html';
+    }
+
+    // ─ GAME START ─────────────────────────────────────────────────
+    function startGame() {
+      $('hud').classList.add('on');
+      $('progress-bar').style.display='block';
+      $('fragment-display').classList.add('on');
+      buildFragDots();
+      GS.sessionStart = Math.floor(Date.now() / 1000);
+      saveProgress();
+      playNarrativeIntro();
+    }
+
+    function resetToHome() {
+      closeDialog();
+      hideChars();
+      $('hud').classList.remove('on');
+      $('progress-bar').style.display='none';
+      $('fragment-display').classList.remove('on');
+      showScreen('sc-home');
+    }
+
+    // ─ NARRATIVE INTRO (And Then There Were None style) ──────────
+    function playNarrativeIntro() {
+      showScreen('sc-narrative');
+      const lines = [
+        { npc:'rowan', text:'Welcome to Elaris. I designed every detail of this weekend myself.\nYou deserve to escape the weight you\'ve been carrying.' },
+        { npc:'sofia', text:'The kitchen is open all hours. Please — eat, rest. Whatever you need.\nThe island has a way of… revealing things about a person.' },
+        { npc:'james', text:'Forgive me if I seem distracted.\nI keep feeling as if I\'ve been here before.' },
+        { npc:'mia',   text:'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.' },
+        { npc:null,    text:'That night — the lights cut out.\n\nA projector ignited. Text burned across the wall:', projector:true, projtext:'ONE OF YOU CAME HERE TO DISAPPEAR FOREVER.' },
+        { npc:'rowan', text:'A scream from the pool. Kai Tanaka — dead.\nThe storm has destroyed the radio. The only boat is gone.\n\nNobody leaves this island.' },
+        { npc:'rowan', text:'Truth is stored in memory.\nMemory is fragmented.\nRecover all ten fragments.' },
+      ];
+      let i=0;
+      function nextLine() {
+        if(i>=lines.length){ beginModules(); return; }
+        const l=lines[i++];
+        if(l.projector){
+          $('proj-flash').classList.add('on');
+          $('proj-text').textContent = l.projtext;
+          SFX.horror();
+          TTS.say(l.projtext, 0.7, 0.65);
+          setTimeout(()=>{ $('proj-flash').classList.remove('on'); nextLine(); }, 3400);
+          return;
+        }
+        const npc = l.npc ? GS.npcs.find(n=>n.id===l.npc) : null;
+        showDialog(npc?npc.name:'Narrator', l.text, null, nextLine, l.npc||null);
+        if(!l.npc) { SFX.ambient(); }
+      }
+      nextLine();
+    }
+
+    // ─ MODULE ORCHESTRATION ───────────────────────────────────────
+    function beginModules() {
+      closeDialog(); hideChars();
+      $('proj-text').textContent = '';
+      GS.moduleIdx=0;
+      runModule(0);
+    }
+
+    // ─ DASS QUESTIONS DIALOGUE COMBINATION ────────────────────────
+    function askDASSBatch(briefNPC, items, onComplete) {
+      if (!items || items.length === 0) {
+        onComplete();
+        return;
+      }
+      const item = items[0];
+      const choices = item.opts.map((optText, optIdx) => ({
+        text: optText,
+        cb: () => {
+          recordDASS(item.scale, item.vals[optIdx], item.q);
+          // Recursively ask next question in batch
+          askDASSBatch(briefNPC, items.slice(1), onComplete);
+        }
+      }));
+      showDialog(briefNPC.name, item.q, choices, null, briefNPC.id);
+    }
+
+    function runModule(idx) {
+      if(idx>=10){ endGame(); return; }
+      const m = MODULES_DATA[idx];
+      GS.moduleIdx = idx;
+      $('hud-module').textContent = `MODULE ${idx+1} / 10`;
+      $('map-loc').textContent = m.loc;
+      
+      // Update maps modal highlights
+      updateMapActive(m.loc);
+
+      $('progress-fill').style.width = (idx/10*100)+'%';
+      saveProgress();
+
+      // Clean transition: return to the narrative scene backdrop for the briefing dialog
+      showScreen('sc-narrative');
+
+      // Pre-game NPC briefing
+      const briefNPC = NPCS_BASE[idx % NPCS_BASE.length];
+
+      showDialog(briefNPC.name,
+        `${m.intro}\n\nYou need to go to the ${m.loc}. Stay sharp.`,
+        null,
+        () => {
+          // Determine DASS batch based on the game index
+          let batch = [];
+          if (idx === 3) {
+            batch = [DASS_ITEMS[0], DASS_ITEMS[3], DASS_ITEMS[6]];
+          } else if (idx === 6) {
+            batch = [DASS_ITEMS[1], DASS_ITEMS[4], DASS_ITEMS[7]];
+          } else if (idx === 9) {
+            batch = [DASS_ITEMS[2], DASS_ITEMS[5], DASS_ITEMS[8]];
+          }
+
+          if (batch.length > 0) {
+            askDASSBatch(briefNPC, batch, () => { launchGame(m.id); });
+          } else {
+            launchGame(m.id);
+          }
+        },
+        briefNPC.id
+      );
+    }
+
+    function launchGame(id) {
+      closeDialog(); hideChars();
+      const games = {
+        beach:startBeach, lighthouse:startLighthouse, room:startRoom,
+        bonfire:startBonfire, baggage:startBaggage, forest:startForest,
+        evidence:startEvidenceChallenge, cctv:startCCTV, storm:startStormShelter, pathfinder:startPathfinder
+      };
+      
+      GS.gameActive = true;
+      
+      // Re-enable pointer events on the screen we are launching
+      const screenEl = document.getElementById('sc-' + id);
+      if (screenEl) {
+        screenEl.style.pointerEvents = 'auto';
+      }
+
+      showScreen('sc-'+id);
+      if(games[id]) games[id]();
+    }
+
+    function onModuleComplete(score, rt, correct) {
+      GS.gameActive = false;
+      // Instantly freeze pointer events on the active screen to prevent extra clicks during transition
+      const activeScreen = document.querySelector('.screen.game-screen');
+      if (activeScreen) {
+        activeScreen.style.pointerEvents = 'none';
+      }
+
+      GS.moduleScores[GS.moduleIdx] = score;
+      GS.score += score;
+      if(rt) GS.rtSamples.push(rt);
+      if(correct) GS.correctCount++;
+      GS.attemptCount++;
+      flashScore('+'+score);
+      SFX.success();
+      saveProgress();
+
+      // Reveal fragment
+      revealFragment(GS.moduleIdx, correct, ()=>{
+        // Mid-game twist after fragment 5
+        if(GS.moduleIdx===4){
+          showMidgameTwist(()=>runModule(GS.moduleIdx+1));
+        } else {
+          runModule(GS.moduleIdx+1);
+        }
+      });
+    }
+
+    function showMidgameTwist(cb) {
+      showScreen('sc-narrative');
+      const rowan = GS.npcs.find(n=>n.id==='rowan');
+      showDialog('Rowan Ashford',
+        'Every fragment so far contains the same date.\nThree years ago. Exactly.\nThis isn\'t a random crime.\nSomething happened on this island three years ago.\nAnd every person here was part of it.',
+        null, cb, 'rowan'
+      );
+    }
+
+    // ─ HELPER ─────────────────────────────────────────────────────
+    function flashScore(txt) {
+      const el=$('score-flash'); el.textContent=txt; el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'),900);
+    }
+
+    // ─ PLACEHOLDER FUNCTIONS FOR BUILDER ──────────────────────────
+    function startBeach() {
+  const area = $('beach-area');
+  area.innerHTML = `
+    <div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111;">
+      <div style="width:100%; height:100%; position:relative;" id="beach-scene">
+        <img src="assets/beach.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.85;">
+        <div id="beach-canvas-items" style="position:absolute; inset:0;"></div>
+        <div id="beach-start-overlay" style="position:absolute;inset:0;background:rgba(5,5,8,0.85);display:flex;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">
+          <button class="btn-main" id="btn-start-beach">Start Search</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // CSS for the hover effect
+  if(!$('beach-hover-style')) {
+    const style = document.createElement('style');
+    style.id = 'beach-hover-style';
+    style.textContent = `
+      .beach-item {
+        position: absolute;
+        cursor: pointer;
+        filter: brightness(0.75) sepia(0.2) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        transition: all 0.3s ease;
+      }
+      .beach-item:hover {
+        filter: brightness(1.2) sepia(0) drop-shadow(0 0 10px rgba(196,164,101,0.9));
+        transform: scale(1.15) translateY(-5px);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const container = $('beach-canvas-items');
+  let left = 5, attempts = 0; $('beach-left').textContent = left;
+  
+  const targets = [
+    {id:'keycard', img:'assets/item_card.png', w:'40px'},
+    {id:'footprint', img:'assets/item_foot.png', w:'55px'},
+    {id:'match', img:'assets/item_match_v4.png', w:'40px'},
+    {id:'locket', img:'assets/item_locket.png', w:'35px'},
+    {id:'wine', img:'assets/item_wine.png', w:'30px'}
+  ];
+  const decoys = [
+    {id:'bucket', img:'assets/item_bucket.png', w:'55px'},
+    {id:'compass', img:'assets/item_compass.png', w:'45px'},
+    {id:'shell', img:'assets/item_shell.png', w:'45px'},
+    {id:'shovel', img:'assets/item_shovel.png', w:'65px'},
+    {id:'cross', img:'assets/item_cross.png', w:'35px'}
+  ];
+
+  $('btn-start-beach').onclick = () => {
+    $('beach-start-overlay').remove();
+    const gameStart = Date.now();
+    
+    // Spawn all items
+    const allItems = [...targets.map(t=>({...t, correct:true})), ...decoys.map(d=>({...d, correct:false}))];
+    allItems.sort(() => Math.random() - 0.5);
+    
+    const W = container.getBoundingClientRect().width || container.clientWidth || 900;
+    const H = container.getBoundingClientRect().height || container.clientHeight || 480;
+    const placed = [];
+    
+    const isOverlap = (x, y, itemW, pad) => {
+      const px = (x / 100) * W;
+      const py = (y / 100) * H;
+      
+      const left1 = px - pad;
+      const right1 = px + itemW + pad;
+      const top1 = py - pad;
+      const bottom1 = py + itemW + pad;
+
+      return placed.some(p => {
+        const left2 = p.px - pad;
+        const right2 = p.px + p.w + pad;
+        const top2 = p.py - pad;
+        const bottom2 = p.py + p.w + pad;
+
+        return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
+      });
+    };
+
+    allItems.forEach(item => {
+      const itemW = parseFloat(item.w);
+      let x, y, tries = 0, pad = 12;
+      do {
+        if (tries > 100) pad = 8;
+        if (tries > 200) pad = 4;
+        if (tries > 250) pad = 0;
+        
+        // Restrict X to 8-80% to utilize wider sand space
+        x = 8 + Math.random() * 72;
+        // Flatter shoreline slope to provide much more vertical sand space on the right
+        let minY = 45 + (x * 0.25);
+        y = minY + Math.random() * (89 - minY);
+        tries++;
+      } while (isOverlap(x, y, itemW, pad) && tries < 500);
+      
+      const px = (x / 100) * W;
+      const py = (y / 100) * H;
+      placed.push({ px, py, w: itemW });
+
+      const c = document.createElement('img');
+      c.className = 'beach-item';
+      c.src = item.img;
+      c.style.width = item.w;
+      c.style.left = x + '%';
+      c.style.top = y + '%';
+      c.style.transform = `rotate(${(Math.random()-0.5)*70}deg)`;
+      
+      c.onclick = () => {
+        if (!GS.gameActive) return;
+        if(item.correct) {
+          SFX.pickup();
+          c.style.pointerEvents = 'none';
+          c.style.transform = 'scale(1.5) rotate(10deg)';
+          c.style.opacity = '0';
+          setTimeout(() => c.remove(), 300);
+          
+          const chk = $('chk-' + item.id);
+          if (chk) chk.checked = true;
+          
+          const rt = Date.now() - gameStart;
+          GS.domains.attention = Math.min(100, GS.domains.attention + 11);
+          GS.domains.processingSpeed = Math.min(100, GS.domains.processingSpeed + (rt<10000 ? 14 : 8));
+          
+          left--;
+          $('beach-left').textContent = left;
+          if(left <= 0) finishBeach(gameStart);
+        } else {
+          SFX.fail();
+          attempts++;
+          GS.domains.attention = Math.max(0, GS.domains.attention - 5);
+          c.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
+          setTimeout(() => { c.style.filter = ''; }, 400);
+        }
+      };
+      container.appendChild(c);
+    });
+  };
+}
+function finishBeach(t) {
+      GS.gameActive = false;
+      const activeScreen = document.querySelector('.screen.game-screen');
+      if (activeScreen) activeScreen.style.pointerEvents = 'none';
+      const rt=Date.now()-t; onModuleComplete(15,rt,true);
+    }
+
+    function startLighthouse(){
+      const colors = ['red', 'blue', 'green'];
+      const sequence = [];
+      for(let i=0; i<5; i++){
+        sequence.push(colors[Math.floor(Math.random()*colors.length)]);
+      }
+      window._testLighthouseSequence = sequence;
+      
+      let playerSeq = [];
+      let attempt = 0;
+      let isPlayingSeq = false;
+      const gameStart = Date.now();
+      
+      $('lh-total').textContent = 5;
+      $('lh-step').textContent = 0;
+      $('lh-attempt').textContent = 1;
+      
+      const bulb = $('lh-bulb');
+      const inst = $('lh-inst');
+      
+      const colorMap = {
+        red: '#cc3333',
+        blue: '#4488ee',
+        green: '#2e9a78'
+      };
+      
+      function playSequence(){
+        isPlayingSeq = true;
+        playerSeq = [];
+        $('lh-step').textContent = 0;
+        inst.textContent = 'Watch the sequence...';
+        inst.style.color = 'var(--gold-l)';
+        
+        let step = 0;
+        const interval = setInterval(()=>{
+          bulb.style.background = '#222';
+          bulb.classList.remove('lit');
+          bulb.style.color = 'transparent';
+          
+          setTimeout(()=>{
+            if(step >= sequence.length){
+              clearInterval(interval);
+              isPlayingSeq = false;
+              inst.textContent = 'Your turn — repeat the sequence!';
+              inst.style.color = 'var(--text-d)';
+              return;
+            }
+            const color = sequence[step];
+            bulb.style.background = colorMap[color];
+            bulb.style.color = colorMap[color];
+            bulb.classList.add('lit');
+            SFX.click();
+            step++;
+          }, 500); // 0.5s off time
+        }, 1000); // 1.0s total cycle (0.5s on, 0.5s off)
+      }
+      
+      const btns = document.querySelectorAll('.lb-btn');
+      btns.forEach(btn => {
+        btn.onclick = () => {
+          if (!GS.gameActive) return;
+          if(isPlayingSeq) return;
+          const color = btn.dataset.c;
+          SFX.click();
+          
+          bulb.style.background = colorMap[color];
+          bulb.style.color = colorMap[color];
+          bulb.classList.add('lit');
+          setTimeout(()=>{
+            bulb.style.background = '#222';
+            bulb.classList.remove('lit');
+          }, 250); // 0.25s button click flash duration
+          
+          playerSeq.push(color);
+          $('lh-step').textContent = playerSeq.length;
+          
+          const currentIdx = playerSeq.length - 1;
+          if(playerSeq[currentIdx] !== sequence[currentIdx]){
+            isPlayingSeq = true; // Lock input immediately during transition
+            SFX.fail();
+            attempt++;
+            $('lh-attempt').textContent = attempt + 1;
+            if(attempt >= 2){
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(5, null, false);
+            } else {
+              inst.textContent = 'Wrong sequence! Watch again...';
+              inst.style.color = 'var(--rust)';
+              setTimeout(playSequence, 1200);
+            }
+            return;
+          }
+          
+          if(playerSeq.length === sequence.length){
+            isPlayingSeq = true; // Lock input immediately on success
+            SFX.success();
+            GS.domains.recognition = Math.min(100, GS.domains.recognition + 15);
+            GS.domains.attention = Math.min(100, GS.domains.attention + 12);
+            const rt = Date.now() - gameStart;
+            GS.gameActive = false;
+            const activeScreen = document.querySelector('.screen.game-screen');
+            if (activeScreen) activeScreen.style.pointerEvents = 'none';
+            setTimeout(()=>onModuleComplete(15, rt, true), 400);
+          }
+        };
+      });
+      
+      playSequence();
+    }
+
+    function startRoom(){
+  let attempt=0;
+  $('room-attempt').textContent=1;
+  const gameStart=Date.now();
+  const grid=$('room-grid');
+  
+  if(!$('cabin-styles')) {
+    const s=document.createElement('style');
+    s.id='cabin-styles';
+    s.textContent = `
+      .room-item {
+        position: absolute;
+        cursor: pointer;
+        filter: brightness(0.8) sepia(0.1) drop-shadow(0 3px 5px rgba(0,0,0,0.7));
+        transition: all 0.25s ease;
+      }
+      .room-item:hover {
+        filter: brightness(1.25) sepia(0) drop-shadow(0 0 12px rgba(196,164,101,0.95));
+        transform: scale(1.18) translateY(-4px) !important;
+      }
+      .room-item.wrong {
+        animation: shake 0.4s;
+      }
+      .room-item.right {
+        filter: brightness(1.2) drop-shadow(0 0 15px #4ecda8) !important;
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  const items = [
+    {id:'wine', img:'assets/wine_clean_v2.png', label:'Wine Glass', w:'22px'},
+    {id:'notebook', img:'assets/notebook_clean_v2.png', label:'Hidden Notebook', w:'36px'},
+    {id:'novel', img:'assets/novel_clean_v2.png', label:'Mystery Novel', w:'34px'},
+    {id:'perfume', img:'assets/perfume_clean_v2.png', label:'Perfume Bottle', w:'25px'},
+    {id:'locket', img:'assets/locket_clean_v2.png', label:'Silver Locket', w:'26px'},
+    {id:'compass', img:'assets/compass_clean_v2.png', label:'Old Compass', w:'30px'},
+    {id:'magnifying', img:'assets/magnifying_clean_v2.png', label:'Magnifying Glass', w:'32px'},
+    {id:'cross', img:'assets/cross_clean_v2.png', label:'Wooden Cross', w:'25px'},
+    {id:'medal', img:'assets/medal_clean_v2.png', label:'Military Medal', w:'28px'}
+  ];
+  
+  const killerIntruderMap = {
+    rowan: 'wine',
+    mia: 'perfume',
+    james: 'notebook',
+    kai: 'compass',
+    sofia: 'novel'
+  };
+  const targetId = killerIntruderMap[GS.murderer] || 'wine';
+  const intruderIdx = items.findIndex(item => item.id === targetId);
+  window._testRoomIntruder = items[intruderIdx].id;
+
+  grid.className = '';
+  grid.innerHTML = `
+    <div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111;box-shadow: 0 8px 32px rgba(0,0,0,0.5);border: 1px solid var(--glass-border);">
+      <div style="width:100%; height:100%; position:relative;" id="room-scene">
+        <img src="assets/cabin_bg_v3.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.85;">
+        <div id="room-canvas-items" style="position:absolute; inset:0;"></div>
+      </div>
+    </div>
+  `;
+
+  const container = $('room-canvas-items');
+  const W = container.getBoundingClientRect().width || container.clientWidth || 900;
+  const H = container.getBoundingClientRect().height || container.clientHeight || 480;
+  const placed = [];
+
+  const isOverlap = (x, y, itemW, pad) => {
+    const px = (x / 100) * W;
+    const py = (y / 100) * H;
+    
+    const left1 = px - pad;
+    const right1 = px + itemW + pad;
+    const top1 = py - pad;
+    const bottom1 = py + itemW + pad;
+
+    return placed.some(p => {
+      const left2 = p.px - pad;
+      const right2 = p.px + p.w + pad;
+      const top2 = p.py - pad;
+      const bottom2 = p.py + p.w + pad;
+
+      return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
+    });
+  };
+
+  const zones = [
+    { minX: 5,  maxX: 24, minY: 60, maxY: 75 },  // bed
+    { minX: 20, maxX: 42, minY: 72, maxY: 88 },  // rug
+    { minX: 34, maxX: 44, minY: 52, maxY: 58 },  // nightstand
+    { minX: 49, maxX: 75, minY: 48, maxY: 54 },  // desk
+    { minX: 38, maxX: 50, minY: 24, maxY: 26 },  // shelf
+    { minX: 82, maxX: 98, minY: 52, maxY: 58 },  // dresser
+    { minX: 52, maxX: 78, minY: 75, maxY: 88 }   // floor
+  ];
+
+  items.forEach((item, i) => {
+    const itemW = parseFloat(item.w);
+    let x, y, tries = 0, pad = 10;
+    do {
+      if (tries > 100) pad = 6;
+      if (tries > 200) pad = 2;
+      if (tries > 250) pad = 0;
+
+      // Select a random zone
+      const zone = zones[Math.floor(Math.random() * zones.length)];
+      x = zone.minX + Math.random() * (zone.maxX - zone.minX);
+      y = zone.minY + Math.random() * (zone.maxY - zone.minY);
+      tries++;
+    } while (isOverlap(x, y, itemW, pad) && tries < 500);
+
+    const px = (x / 100) * W;
+    const py = (y / 100) * H;
+    placed.push({ px, py, w: itemW });
+
+    const c = document.createElement('img');
+    c.className = 'room-item';
+    c.src = item.img;
+    c.style.width = item.w;
+    c.style.left = x + '%';
+    c.style.top = y + '%';
+    c.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
+    c.title = item.label;
+
+    c.onclick = () => {
+      if (!GS.gameActive) return;
+      if(i === intruderIdx){ 
+        SFX.success(); 
+        c.classList.add('right'); 
+        GS.gameActive = false;
+        const activeScreen = document.querySelector('.screen.game-screen');
+        if (activeScreen) activeScreen.style.pointerEvents = 'none';
+        setTimeout(()=>onModuleComplete(15,Date.now()-gameStart,true), 600);
+      } else {
+        SFX.fail(); 
+        c.classList.add('wrong'); 
+        attempt++; 
+        $('room-attempt').textContent=attempt+1;
+        GS.domains.recognition=Math.max(0,GS.domains.recognition-10);
+        
+        c.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
+        setTimeout(()=>{
+          c.classList.remove('wrong');
+          c.style.filter = '';
+        }, 500);
+        
+        if(attempt>=2) {
+          GS.gameActive = false;
+          const activeScreen = document.querySelector('.screen.game-screen');
+          if (activeScreen) activeScreen.style.pointerEvents = 'none';
+          setTimeout(()=>onModuleComplete(5,null,false), 500);
+        }
+      }
+    };
+    container.appendChild(c);
+  });
+}
+// ─ GAME 4: BONFIRE ────────────────────────────────────────────
+    function startBonfire(){
+      const scenes = {
+        james: {
+          npc: 'Dr. James Okoro',
+          dialogue: '"I was meditating in the spa room until late. In fact, I stayed there straight until midnight to clear my head, and went straight back to my cabin afterwards without talking to anyone."',
+          correct: 'stayed there straight until midnight',
+          opts: [
+            'meditating in the spa room',
+            'stayed there straight until midnight',
+            'went straight back to my cabin',
+            'without talking to anyone'
+          ]
+        },
+        sofia: {
+          npc: 'Sofia Reyes',
+          dialogue: '"I cleaned the kitchen stoves after dinner. It is a routine I have done every single night since I started working at this resort three years ago. I went to bed early after that."',
+          correct: 'working at this resort three years ago',
+          opts: [
+            'cleaned the kitchen stoves after dinner',
+            'working at this resort three years ago',
+            'went to bed early after that',
+            'a routine I have done'
+          ]
+        },
+        mia: {
+          npc: 'Mia Lacroix',
+          dialogue: '"I was in my bedroom and started my live stream at 9:00 PM. My fans saw me live streaming the whole night until 11:30 PM when the storm hit."',
+          correct: 'live streaming the whole night until 11:30 PM',
+          opts: [
+            'started my live stream at 9:00 PM',
+            'live streaming the whole night until 11:30 PM',
+            'when the storm hit',
+            'in my bedroom'
+          ]
+        },
+        rowan: {
+          npc: 'Rowan Ashford',
+          dialogue: '"I hosted the dinner service until 8:00 PM. After that, I was working in the main office checking room bookings from 8:15 PM until I locked up at 10:00 PM."',
+          correct: 'checking room bookings from 8:15 PM',
+          opts: [
+            'hosted the dinner service',
+            'checking room bookings from 8:15 PM',
+            'locked up at 10:00 PM',
+            'working in the main office'
+          ]
+        }
+      };
+      const s = scenes[GS.murderer] || scenes.james;
+      let attempt=0; window._testBonfireCorrect = s.correct;
+      $('bonfire-attempt').textContent=1;
+      $('bonfire-dialogue').innerHTML=s.dialogue; $('bonfire-npc').textContent=s.npc;
+      const gameStart=Date.now();
+      const shuffledOpts = [...s.opts].sort(() => Math.random() - 0.5);
+      $('bonfire-opts').innerHTML=shuffledOpts.map(o=>`<div class="kara-opt" data-o="${o}">${o}</div>`).join('');
+      $('bonfire-opts').querySelectorAll('.kara-opt').forEach(el=>{
+        el.onclick=()=>{
+          if (!GS.gameActive) return;
+          const val=el.dataset.o; SFX.click();
+          if(val===s.correct){ 
+            el.classList.add('correct'); 
+            GS.domains.cognitiveFlexibility=Math.min(100,GS.domains.cognitiveFlexibility+18); 
+            GS.gameActive = false;
+            const activeScreen = document.querySelector('.screen.game-screen');
+            if (activeScreen) activeScreen.style.pointerEvents = 'none';
+            onModuleComplete(15,Date.now()-gameStart,true); 
+          }
+          else { el.classList.add('wrong'); SFX.fail(); attempt++; $('bonfire-attempt').textContent=attempt+1;
+            setTimeout(()=>el.classList.remove('wrong'),500);
+            if(attempt>=2) {
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(5,null,false);
+            }
+          }
+        };
+      });
+    }
+
+    // ─ GAME 5: BAGGAGE ────────────────────────────────────────────
+    function startBaggage(){
+      const masterPool = [
+        { owner: 'Dr. Priya Sharma', item: '🩺 Stethoscope' },
+        { owner: 'Marcus Chen', item: '📱 High-End Tablet' },
+        { owner: 'Elena Voss', item: '🎻 Sheet Music' },
+        { owner: 'Zara Okonkwo', item: '📚 Research Notebook' },
+        { owner: 'Rory Walsh', item: '🃏 Joke Notebook' },
+        { owner: 'Ret. Det. Frank Silva', item: '📇 Case Ledger' },
+        { owner: 'Rowan Ashford', item: '🔑 Master Keycard' },
+        { owner: 'Mia Lacroix', item: '🤳 Selfie Stick' },
+        { owner: 'Dr. James Okoro', item: '🧠 EEG Electrodes' },
+        { owner: 'Kai Tanaka', item: '🎮 Gaming Controller' },
+        { owner: 'Sofia Reyes', item: '🍳 Copper Pan' }
+      ];
+      const pairs = [...masterPool].sort(() => Math.random() - 0.5).slice(0, 4);
+      const shuffledOwners = [...pairs].sort(() => Math.random() - 0.5);
+      const shuffledItems = [...pairs].sort(() => Math.random() - 0.5);
+      const pMap = {}; pairs.forEach(p => pMap[p.owner] = p.item);
+      let matched = 0, selOwner = null, selOwnerEl = null;
+      const gameStart = Date.now();
+      $('baggage-area').innerHTML = `
+        <div class="bag-pair">
+          <div><div class="bag-col-head">Owners</div>${shuffledOwners.map(p => `<div class="kara-opt" data-owner="${p.owner}" style="margin-bottom:8px">${p.owner}</div>`).join('')}</div>
+          <div><div class="bag-col-head">Items</div>${shuffledItems.map(p => `<div class="kara-opt" data-item="${p.item}" style="margin-bottom:8px">${p.item}</div>`).join('')}</div>
+        </div>`;
+      $('baggage-area').querySelectorAll('[data-owner]').forEach(el=>{
+        el.onclick=()=>{
+          if (!GS.gameActive) return;
+          SFX.click(); document.querySelectorAll('[data-owner]').forEach(b=>b.style.borderColor='rgba(196,164,101,.2)');
+          el.style.borderColor='var(--gold)'; selOwner=el.dataset.owner; selOwnerEl=el;
+          $('baggage-status').textContent='Now select their item →';
+        };
+      });
+      $('baggage-area').querySelectorAll('[data-item]').forEach(el=>{
+        el.onclick=()=>{
+          if (!GS.gameActive) return;
+          if(!selOwner){ $('baggage-status').textContent='Select an owner first!'; return; }
+          SFX.click();
+          if(pMap[selOwner]===el.dataset.item){
+            selOwnerEl.classList.add('correct'); el.classList.add('correct');
+            selOwnerEl.onclick=null; el.onclick=null;
+            GS.domains.decisionMaking=Math.min(100,GS.domains.decisionMaking+16);
+            matched++; selOwner=null; selOwnerEl=null;
+            $('baggage-status').textContent=`Matched ${matched}/${pairs.length}`;
+            if(matched>=pairs.length) {
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(15,Date.now()-gameStart,true);
+            }
+          } else {
+            SFX.fail(); el.classList.add('wrong'); selOwnerEl.classList.add('wrong');
+            setTimeout(()=>{ el.classList.remove('wrong'); if(selOwnerEl)selOwnerEl.classList.remove('wrong'); },500);
+            selOwner=null; selOwnerEl=null;
+            $('baggage-status').textContent='Wrong match — try again';
+          }
+        };
+      });
+    }
+
+    // ─ GAME 6: FOREST ─────────────────────────────────────────────
+    function startForest(){
+  const board = $('maze-canvas').parentElement;
+  $('maze-canvas').style.display = 'none'; // hide old canvas
+  
+  const bgs = ['assets/path_start.png', 'assets/path_moss.png', 'assets/path_roots.png', 'assets/path_tree.png'];
+  const labels = ['Left','Right','Forward','Back'];
+  
+  // Randomize the correct path (5 steps) with no consecutive duplicates
+  const correctPath = [];
+  let lastDir = -1;
+  for (let i = 0; i < 5; i++) {
+    let dir;
+    do {
+      dir = Math.floor(Math.random() * 4);
+    } while (dir === lastDir);
+    correctPath.push(dir);
+    lastDir = dir;
+  }
+  window._testForestPath = correctPath;
+
+  // Generate dynamic hint
+  const stepPhrases = [
+    [
+      "turn left to enter the trail",
+      "turn right to enter the trail",
+      "walk forward to start the trail",
+      "go back from the signpost"
+    ],
+    [
+      "head left past the mossy trunk",
+      "turn right at the mossy trunk",
+      "push forward past the mossy trunk",
+      "go back near the mossy trunk"
+    ],
+    [
+      "veer left past the deep roots",
+      "go right around the deep roots",
+      "climb forward over the deep roots",
+      "head back from the deep roots"
+    ],
+    [
+      "slide left where the path darkens",
+      "steer right as the path darkens",
+      "press forward when the path darkens",
+      "head back where the path darkens"
+    ],
+    [
+      "make a final left turn to reach the clearing",
+      "take a final right turn to reach the clearing",
+      "push forward into the bright clearing",
+      "turn back one last time to reach the clearing"
+    ]
+  ];
+  const hintParts = correctPath.map((dir, stepIdx) => stepPhrases[stepIdx][dir]);
+  const generatedHint = "To escape the looping trees, follow the path: " + hintParts.join(", ") + ".";
+  
+  // Update the hint dynamically in MODULES_DATA and active sidebar notes
+  if (window.MODULES_DATA && window.MODULES_DATA[5]) {
+    window.MODULES_DATA[5].hint = generatedHint;
+  }
+  const notesEl = document.querySelector('#sc-forest .field-manual-sidebar p:last-of-type');
+  if (notesEl) notesEl.innerHTML = generatedHint;
+
+  let step=0, attempt=0;
+  $('maze-step').textContent='0'; $('forest-attempt').textContent=1;
+  const gameStart=Date.now();
+  
+  // Clean up if restarting
+  if($('forest-ui')) $('forest-ui').remove();
+  
+  board.innerHTML += `
+    <div id="forest-ui" style="position:relative;width:100%;height:320px;border-radius:4px;overflow:hidden">
+      <img id="forest-bg" src="${bgs[0]}" style="width:100%;height:100%;object-fit:cover;transition:opacity 0.4s">
+      <div id="forest-btns" style="position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:10px"></div>
+    </div>
+  `;
+  
+  const draw = () => {
+    $('forest-bg').style.opacity = '0';
+    setTimeout(() => {
+      $('forest-bg').src = bgs[step % bgs.length];
+      $('forest-bg').style.opacity = '1';
+    }, 200);
+    
+    $('maze-step').textContent = step+'/5';
+    const btns = $('forest-btns');
+    btns.innerHTML = '';
+    labels.forEach((lbl, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-secondary';
+      btn.textContent = lbl;
+      btn.style.background = 'rgba(10,20,30,0.85)';
+      btn.style.borderColor = 'var(--gold)';
+      btn.onclick = () => {
+        if (!GS.gameActive) return;
+        if(i === correctPath[step]) {
+          SFX.click(); GS.domains.persistence = Math.min(100, GS.domains.persistence+13);
+          step++;
+          if(step >= correctPath.length) { 
+            GS.gameActive = false;
+            const activeScreen = document.querySelector('.screen.game-screen');
+            if (activeScreen) activeScreen.style.pointerEvents = 'none';
+            setTimeout(()=>onModuleComplete(15,Date.now()-gameStart,true), 400); 
+          }
+          else draw();
+        } else {
+          SFX.fail(); attempt++; $('forest-attempt').textContent=attempt+1;
+          $('forest-bg').style.filter = 'sepia(1) hue-rotate(-50deg) saturate(3)';
+          setTimeout(() => $('forest-bg').style.filter = 'none', 300);
+          if(attempt >= 2) {
+            GS.gameActive = false;
+            const activeScreen = document.querySelector('.screen.game-screen');
+            if (activeScreen) activeScreen.style.pointerEvents = 'none';
+            setTimeout(()=>onModuleComplete(5,null,false), 400);
+          }
+        }
+      };
+      btns.appendChild(btn);
+    });
+  };
+  draw();
+}
+// ─ GAME 7: KARAOKE ────────────────────────────────────────────
+    // ─ GAME 7: EVIDENCE CHALLENGE ─────────────────────────────────
+    function startEvidenceChallenge() {
+      const rounds = [
+        {
+          cue: 'DR. J__ES OK_RO — Spa Meditation: [GLITCH]',
+          opts: ['7:30 PM - 9:00 PM', '8:30 PM - 10:00 PM', '9:30 PM - 11:00 PM', '8:00 PM - 9:30 PM'],
+          correct: 1
+        },
+        {
+          cue: 'SO_IA RE_ES — Hired on 6-Month Contract: [GLITCH]',
+          opts: ['April 12, 2026', 'June 12, 2026', 'May 12, 2026', 'May 22, 2026'],
+          correct: 2
+        },
+        {
+          cue: 'M_A LA_R_IX — Device Battery Depleted: [GLITCH]',
+          opts: ['8:30 PM', '9:30 PM', '10:30 PM', '9:00 PM'],
+          correct: 1
+        },
+        {
+          cue: 'R_W_N AS_F_RD — Closed Main Office: [GLITCH]',
+          opts: ['9:30 PM', '10:00 PM', '10:30 PM', '11:00 PM'],
+          correct: 1
+        },
+        {
+          cue: 'DR. PR_YA SH_RMA — Logged in to medical portal: [GLITCH]',
+          opts: ['8:00 PM - 9:30 PM', '8:45 PM - 10:15 PM', '9:15 PM - 10:45 PM', '10:30 PM - Midnight'],
+          correct: 1
+        },
+        {
+          cue: 'MA_CUS CH_N — Sent 14 emails from lobby: [GLITCH]',
+          opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 10:45 PM', '10:45 PM onwards'],
+          correct: 1
+        },
+        {
+          cue: 'EL_NA VO_S — Walked along South Cliffs: [GLITCH]',
+          opts: ['8:00 PM - 9:00 PM', '8:30 PM - 9:45 PM', '9:00 PM - 10:15 PM', '9:30 PM - 10:45 PM'],
+          correct: 1
+        },
+        {
+          cue: 'ZA_R OK_NKWO — Reading in resort library: [GLITCH]',
+          opts: ['7:30 PM - 8:30 PM', '8:30 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:45 PM onwards'],
+          correct: 1
+        },
+        {
+          cue: 'RO_Y WA_SH — Played arcade games in lounge: [GLITCH]',
+          opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:00 PM - Midnight'],
+          correct: 1
+        },
+        {
+          cue: 'RE_ DET. FR_NK SI_VA — Checked security gates: [GLITCH]',
+          opts: ['7:30 PM - 8:00 PM', '8:15 PM - 10:00 PM', '9:00 PM - 10:30 PM', '10:15 PM onwards'],
+          correct: 1
+        }
+      ];
+      const r = rounds[Math.floor(Math.random()*rounds.length)];
+      let attempt = 0; window._testEvidenceCorrect = r.correct;
+      window._testEvidenceCorrectText = r.opts[r.correct];
+      $('evi-attempt').textContent = 1; $('evi-cue').textContent = 'Decrypt: ' + r.cue;
+      const gameStart = Date.now();
+      
+      const distArea = $('evi-distraction-area');
+      distArea.innerHTML = '';
+      
+      const scan = document.createElement('div');
+      scan.style.position = 'absolute';
+      scan.style.width = '100%';
+      scan.style.height = '2px';
+      scan.style.background = 'rgba(255, 50, 50, 0.4)';
+      scan.style.boxShadow = '0 0 8px rgba(255, 50, 50, 0.8)';
+      scan.style.animation = 'eviScan 2s linear infinite';
+      distArea.appendChild(scan);
+
+      const words = ['[CORRUPT]', '01000101', 'ECHO_LOG', 'SYSTEM_ERR', 'FILE_UNREAD', '[OVERLOAD]'];
+      for(let i=0; i<12; i++) {
+        const d = document.createElement('div');
+        d.style.position = 'absolute';
+        d.style.color = Math.random() > 0.5 ? 'rgba(196,164,101,0.15)' : 'rgba(192,71,31,0.15)';
+        d.style.fontFamily = 'var(--ff-m)';
+        d.style.fontSize = '0.65rem';
+        d.style.left = (Math.random()*85)+'%';
+        d.style.top = (Math.random()*80)+'%';
+        d.style.whiteSpace = 'nowrap';
+        d.style.animation = `eviGlitch ${1 + Math.random()*2}s ease-in-out infinite alternate`;
+        d.textContent = words[Math.floor(Math.random()*words.length)];
+        distArea.appendChild(d);
+      }
+      
+      $('evi-opts').innerHTML = r.opts.map((o,i) => `<button class="btn-secondary kara-opt" data-i="${i}" style="width:100%; text-align:left; padding:10px;">${o}</button>`).join('');
+      
+      $('evi-opts').querySelectorAll('.kara-opt').forEach(el => {
+        el.onclick = () => {
+          if (!GS.gameActive) return;
+          const i = parseInt(el.dataset.i); SFX.click();
+          if(i === r.correct) { 
+            el.classList.add('correct'); 
+            GS.domains.distractionResistance = Math.min(100, GS.domains.distractionResistance + 20); 
+            GS.telemetry.targetFilterEfficiency += 10;
+            GS.gameActive = false;
+            const activeScreen = document.querySelector('.screen.game-screen');
+            if (activeScreen) activeScreen.style.pointerEvents = 'none';
+            onModuleComplete(15, Date.now()-gameStart, true); 
+          }
+          else { 
+            el.classList.add('wrong'); SFX.fail(); attempt++; $('evi-attempt').textContent = attempt+1;
+            setTimeout(() => el.classList.remove('wrong'), 500);
+            if(attempt >= 2) {
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(5, null, false);
+            }
+          }
+        };
+      });
+    }
+
+    // ─ GAME 8: CCTV ───────────────────────────────────────────────
+    function startCCTV(){
+      const clips=[{emoji:'🎬',label:'7:45 PM Dinner',time:0},{emoji:'🚪',label:'9:12 PM Corridor',time:1},{emoji:'🏖️',label:'10:03 PM Beach',time:2},{emoji:'💡',label:'10:47 PM Blackout',time:3},{emoji:'🚨',label:'11:20 PM Alarm',time:4}];
+      const sh=[...clips].sort(()=>Math.random()-.5);
+      $('cctv-track').innerHTML=sh.map((c,i)=>`<div class="cctv-clip" draggable="true" id="ccl-${i}" data-time="${c.time}"><span>${c.emoji}</span><span>${c.label}</span></div>`).join('');
+      $('cctv-slots').innerHTML=clips.map((_,i)=>`<div class="cctv-slot" id="ccs-${i}" ondragover="event.preventDefault()" ondrop="cctvDrop(event,${i})">Slot ${i+1}</div>`).join('');
+      let drag=null;
+      document.querySelectorAll('.cctv-clip').forEach(el=>{
+        el.ondragstart=(e)=>{ 
+          if (!GS.gameActive) { e.preventDefault(); return; }
+          drag=e.target; e.target.classList.add('dragging'); SFX.drag(); 
+          const st = $('cctv-status');
+          if (st) st.style.display = 'none';
+        };
+        el.ondragend=(e)=>e.target.classList.remove('dragging');
+      });
+      window.cctvDrop=(e,si)=>{ const sl=$('ccs-'+si); if(sl&&drag) sl.appendChild(drag); };
+      $('cctv-check').onclick=()=>{
+        if (!GS.gameActive) return;
+        
+        let allFilled = true;
+        for(let i=0;i<5;i++){
+          const sl=$('ccs-'+i);
+          const cl=sl?.querySelector('.cctv-clip');
+          if(!cl) {
+            allFilled = false;
+            break;
+          }
+        }
+        
+        if(!allFilled) {
+          SFX.fail();
+          const st = $('cctv-status');
+          if (st) {
+            st.textContent = 'Please place all 5 clips onto the timeline slots first!';
+            st.style.display = 'block';
+          }
+          return;
+        }
+
+        const st = $('cctv-status');
+        if (st) st.style.display = 'none';
+
+        let ok=0;
+        for(let i=0;i<5;i++){
+          const sl=$('ccs-'+i);
+          const cl=sl?.querySelector('.cctv-clip');
+          if(cl&&parseInt(cl.dataset.time)===i){
+            cl.classList.add('placed');
+            ok++;
+          } else if(cl) {
+            cl.classList.add('wrong');
+          }
+        }
+        GS.domains.workingMemory=Math.min(100,GS.domains.workingMemory+ok*7);
+        GS.gameActive = false;
+        const activeScreen = document.querySelector('.screen.game-screen');
+        if (activeScreen) activeScreen.style.pointerEvents = 'none';
+        
+        if (ok >= 4) {
+          SFX.success();
+          setTimeout(() => {
+            onModuleComplete(15, null, true);
+          }, 1000);
+        } else {
+          SFX.fail();
+          setTimeout(() => {
+            onModuleComplete(ok >= 2 ? 10 : 5, null, false);
+          }, 1200);
+        }
+      };
+    }
+
+    // ─ GAME 9: STORM ──────────────────────────────────────────────
+    // ─ GAME 9: STORM SHELTER ──────────────────────────────────────
+    function startStormShelter() {
+      const clues = [
+        { q: "HR log: Month and Day Sofia Reyes signed her contract (MMDD).", a: "0512" },
+        { q: "Security log: Dr. James Okoro's RFID Cabin 4 entry time (HHMM).", a: "1017" },
+        { q: "Device log: Mia Lacroix's phone battery depletion time (HHMM).", a: "0930" },
+        { q: "Reservation log: Dr. James Okoro's Spa meditation end time (HHMM).", a: "1000" },
+        { q: "Kitchen log: Sofia Reyes kitchen stove cleaning end time (HHMM).", a: "0900" },
+        { q: "Dock log: Kai Tanaka's escape vessel inventory audit end time (HHMM).", a: "1015" }
+      ];
+      const activeClue = clues[Math.floor(Math.random()*clues.length)];
+      const code = activeClue.a;
+      let input = ''; let attempt = 0;
+      window._testStormCode = code;
+      $('storm-clue').textContent = `Decode: ${activeClue.q}`;
+      $('storm-display').textContent = '----';
+      $('storm-attempt').textContent = 1;
+      const gameStart = Date.now();
+      
+      const keypad = $('storm-keypad');
+      keypad.innerHTML = '';
+      [1,2,3,4,5,6,7,8,9,'C',0,'E'].forEach(k => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.padding = '15px';
+        btn.style.fontSize = '1.2rem';
+        btn.textContent = k;
+        btn.onclick = () => {
+          if (!GS.gameActive) return;
+          SFX.click();
+          if(k === 'C') { input = ''; }
+          else if(k === 'E') {
+            if(input === code) {
+              GS.domains.multitasking = Math.min(100, GS.domains.multitasking + 15);
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(15, Date.now()-gameStart, true);
+            } else {
+              SFX.fail();
+              input = '';
+              attempt++;
+              GS.telemetry.matchErrorRate++;
+              if(attempt < 2) {
+                $('storm-attempt').textContent = attempt + 1;
+              } else {
+                GS.gameActive = false;
+                const activeScreen = document.querySelector('.screen.game-screen');
+                if (activeScreen) activeScreen.style.pointerEvents = 'none';
+                onModuleComplete(5, null, false);
+              }
+            }
+          } else {
+            if(input.length < 4) input += k;
+          }
+          $('storm-display').textContent = input.padEnd(4, '-');
+        };
+        keypad.appendChild(btn);
+      });
+    }
+
+    // ─ GAME 10: PATHFINDER ────────────────────────────────────────
+    function startPathfinder(){
+      const board=$('pf-board'); const pfc=$('pf-canvas');
+      const W=Math.min(840,window.innerWidth*.84); const H=Math.min(460,window.innerHeight*.55);
+      board.style.width=W+'px'; board.style.height=H+'px';
+      pfc.width=W; pfc.height=H; pfc.style.width=W+'px'; pfc.style.height=H+'px';
+      const ctx=pfc.getContext('2d');
+      board.querySelectorAll('.pf-node').forEach(n=>n.remove());
+      
+      const startNum = Math.floor(1 + Math.random() * 5);
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const startCharIdx = Math.floor(Math.random() * 16);
+      const labels = [];
+      for(let idx=0; idx<5; idx++) {
+        labels.push((startNum + idx).toString());
+        labels.push(alphabet[startCharIdx + idx]);
+      }
+      
+      const generatedHint = "Tap the nodes in the exact alpha-numeric sequence: " + labels.join(", ") + ". Avoid errors to unlock the ignition sequence.";
+      if (window.MODULES_DATA && window.MODULES_DATA[9]) {
+        window.MODULES_DATA[9].hint = generatedHint;
+      }
+      const notesEl = document.querySelector('#sc-pathfinder .field-manual-sidebar p:last-of-type');
+      if (notesEl) notesEl.innerHTML = generatedHint;
+
+      const nodes=[]; let target=0,errors=0,attempt=0,lastPos=null;
+      $('pf-errors').textContent=0; $('pf-next').textContent=labels[0]; $('pf-attempt').textContent=1;
+      const gameStart=Date.now();
+
+      labels.forEach((lbl,i)=>{
+        let x,y,tries=0;
+        do{ x=65+Math.random()*(W-130); y=65+Math.random()*(H-130); tries++; }
+        while(tries<200&&nodes.some(n=>Math.hypot(n.x-x,n.y-y)<76));
+        nodes.push({x,y});
+        const el=document.createElement('div'); el.className='pf-node'; el.textContent=lbl;
+        el.style.left=x+'px'; el.style.top=y+'px'; el.dataset.idx=i;
+        el.onclick=()=>{
+          if (!GS.gameActive) return;
+          const rt=Date.now()-gameStart;
+          if(i===target){
+            SFX.click(); el.classList.add('done');
+            if(lastPos){ ctx.beginPath(); ctx.moveTo(lastPos.x,lastPos.y); ctx.lineTo(x,y);
+              const g=ctx.createLinearGradient(lastPos.x,lastPos.y,x,y);
+              g.addColorStop(0,'rgba(196,164,101,.9)'); g.addColorStop(1,'rgba(196,164,101,.3)');
+              ctx.strokeStyle=g; ctx.lineWidth=2; ctx.setLineDash([3,5]); ctx.stroke(); ctx.setLineDash([]);
+            }
+            lastPos={x,y}; target++; $('pf-next').textContent=target<labels.length?labels[target]:'✓';
+            GS.domains.cognitiveFlexibility=Math.min(100,GS.domains.cognitiveFlexibility+7);
+            GS.domains.decisionMaking=Math.min(100,GS.domains.decisionMaking+6);
+            if(target>=labels.length) {
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(errors<=3?20:12,rt,true);
+            }
+          } else if(!el.classList.contains('done')){
+            SFX.fail(); errors++; $('pf-errors').textContent=errors;
+            el.classList.add('err'); attempt++;
+            setTimeout(()=>el.classList.remove('err'),380);
+            $('pf-attempt').textContent=attempt+1;
+            GS.domains.errorMonitoring=Math.min(100,GS.domains.errorMonitoring+6);
+            if(attempt>=10) {
+              GS.gameActive = false;
+              const activeScreen = document.querySelector('.screen.game-screen');
+              if (activeScreen) activeScreen.style.pointerEvents = 'none';
+              onModuleComplete(target>=6?10:5,rt,false);
+            }
+          }
+        };
+        board.appendChild(el);
+      });
+    }
+
+    // ─ END GAME ───────────────────────────────────────────────────
+    function endGame(){
+      GS.moduleIdx = 10;
+      closeDialog();
+      const resAcc = $('res-accusation');
+      if (resAcc) resAcc.style.display = 'none';
+      $('progress-bar').style.display='none';
+      $('progress-fill').style.width='100%';
+
+      // Normalize domains
+      Object.keys(GS.domains).forEach(k=>{ if(GS.domains[k]===0) GS.domains[k]=25+Math.floor(Math.random()*30); });
+
+      const total=Math.min(100,Math.round(GS.score/165*100));
+      const rts=GS.rtSamples; const avgRT=rts.length?Math.round(rts.reduce((a,b)=>a+b,0)/rts.length):520;
+      const acc=Math.round(Math.min(99,GS.correctCount/10*100));
+
+      $('res-player').textContent=GS.playerIcon+' '+GS.playerName+' · '+GS.playerRole;
+      $('res-score').textContent=total+'/100'; $('res-acc').textContent=acc+'%'; $('res-rt').textContent=avgRT+'ms';
+
+      const DL={'attention':'Attention','recognition':'Recognition','processingSpeed':'Processing Speed','workingMemory':'Working Memory','decisionMaking':'Decision Making','cognitiveFlexibility':'Cognitive Flexibility','errorMonitoring':'Error Monitoring','persistence':'Persistence','distractionResistance':'Distraction Resist.','multitasking':'Multitasking'};
+      $('domain-bars').innerHTML=Object.entries(GS.domains).map(([k,v])=>`
+        <div class="result-bar-wrap"><div class="result-bar-label">${DL[k]}</div>
+        <div class="result-bar-track"><div class="result-bar-fill" id="rb-${k}" style="width:0%"></div></div>
+        <div class="result-val">${v}%</div></div>`).join('');
+      setTimeout(()=>Object.entries(GS.domains).forEach(([k,v])=>{ const e=$('rb-'+k); if(e)e.style.width=v+'%'; }),300);
+
+      const getR=v=>v<40?'HIGH':v<65?'MODERATE':'LOW';
+      const rClass=r=>r==='HIGH'?'risk-hi':r==='MODERATE'?'risk-med':'risk-low';
+      $('risk-section').innerHTML=[
+        {l:'Memory Risk',r:getR((GS.domains.recognition+GS.domains.workingMemory)/2)},
+        {l:'Executive Risk',r:getR((GS.domains.cognitiveFlexibility+GS.domains.decisionMaking)/2)},
+        {l:'Processing Risk',r:getR((GS.domains.processingSpeed+GS.domains.attention)/2)},
+      ].map(x=>`<div style="background:var(--ink-ss);border:1px solid rgba(196,164,101,.16);padding:16px;border-radius:3px;text-align:center">
+        <div style="font-size:.65rem;color:var(--text-d);font-family:var(--ff-m);letter-spacing:.1em;margin-bottom:8px">${x.l}</div>
+        <div class="risk-badge ${rClass(x.r)}">${x.r}</div></div>`).join('');
+
+      const murdNPC=GS.npcs.find(n=>n.id===GS.murderer);
+      const epilogue = total>65
+        ? `The fragments pointed to ${murdNPC?.name||'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten recovered memories — and the knowledge that some truths only emerge under pressure.`
+        : `The fog was too thick. ${murdNPC?.name||'The host'} disappeared on the last dawn. But the island recorded everything — every choice, every hesitation, every moment of clarity and confusion. The data outlasts the mystery.`;
+      $('res-epilogue').textContent=epilogue;
+
+      saveProgress(); // Final save
+      showDeductionBoard();
+    }
+
+    // ─ DEDUCTION BOARD ────────────────────────────────────────────
+    function showDeductionBoard(){
+      const db=$('deduction-board');
+      const cluesList=[
+        'ECHO project harmed participants 3 years ago',
+        'Data was suppressed and never published',
+        'Two guests signed the final ECHO report',
+        'Three guests lied about the 11 PM meeting',
+        'Security footage shows a figure at 3:14 AM',
+        'Boat was gone before dawn — planned exit',
+        'Five faces in the photograph match guests here',
+        'Two names partially visible in encrypted email',
+        'Victim recognized someone on arrival',
+        "One guest couldn't stream without a phone",
+        'Chef said "three years" then corrected to "last month"',
+        'Neuropsychologist claimed not to leave spa',
+        'Every fragment references the same date — 3 years ago',
+        'Kai Tanaka died near the shore at approximately 11:40 PM',
+        'Radio was destroyed before the first day ended',
+      ];
+      
+      const murdererContradictions = {
+        rowan: [
+          'Resort Host claimed he was checking bookings in the office at 8:15 PM',
+          'Wine glass found in Cabin 7 matches resort host dining inventory',
+          "Host's verified logs show he was in the pantry auditing inventory at 8:15 PM"
+        ],
+        james: [
+          'Neuropsychologist claimed to stay in spa until midnight',
+          'Neuropsychology research notebook found in Cabin 7',
+          'Spa logs show the Neuropsychologist left the spa at 10:17 PM, not midnight'
+        ],
+        mia: [
+          'Influencer claimed to livestream until 11:30 PM',
+          'Perfume bottle found in Cabin 7 belongs to the influencer',
+          "Device logs show the Influencer's phone battery died at 9:30 PM"
+        ],
+        sofia: [
+          'Chef claimed she worked at the resort for three years',
+          'Mystery novel found in Cabin 7 belongs to the chef',
+          "Chef's contract was signed on May 12, 2026 (only one month ago)"
+        ]
+      };
+      
+      const contradictionClues = murdererContradictions[GS.murderer] || [
+        cluesList[9], cluesList[10], cluesList[11]
+      ];
+      
+      const cats=[
+        {cat:'Motive',clues:[cluesList[0],cluesList[1],cluesList[2]]},
+        {cat:'Opportunity',clues:[cluesList[3],cluesList[4],cluesList[5]]},
+        {cat:'Relationship',clues:[cluesList[6],cluesList[7],cluesList[8]]},
+        {cat:'Contradiction',clues:contradictionClues},
+        {cat:'Timeline',clues:[cluesList[12],cluesList[13],cluesList[14]]},
+      ];
+      
+      $('deduction-grid').innerHTML=cats.map(c=>`
+        <div style="border:1px solid rgba(196,164,101,.18);padding:14px;border-radius:3px;background:var(--ink-ss)">
+          <div style="font-family:var(--ff-t);font-size:.7rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">${c.cat}</div>
+          ${c.clues.map(cl=>`<div class="clue-card" onclick="this.classList.toggle('connected');SFX.click()" style="margin-bottom:7px">
+            <div class="clue-cat">Evidence</div>${cl}</div>`).join('')}
+        </div>`).join('');
+
+      $('accuse-btn').onclick=()=>{
+        $('accuse-form').style.display='block';
+        $('accuse-opts').innerHTML=GS.npcs.filter(n => n.id !== GS.victim).map(n=>`
+          <button class="btn-choice" onclick="makeAccusation('${n.id}','${n.name}')">${n.name} — ${n.role}</button>`).join('');
+      };
+
+      showScreen('sc-deduction');
+    }
+
+    function makeAccusation(id, name) {
+      const correct=id===GS.murderer;
+      SFX[correct?'success':'fail']();
+      const msg=correct
+        ? `Correct. ${name} was the killer.\n\nThey returned to destroy the last evidence of PROJECT ECHO — and realized the witnesses were the evidence.`
+        : `Incorrect. ${name} was not the killer.\n\nSomeone else designed this reunion. The truth is still out there.`;
+      
+      GS.killerGuess = id;
+      saveProgress();
+      
+      const userJson = localStorage.getItem('elaris_user');
+      if (userJson) {
+        try {
+          const user = JSON.parse(userJson);
+          const uid = user.user_id || user.id;
+          if (uid) {
+            localStorage.setItem('elaris_completed_game_' + uid, 'true');
+          }
+        } catch(e) {}
+      }
+      
+      $('hud').classList.remove('on');
+      
+      const resAcc = $('res-accusation');
+      if (resAcc) {
+        resAcc.style.display = 'block';
+        resAcc.style.whiteSpace = 'pre-wrap';
+        if (correct) {
+          resAcc.style.background = 'rgba(78, 205, 168, 0.1)';
+          resAcc.style.border = '1px solid rgba(78, 205, 168, 0.3)';
+          resAcc.style.color = '#4ecda8';
+        } else {
+          resAcc.style.background = 'rgba(192, 71, 31, 0.1)';
+          resAcc.style.border = '1px solid rgba(192, 71, 31, 0.3)';
+          resAcc.style.color = '#ff5e4d';
+        }
+        resAcc.innerHTML = `<strong style="font-family: var(--ff-t); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 4px; color: var(--gold-l);">Accusation Outcome</strong>${msg}`;
+      }
+      
+      showScreen('sc-results');
+    }
+
+    // ─ EXIT & TELEMETRY RECORDING ─────────────────────────────────
+    function confirmExit() {
+      SFX.click();
+      showModal('modal-exit-confirm');
+    }
+
+    // ─ TELEMETRY CONVERSION OF AVOIDANCE / ABRUPT WITHDRAWAL ─────
+    function exitConfirmed() {
+      // Record exit depression marker (withdrawal/avoidance behaviors trigger higher scores)
+      recordDASS('depression', 3, "User exited the assessment early");
+      saveProgress();
+      
+      closeModal('modal-exit-confirm');
+      resetToHome();
+    }
+
+    // ─ MODALS CONTROL ─────────────────────────────────────────────
+    function showModal(id) {
+      SFX.click();
+      $(id).classList.add('on');
+    }
+    function closeModal(id) {
+      SFX.click();
+      $(id).classList.remove('on');
+    }
+
+    // MAP MODAL
+    function updateMapActive(currentLoc) {
+      document.querySelectorAll('.map-node').forEach(el => el.classList.remove('active'));
+      const activeNode = $('mn-' + currentLoc);
+      if (activeNode) { activeNode.classList.add('active'); }
+    }
+
+    function mapClick(loc) {
+      SFX.click();
+      alert(`Current destination node: ${loc}. Complete current module tasks to navigate.`);
+    }
+
+
+
+    // EVIDENCE MODAL
+    function showEvidenceModal() {
+      const list = $('evidence-list');
+      list.innerHTML = '';
+      let collected = 0;
+      GS.fragments.forEach((f, idx) => {
+        if(f) {
+          collected++;
+          const fd = MEMORY_FRAGMENTS[idx];
+          list.innerHTML += `
+            <div class="evidence-item" style="grid-column: 1 / -1; margin-bottom: 8px;">
+              <h4>Fragment #${idx+1}</h4>
+              <p style="font-style:italic; font-size:0.72rem; white-space: pre-wrap; line-height: 1.4; color: var(--text-d); margin-top: 4px;">${fd.text}</p>
+            </div>
+          `;
+        }
+      });
+      if(collected === 0) {
+        list.innerHTML = '<div style="grid-column: 1/3; color:var(--text-dm);">No evidence logs collected yet.</div>';
+      }
+      showModal('modal-evidence');
+    }
+
+    // DOSSIER FLIPPING BOOK
+    let currentDossierPage = 0;
+    const dossierList = [
+      ...IDENTITIES,
+      ...NPCS_BASE
+    ];
+
+    function showDossierCard() {
+      const profile = dossierList[currentDossierPage];
+      const details = profile.details || 'No detailed records found.';
+      const alibi = profile.alibi || 'No verified alibi.';
+      const portraitSrc = profile.image || 'assets/portrait_general_1780832290626.png';
+      
+      $('cf-page-num').textContent = currentDossierPage + 1;
+      $('cf-page-total').textContent = dossierList.length;
+
+      $('cf-book-card').innerHTML = `
+        <div class="book-row">
+          <div class="book-page-left">
+            <img class="book-portrait" src="${portraitSrc}" onerror="this.src='assets/portrait_general_1780832290626.png'" />
+            <h4 style="font-size:0.9rem; color:var(--gold-l);">${profile.icon || ''} ${profile.name}</h4>
+            <p style="font-size:0.68rem; color:var(--text-d); font-family:var(--ff-m);">${profile.role}</p>
+          </div>
+          <div class="book-page-right-wrapper" style="position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; width: 100%;">
+            <div class="book-page-right" id="cf-page-right" style="flex: 1; overflow-y: auto; padding-right: 5px; padding-bottom: 25px;">
+              <h5 style="color:var(--gold); font-family:var(--ff-t); font-size:0.7rem; margin-bottom:5px;">dossier files</h5>
+              <p style="margin-bottom:12px; font-size:0.75rem; color:var(--text-p);">${details}</p>
+              <h5 style="color:var(--rust); font-family:var(--ff-t); font-size:0.7rem; margin-bottom:2px;">alibi timeline</h5>
+              <p style="font-style:italic; font-size:0.72rem; color:var(--text-d);">${alibi}</p>
+            </div>
+            <div class="scroll-arrow-down" id="dossier-scroll-arrow" style="display: none;">▼</div>
+          </div>
+        </div>
+      `;
+
+      const pageRight = $('cf-page-right');
+      const arrow = $('dossier-scroll-arrow');
+      
+      const updateArrow = () => {
+        const maxScroll = pageRight.scrollHeight - pageRight.clientHeight;
+        if (maxScroll > 1 && pageRight.scrollTop < maxScroll - 5) {
+          arrow.style.display = 'flex';
+        } else {
+          arrow.style.display = 'none';
+        }
+      };
+
+      setTimeout(updateArrow, 100);
+      pageRight.onscroll = updateArrow;
+      
+      arrow.onclick = () => {
+        pageRight.scrollBy({ top: 60, behavior: 'smooth' });
+      };
+    }
+
+    function prevDossierPage() {
+      SFX.click();
+      if(currentDossierPage > 0) {
+        currentDossierPage--;
+        showDossierCard();
+      }
+    }
+
+    function nextDossierPage() {
+      SFX.click();
+      if(currentDossierPage < dossierList.length - 1) {
+        currentDossierPage++;
+        showDossierCard();
+      }
+    }
+
+    // Hook Files dossiers button
+    $('cf-btn').onclick = () => {
+      currentDossierPage = 0;
+      showDossierCard();
+      showModal('modal-cf');
+    };
+    
+    // Hook Map button
+    $('map-btn').onclick = () => {
+      showModal('modal-map');
+    };
+
+    // ─ PROGRESS SAVE (localStorage → admin can read) ──────────────
+    function saveProgress(){
+      const data={
+        player:{ name:GS.playerName, role:GS.playerRole, icon:GS.playerIcon },
+        score:GS.score, moduleIdx:GS.moduleIdx,
+        moduleScores:GS.moduleScores,
+        domains:GS.domains,
+        fragments:GS.fragments,
+        dass: {
+          depression: Math.round(((GS.dass.depression || []).reduce((a, b) => a + b, 0)) * (14 / 3)),
+          anxiety:    Math.round(((GS.dass.anxiety    || []).reduce((a, b) => a + b, 0)) * (14 / 3)),
+          stress:     Math.round(((GS.dass.stress     || []).reduce((a, b) => a + b, 0)) * (14 / 3))
+        },
+        dassRaw: GS.dassRaw,
+        rtSamples:GS.rtSamples,
+        correctCount:GS.correctCount,
+        attemptCount:GS.attemptCount,
+        murderer:GS.murderer,
+        killerGuess:GS.killerGuess || "",
+        sessionStart:GS.sessionStart,
+        lastUpdated:Math.floor(Date.now() / 1000)
+      };
+      localStorage.setItem('elaris_session', JSON.stringify(data));
+      localStorage.setItem('elaris_session_ts', Date.now());
+      
+      // Update Go backend progress as well
+      const userJson = localStorage.getItem('elaris_user');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        fetch('/api/user/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.user_id || user.id,
+            progress: data
+          }),
+          keepalive: true
+        }).catch(err => console.warn('telemetry save error:', err));
+      }
+    }
+
+    // Auto-save telemetry on midway exits (tab close, minimize, navigate away)
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveProgress();
+      }
+    });
+    window.addEventListener('pagehide', saveProgress);
+
+    function checkProgressButton() {
+      const btn = $('btn-home-progress');
+      if (!btn) return;
+      
+      const userJson = localStorage.getItem('elaris_user');
+      if (!userJson) {
+        btn.style.display = 'none';
+        return;
+      }
+      
+      try {
+        const user = JSON.parse(userJson);
+        const uid = user.user_id || user.id;
+        if (!uid) {
+          btn.style.display = 'none';
+          return;
+        }
+        
+        // 1. Check local storage flag first for immediate display
+        const localFlagKey = 'elaris_completed_game_' + uid;
+        if (localStorage.getItem(localFlagKey) === 'true') {
+          btn.style.display = 'block';
+          return;
+        }
+        
+        // 2. Query backend to see if there are past completed sessions
+        fetch('/api/sessions?user_id=' + encodeURIComponent(uid))
+          .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch sessions');
+            return res.json();
+          })
+          .then(sessions => {
+            // A session is completed if killer_guess is not empty
+            const hasCompleted = sessions && sessions.some(s => s.killer_guess && s.killer_guess.trim() !== "");
+            if (hasCompleted) {
+              localStorage.setItem(localFlagKey, 'true');
+              btn.style.display = 'block';
+            } else {
+              btn.style.display = 'none';
+            }
+          })
+          .catch(err => {
+            console.warn('Error checking past progress:', err);
+            btn.style.display = 'none';
+          });
+          
+      } catch (e) {
+        console.error('Error parsing user storage:', e);
+        btn.style.display = 'none';
+      }
+    }
+
+    // ─ INIT ───────────────────────────────────────────────────────
+    initBG();
+    checkProgressButton();
+  </script>
+</body>
+</html>

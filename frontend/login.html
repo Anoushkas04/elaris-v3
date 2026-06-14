@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Last Trip to Elaris Island — Board the Vessel</title>
+
+  <!-- ── Google Fonts ───────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Special+Elite&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ━━━━━━━━━━━━━━━━━━━━  CSS VARIABLES  ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    :root {
+      --gold:   #c4a465;
+      --gold-l: #f0e2b8;
+      --gold-d: #7a5e30;
+      --ink:    #050508;
+      --ink-m:  #0a0a14;
+      --rust:   #c0471f;
+      --teal:   #2e9a78;
+      --ff-t:   'Cinzel', serif;
+      --ff-b:   'Crimson Text', serif;
+      --ff-m:   'Special Elite', cursive;
+
+      /* derived */
+      --glass-bg:     rgba(10, 10, 20, 0.72);
+      --glass-border: rgba(196, 164, 101, 0.25);
+      --input-bg:     rgba(255,255,255,0.04);
+      --input-border: rgba(196,164,101,0.30);
+      --tab-active:   rgba(196,164,101,0.12);
+      --shadow-gold:  0 0 30px rgba(196,164,101,0.18), 0 0 80px rgba(196,164,101,0.06);
+      --radius:       14px;
+      --transition:   0.28s cubic-bezier(.4,0,.2,1);
+      --surface-d:    rgba(15, 20, 25, 0.95);
+      --border-l:     rgba(196, 164, 101, 0.25);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  RESET / BASE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--ink);
+      color: #d8cbb5;
+      font-family: var(--ff-b);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    ::selection { background: rgba(196,164,101,0.30); color: var(--gold-l); }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  CANVAS BACKGROUND  ━━━━━━━━━━━━━━━━━━━━━━ */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  FLOATING PARTICLES  ━━━━━━━━━━━━━━━━━━━━━ */
+    .particle-field {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--gold-l) 0%, var(--gold) 40%, transparent 70%);
+      opacity: 0;
+      animation: floatParticle var(--dur, 12s) var(--delay, 0s) infinite ease-in-out;
+    }
+
+    @keyframes floatParticle {
+      0%   { transform: translateY(0px) translateX(0px) scale(1);   opacity: 0; }
+      15%  { opacity: var(--op, 0.55); }
+      50%  { transform: translateY(var(--dy, -60px)) translateX(var(--dx, 20px)) scale(1.15); opacity: var(--op, 0.55); }
+      85%  { opacity: var(--op, 0.55); }
+      100% { transform: translateY(0px) translateX(0px) scale(1);   opacity: 0; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  PAGE LAYOUT  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 16px 100px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  TOP HEADER  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .hero-header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 680px;
+    }
+
+    .invite-label {
+      font-family: var(--ff-m);
+      font-size: 0.70rem;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: var(--gold-d);
+      opacity: 0.85;
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-family: var(--ff-t);
+      font-size: clamp(2.4rem, 7vw, 4.2rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+      text-shadow:
+        0 0 12px rgba(196,164,101,0.55),
+        0 0 35px rgba(196,164,101,0.28),
+        0 0 70px rgba(196,164,101,0.12),
+        0 2px 4px rgba(0,0,0,0.8);
+      animation: titlePulse 5s ease-in-out infinite;
+    }
+
+    @keyframes titlePulse {
+      0%, 100% { text-shadow: 0 0 12px rgba(196,164,101,.55), 0 0 35px rgba(196,164,101,.28), 0 0 70px rgba(196,164,101,.12), 0 2px 4px rgba(0,0,0,.8); }
+      50%       { text-shadow: 0 0 20px rgba(196,164,101,.75), 0 0 55px rgba(196,164,101,.40), 0 0 100px rgba(196,164,101,.18), 0 2px 4px rgba(0,0,0,.8); }
+    }
+
+    .hero-subtitle {
+      font-family: var(--ff-b);
+      font-style: italic;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      color: #a89070;
+      margin-top: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-divider {
+      margin: 22px auto;
+      height: 1px;
+      width: 320px;
+      max-width: 90%;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--gold-d) 25%,
+        var(--gold) 50%,
+        var(--gold-d) 75%,
+        transparent 100%
+      );
+      opacity: 0.6;
+      position: relative;
+    }
+
+    .hero-divider::before,
+    .hero-divider::after {
+      content: '◆';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.40rem;
+      color: var(--gold);
+      opacity: 0.8;
+    }
+    .hero-divider::before { left: 18%; }
+    .hero-divider::after  { right: 18%; }
+
+    .hero-pullquote {
+      font-family: var(--ff-b);
+      font-style: italic;
+      font-size: clamp(0.88rem, 2vw, 1.05rem);
+      color: #7a6a52;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  CARD  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow:
+        var(--shadow-gold),
+        0 32px 80px rgba(0,0,0,0.70),
+        inset 0 1px 0 rgba(196,164,101,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* gold top border accent */
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--gold-d) 15%,
+        var(--gold) 40%,
+        var(--gold-l) 50%,
+        var(--gold) 60%,
+        var(--gold-d) 85%,
+        transparent 100%
+      );
+      z-index: 10;
+    }
+
+    /* subtle inner corner glows */
+    .auth-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(ellipse 60% 30% at 50% 0%, rgba(196,164,101,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 100% 100%, rgba(46,154,120,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  TABS  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--glass-border);
+      position: relative;
+      z-index: 2;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 18px 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--ff-t);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #5a4e38;
+      transition: color var(--transition), background var(--transition);
+      position: relative;
+      outline: none;
+    }
+
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 20%; right: 20%;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform var(--transition);
+      border-radius: 2px;
+    }
+
+    .tab-btn.active {
+      color: var(--gold);
+      background: var(--tab-active);
+    }
+    .tab-btn.active::after { transform: scaleX(1); }
+    .tab-btn:hover:not(.active) { color: #a08858; background: rgba(196,164,101,0.04); }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  FORM PANELS  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .panels { position: relative; z-index: 2; }
+
+    .panel {
+      padding: 36px 36px 28px;
+      display: none;
+      animation: fadeSlideIn 0.35s ease forwards;
+    }
+    .panel.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  FORM ELEMENTS  ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      font-family: var(--ff-m);
+      font-size: 0.68rem;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--gold-d);
+      margin-bottom: 7px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: #e0d5c0;
+      font-family: var(--ff-b);
+      font-size: 1rem;
+      outline: none;
+      transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background var(--transition);
+    }
+
+    .field input::placeholder { color: #3a3428; }
+
+    .field input:focus {
+      border-color: rgba(196,164,101,0.65);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 3px rgba(196,164,101,0.10), 0 0 20px rgba(196,164,101,0.08);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  ERROR MESSAGE  ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .error-msg {
+      font-family: var(--ff-b);
+      font-size: 0.88rem;
+      color: var(--rust);
+      background: rgba(192,71,31,0.10);
+      border: 1px solid rgba(192,71,31,0.25);
+      border-radius: 6px;
+      padding: 9px 14px;
+      margin-bottom: 18px;
+      display: none;
+      animation: fadeSlideIn 0.25s ease;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  SUBMIT BUTTON  ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .btn-submit {
+      width: 100%;
+      padding: 15px 20px;
+      border: 1px solid var(--gold-d);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--gold);
+      font-family: var(--ff-t);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color var(--transition), border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+      margin-top: 6px;
+    }
+
+    /* fill-slide hover animation */
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--gold-d), var(--gold), var(--gold-l), var(--gold), var(--gold-d));
+      background-size: 200% 100%;
+      transform: translateX(-101%);
+      transition: transform 0.40s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+
+    .btn-submit span { position: relative; z-index: 1; }
+
+    .btn-submit:hover {
+      color: var(--ink);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(196,164,101,0.30), 0 6px 20px rgba(0,0,0,0.40);
+    }
+    .btn-submit:hover::before { transform: translateX(0); }
+
+    .btn-submit:active { transform: scale(0.985); }
+
+    .btn-submit.loading { pointer-events: none; opacity: 0.65; }
+    .btn-submit.loading span::after {
+      content: ' ···';
+      animation: dots 1.2s steps(3, end) infinite;
+    }
+    @keyframes dots {
+      0%   { content: ' ·'; }
+      33%  { content: ' ··'; }
+      66%  { content: ' ···'; }
+      100% { content: ' ·'; }
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  IDENTITY GRID  ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .identity-section {
+      margin-bottom: 22px;
+    }
+
+    .identity-section-label {
+      font-family: var(--ff-m);
+      font-size: 0.68rem;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--gold-d);
+      margin-bottom: 12px;
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .id-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(196,164,101,0.15);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition:
+        border-color var(--transition),
+        background var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+      user-select: none;
+      -webkit-user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .id-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(196,164,101,0.08) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .id-card:hover {
+      border-color: rgba(196,164,101,0.45);
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    }
+    .id-card:hover::before { opacity: 1; }
+
+    .id-card.selected {
+      border-color: var(--gold);
+      background: rgba(196,164,101,0.10);
+      box-shadow: 0 0 0 1px var(--gold-d), 0 0 20px rgba(196,164,101,0.18), 0 8px 24px rgba(0,0,0,0.40);
+    }
+    .id-card.selected::before { opacity: 1; }
+
+    /* selected check mark */
+    .id-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 5px; right: 7px;
+      font-size: 0.60rem;
+      color: var(--gold);
+      font-weight: bold;
+    }
+
+    .id-icon {
+      font-size: 1.65rem;
+      line-height: 1;
+      margin-bottom: 6px;
+      display: block;
+      filter: drop-shadow(0 0 6px rgba(196,164,101,0.20));
+    }
+
+    .id-name {
+      font-family: var(--ff-t);
+      font-size: 0.60rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .id-trait {
+      font-family: var(--ff-b);
+      font-style: italic;
+      font-size: 0.68rem;
+      color: #5a4e38;
+      line-height: 1.3;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  ADMIN LINK  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .admin-footer {
+      text-align: center;
+      padding: 18px 36px 26px;
+      border-top: 1px solid rgba(196,164,101,0.08);
+      position: relative;
+      z-index: 2;
+    }
+
+    .admin-link {
+      font-family: var(--ff-b);
+      font-style: italic;
+      font-size: 0.82rem;
+      color: #3e3528;
+      text-decoration: none;
+      transition: color var(--transition);
+      letter-spacing: 0.02em;
+    }
+    .admin-link:hover { color: var(--gold-d); }
+    .admin-link:hover .admin-arrow { transform: translateX(4px); }
+
+    .admin-arrow {
+      display: inline-block;
+      transition: transform var(--transition);
+      margin-left: 3px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  ADMIN MODAL  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .admin-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8, 12, 16, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .admin-modal-overlay.show {
+      opacity: 1; pointer-events: auto;
+    }
+    .admin-modal-content {
+      width: 100%; max-width: 360px;
+      padding: 30px;
+      background: var(--surface-d);
+      border: 1px solid var(--border-l);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .admin-modal-overlay.show .admin-modal-content {
+      transform: translateY(0);
+    }
+    .admin-modal-content h2 { 
+      margin-top: 0; margin-bottom: 20px; 
+      color: var(--gold-l); 
+      font-family: var(--ff-t);
+      font-size: 1.4rem;
+      text-align: center;
+    }
+    .admin-modal-error {
+      color: var(--rust);
+      font-size: 0.85rem;
+      text-align: center;
+      margin-bottom: 15px;
+      min-height: 1.2rem;
+    }
+
+    /* Admin Modal Inputs Styling */
+    .admin-modal-content .input-group {
+      position: relative;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .admin-modal-content .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(196, 164, 101, 0.25);
+      border-radius: 8px;
+      color: #e0d5c0;
+      font-family: var(--ff-b);
+      font-size: 1.05rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .admin-modal-content .input-group input:focus {
+      border-color: rgba(196, 164, 101, 0.65);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 0 3px rgba(196, 164, 101, 0.10), 0 0 15px rgba(196, 164, 101, 0.06);
+    }
+    .admin-modal-content .input-group label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--ff-m);
+      font-size: 0.82rem;
+      color: #7a7a8a;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.05em;
+    }
+    .admin-modal-content .input-group input:focus ~ label,
+    .admin-modal-content .input-group input:not(:placeholder-shown) ~ label {
+      top: 0;
+      transform: translateY(-50%);
+      font-size: 0.65rem;
+      color: var(--gold-l);
+      background: #0f141a; /* Matches surface-d solid background color */
+      padding: 0 6px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  PROTOCOL WARNING TOAST  ━━━━━━━━━━━━━━━━━ */
+    .proto-warning {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: rgba(12,8,4,0.95);
+      border: 1px solid rgba(192,71,31,0.50);
+      border-radius: 10px;
+      padding: 14px 22px;
+      max-width: 440px;
+      width: calc(100% - 32px);
+      font-family: var(--ff-b);
+      font-size: 0.88rem;
+      color: #c89070;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.70), 0 0 0 1px rgba(192,71,31,0.20);
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+      backdrop-filter: blur(10px);
+    }
+    .proto-warning.show { transform: translateX(-50%) translateY(0); }
+    .proto-warning strong { color: var(--rust); font-family: var(--ff-m); font-style: normal; font-size: 0.80rem; letter-spacing: 0.08em; }
+    .proto-warning code { font-family: var(--ff-m); font-size: 0.82rem; color: var(--gold); background: rgba(196,164,101,0.12); padding: 1px 5px; border-radius: 3px; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  SCROLLBAR  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--ink); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-d); border-radius: 3px; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━  RESPONSIVE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 520px) {
+      .panel { padding: 28px 20px 22px; }
+      .admin-footer { padding: 16px 20px 22px; }
+      .identity-grid { gap: 7px; }
+      .id-card { padding: 10px 5px; }
+      .id-icon { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── CANVAS BACKGROUND ─────────────────────────────────────────── -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ── FLOATING PARTICLE DUST ────────────────────────────────────── -->
+  <div class="particle-field" id="particle-field" aria-hidden="true"></div>
+
+  <!-- ── PROTOCOL WARNING TOAST ────────────────────────────────────── -->
+  <div class="proto-warning" id="proto-warning" role="alert" aria-live="polite">
+    <strong>⚠ FILE PROTOCOL DETECTED</strong><br />
+    This page requires a running server to reach the API. Open it at
+    <code>http://localhost:8080/login.html</code> to enable authentication.
+  </div>
+
+  <!-- ── PAGE WRAPPER ──────────────────────────────────────────────── -->
+  <div class="page-wrapper">
+
+    <!-- HERO HEADER -->
+    <header class="hero-header" role="banner">
+      <p class="invite-label">You Are Cordially Invited</p>
+      <h1 class="hero-title">Elaris Island</h1>
+      <p class="hero-subtitle">A weekend designed to help you escape stress&nbsp;—&nbsp;forever.</p>
+      <div class="hero-divider" aria-hidden="true"></div>
+      <p class="hero-pullquote">
+        &ldquo;Ten strangers. One island. No way out until the truth is found.&rdquo;
+      </p>
+    </header>
+
+    <!-- AUTH CARD -->
+    <main class="auth-card" role="main" aria-label="Authentication">
+
+      <!-- TABS -->
+      <div class="tabs" role="tablist" aria-label="Choose action">
+        <button
+          class="tab-btn active"
+          id="tab-login"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-login"
+          data-target="login"
+        >Board the Boat</button>
+        <button
+          class="tab-btn"
+          id="tab-register"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-register"
+          data-target="register"
+        >New Guest</button>
+      </div>
+
+      <!-- PANELS -->
+      <div class="panels">
+
+        <!-- ── LOGIN PANEL ─────────────────────────────────────────── -->
+        <section
+          class="panel active"
+          id="panel-login"
+          role="tabpanel"
+          aria-labelledby="tab-login"
+        >
+          <div class="error-msg" id="login-error" role="alert"></div>
+
+          <form id="login-form" novalidate autocomplete="off">
+            <div class="field">
+              <label for="login-name">Your Name</label>
+              <input
+                id="login-name"
+                type="text"
+                name="name"
+                placeholder="As printed on your invitation…"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="login-pass">Passphrase</label>
+              <input
+                id="login-pass"
+                type="password"
+                name="passphrase"
+                placeholder="The words whispered at the dock…"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn-submit" id="login-btn">
+              <span>Set Sail</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- ── REGISTER PANEL ──────────────────────────────────────── -->
+        <section
+          class="panel"
+          id="panel-register"
+          role="tabpanel"
+          aria-labelledby="tab-register"
+        >
+          <div class="error-msg" id="register-error" role="alert"></div>
+
+          <form id="register-form" novalidate autocomplete="off">
+            <div class="field">
+              <label for="reg-name">Your Name</label>
+              <input
+                id="reg-name"
+                type="text"
+                name="name"
+                placeholder="Full name on the manifest…"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="reg-age">Age</label>
+              <input
+                id="reg-age"
+                type="number"
+                name="age"
+                min="18"
+                max="99"
+                placeholder="18 or above to board…"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="reg-pass">Passphrase</label>
+              <input
+                id="reg-pass"
+                type="password"
+                name="passphrase"
+                placeholder="Choose your secret phrase…"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+
+
+
+            <button type="submit" class="btn-submit" id="register-btn">
+              <span>Claim Your Cabin</span>
+            </button>
+          </form>
+        </section>
+
+      </div><!-- /panels -->
+
+      <!-- ADMIN FOOTER -->
+      <div class="admin-footer">
+        <a href="admin.html" class="admin-link">
+          Admin access? Enter the Control Room<span class="admin-arrow"> →</span>
+        </a>
+      </div>
+
+    </main><!-- /auth-card -->
+  </div><!-- /page-wrapper -->
+
+  <!-- ── API HELPER (provided by backend build) ─────────────────────── -->
+  <script src="static/js/api.js"></script>
+
+  <!-- ── MAIN SCRIPT ───────────────────────────────────────────────── -->
+  <script>
+  (() => {
+    'use strict';
+
+    /* ── 0. FILE PROTOCOL WARNING ──────────────────────────────── */
+    if (window.location.protocol === 'file:') {
+      const toast = document.getElementById('proto-warning');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { toast.classList.add('show'); });
+      });
+      /* auto-hide after 9s */
+      setTimeout(() => toast.classList.remove('show'), 9000);
+    }
+
+    /* ── 1. CANVAS — STARS + OCEAN WAVES ──────────────────────── */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    let W, H, stars = [], waves = [], animFrame;
+
+    /* star data */
+    function initStars() {
+      stars = [];
+      const N = 140;
+      for (let i = 0; i < N; i++) {
+        stars.push({
+          x:       Math.random() * W,
+          y:       Math.random() * H * 0.80,          /* stay in upper 80% */
+          r:       Math.random() * 1.5 + 0.3,
+          baseOp:  Math.random() * 0.55 + 0.15,
+          op:      0,
+          speed:   Math.random() * 0.35 + 0.08,       /* drift speed */
+          driftX:  (Math.random() - 0.5) * 0.10,
+          twinkle: Math.random() * Math.PI * 2,
+          twSpeed: Math.random() * 0.012 + 0.004,
+        });
+      }
+    }
+
+    /* wave data — 3 layers */
+    function initWaves() {
+      waves = [
+        { amp: 38, period: 0.012, speed: 0.0008, phase: 0,   color: 'rgba(46,154,120,0.12)', yOff: 0.82 },
+        { amp: 28, period: 0.018, speed: 0.0012, phase: 2.1, color: 'rgba(30,100,160,0.09)', yOff: 0.87 },
+        { amp: 20, period: 0.024, speed: 0.0018, phase: 4.5, color: 'rgba(46,154,120,0.07)', yOff: 0.92 },
+      ];
+    }
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      initStars();
+      initWaves();
+    }
+
+    function drawStars(t) {
+      for (const s of stars) {
+        s.twinkle += s.twSpeed;
+        s.op = s.baseOp + Math.sin(s.twinkle) * 0.22;
+        s.x += s.driftX;
+        if (s.x < -2)  s.x = W + 2;
+        if (s.x > W+2) s.x = -2;
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240,226,184,${Math.max(0, Math.min(1, s.op))})`;
+        ctx.fill();
+      }
+    }
+
+    function drawWave(wave, t) {
+      wave.phase += wave.speed;
+      const yBase = H * wave.yOff;
+
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 3) {
+        const y = yBase + Math.sin(x * wave.period + wave.phase) * wave.amp
+                        + Math.sin(x * wave.period * 1.7 + wave.phase * 1.3) * (wave.amp * 0.4);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      ctx.fillStyle = wave.color;
+      ctx.fill();
+    }
+
+    function loop(t) {
+      ctx.clearRect(0, 0, W, H);
+
+      /* subtle vignette overlay */
+      const vg = ctx.createRadialGradient(W/2, H/2, H*0.10, W/2, H/2, H*0.90);
+      vg.addColorStop(0, 'transparent');
+      vg.addColorStop(1, 'rgba(5,5,8,0.55)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, W, H);
+
+      drawStars(t);
+      for (const w of waves) drawWave(w, t);
+
+      animFrame = requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+    animFrame = requestAnimationFrame(loop);
+
+    /* ── 2. FLOATING PARTICLES ─────────────────────────────────── */
+    (function spawnParticles() {
+      const field  = document.getElementById('particle-field');
+      const COUNT  = 18;
+      const configs = [
+        { size:3, op:0.55, dur:11, dx:18,  dy:-55 },
+        { size:2, op:0.40, dur:14, dx:-22, dy:-70 },
+        { size:4, op:0.35, dur:9,  dx:12,  dy:-40 },
+        { size:2, op:0.50, dur:16, dx:-10, dy:-80 },
+        { size:3, op:0.45, dur:12, dx:25,  dy:-60 },
+        { size:2, op:0.38, dur:18, dx:-18, dy:-50 },
+      ];
+
+      for (let i = 0; i < COUNT; i++) {
+        const c   = configs[i % configs.length];
+        const p   = document.createElement('div');
+        p.className = 'particle';
+        const size = c.size + Math.random() * 2;
+        p.style.cssText = [
+          `width:${size}px`,
+          `height:${size}px`,
+          `left:${Math.random() * 100}%`,
+          `top:${20 + Math.random() * 70}%`,
+          `--dur:${c.dur + Math.random() * 6}s`,
+          `--delay:${-Math.random() * 15}s`,
+          `--op:${c.op}`,
+          `--dx:${c.dx + (Math.random()-0.5)*10}px`,
+          `--dy:${c.dy + (Math.random()-0.5)*20}px`,
+        ].join(';');
+        field.appendChild(p);
+      }
+    })();
+
+    /* ── 3. TABS ───────────────────────────────────────────────── */
+    const tabBtns  = document.querySelectorAll('.tab-btn');
+    const panels   = document.querySelectorAll('.panel');
+
+    function switchTab(target) {
+      tabBtns.forEach(b => {
+        const active = b.dataset.target === target;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', active);
+      });
+      panels.forEach(p => {
+        const active = p.id === `panel-${target}`;
+        p.classList.toggle('active', active);
+        /* reset animation */
+        if (active) {
+          p.style.animation = 'none';
+          p.offsetHeight; // reflow
+          p.style.animation = '';
+        }
+      });
+      /* clear errors */
+      document.querySelectorAll('.error-msg').forEach(e => {
+        e.textContent = '';
+        e.classList.remove('visible');
+      });
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.target));
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          switchTab(btn.dataset.target);
+        }
+        /* arrow key navigation */
+        if (e.key === 'ArrowRight') tabBtns[1].focus();
+        if (e.key === 'ArrowLeft')  tabBtns[0].focus();
+      });
+    });
+
+    /* ── 4. IDENTITY CARD SELECTION ────────────────────────────── */
+    let selectedIdentity = null;
+
+    document.querySelectorAll('.id-card').forEach(card => {
+      card.addEventListener('click', () => selectCard(card));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectCard(card);
+        }
+      });
+    });
+
+    function selectCard(card) {
+      document.querySelectorAll('.id-card').forEach(c => {
+        c.classList.remove('selected');
+        c.setAttribute('aria-checked', 'false');
+      });
+      card.classList.add('selected');
+      card.setAttribute('aria-checked', 'true');
+      selectedIdentity = { id: card.dataset.id, name: card.dataset.name };
+    }
+
+    /* ── 5. SHOW / HIDE ERROR ──────────────────────────────────── */
+    function showError(panelPrefix, msg) {
+      const el = document.getElementById(`${panelPrefix}-error`);
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function clearError(panelPrefix) {
+      const el = document.getElementById(`${panelPrefix}-error`);
+      el.textContent = '';
+      el.classList.remove('visible');
+    }
+
+    /* ── 6. PERSIST USER & REDIRECT ────────────────────────────── */
+    function persistAndRedirect(data) {
+      const user = {
+        id:           data.id           ?? data.user?.id,
+        name:         data.name         ?? data.user?.name,
+        identity:     data.identity     ?? data.user?.identity,
+        identityName: data.identityName ?? data.user?.identityName,
+        avatar:       data.avatar       ?? data.user?.avatar ?? '',
+        age:          data.age          ?? data.user?.age,
+      };
+      localStorage.setItem('elaris_user', JSON.stringify(user));
+      window.location.href = 'phq9.html';
+    }
+
+    /* ── 7. LOGIN FORM ─────────────────────────────────────────── */
+    const loginForm = document.getElementById('login-form');
+    const loginBtn  = document.getElementById('login-btn');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError('login');
+
+      const name       = document.getElementById('login-name').value.trim();
+      const passphrase = document.getElementById('login-pass').value;
+
+      if (!name)       { showError('login', 'Please enter your name.');       return; }
+      if (!passphrase) { showError('login', 'Please enter your passphrase.'); return; }
+
+      loginBtn.classList.add('loading');
+
+      try {
+        const res  = await fetch('/api/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ name, passphrase }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          showError('login', data.error || data.message || 'The island does not recognise you.');
+          return;
+        }
+
+        persistAndRedirect(data);
+
+      } catch (err) {
+        showError('login', 'Unable to reach the vessel — is the server running?');
+      } finally {
+        loginBtn.classList.remove('loading');
+      }
+    });
+
+    /* ── 8. REGISTER FORM ──────────────────────────────────────── */
+    const registerForm = document.getElementById('register-form');
+    const registerBtn  = document.getElementById('register-btn');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError('register');
+
+      const name       = document.getElementById('reg-name').value.trim();
+      const age        = parseInt(document.getElementById('reg-age').value, 10);
+      const passphrase = document.getElementById('reg-pass').value;
+
+      if (!name)              { showError('register', 'Please enter your name.');             return; }
+      if (!age || age < 18)   { showError('register', 'You must be 18 or older to board.');  return; }
+      if (!passphrase)        { showError('register', 'Please choose a passphrase.');         return; }
+
+      registerBtn.classList.add('loading');
+
+      try {
+        const res  = await fetch('/api/register', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            name,
+            age,
+            passphrase,
+            identity:     '',
+            identityName: '',
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          showError('register', data.error || data.message || 'Registration declined — try again.');
+          return;
+        }
+
+        persistAndRedirect(data);
+
+      } catch (err) {
+        showError('register', 'Unable to reach the vessel — is the server running?');
+      } finally {
+        registerBtn.classList.remove('loading');
+      }
+    });
+
+    /* ── 9. KEYBOARD ACCESSIBILITY FOR ID CARDS ────────────────── */
+    /* roving tabindex within the grid */
+    const idCards = Array.from(document.querySelectorAll('.id-card'));
+    idCards.forEach((card, idx) => {
+      card.addEventListener('keydown', e => {
+        let next = -1;
+        if (e.key === 'ArrowRight') next = (idx + 1) % idCards.length;
+        if (e.key === 'ArrowLeft')  next = (idx - 1 + idCards.length) % idCards.length;
+        if (e.key === 'ArrowDown')  next = Math.min(idx + 3, idCards.length - 1);
+        if (e.key === 'ArrowUp')    next = Math.max(idx - 3, 0);
+        if (next !== -1) {
+          e.preventDefault();
+          idCards[next].focus();
+        }
+      });
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🔐 Control Room — Elaris Island</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
+<style>
+/* ── CSS Variables ── */
+:root {
+  --gold:   #c4a465;
+  --gold-d: #8e6f38;
+  --ink:    #050508;
+  --ink2:   #0d0d14;
+  --ink3:   #14141f;
+  --ink4:   #1c1c2a;
+  --rust:   #c0471f;
+  --teal:   #2e9a78;
+  --teal-d: #1d6650;
+  --mist:   #a8b4c0;
+  --pale:   #d4c9b8;
+  --dim:    #4a4a5e;
+  --green:  #3db87a;
+  --amber:  #d4a017;
+  --panel:  rgba(20,20,31,0.85);
+  --border: rgba(196,164,101,0.18);
+  --glow:   rgba(196,164,101,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--pale);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Canvas Background ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Layout Wrapper ── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* ── Header ── */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-left h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 24px rgba(196,164,101,0.35);
+  line-height: 1.1;
+}
+.header-left p {
+  font-family: 'Crimson Text', serif;
+  font-size: 1rem;
+  color: var(--mist);
+  margin-top: 4px;
+  font-style: italic;
+}
+.header-right a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: var(--mist);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+  letter-spacing: 0.05em;
+}
+.header-right a:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: var(--glow);
+  text-shadow: 0 0 12px rgba(196,164,101,0.4);
+}
+
+/* ── Live indicator ── */
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  display: inline-block;
+  box-shadow: 0 0 8px var(--teal);
+  animation: pulse-live 2s ease-in-out infinite;
+}
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+/* ── Stats Bar ── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 28px 0;
+}
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 18px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+  transition: border-color 0.25s ease, transform 0.2s ease;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+.stat-card:hover { border-color: rgba(196,164,101,0.4); transform: translateY(-2px); }
+.stat-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.7rem;
+  color: var(--mist);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.stat-value {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(196,164,101,0.3);
+}
+.stat-sub {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 4px;
+  font-style: italic;
+}
+.stat-icon {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-size: 1.4rem;
+  opacity: 0.25;
+}
+
+/* ── Controls Row ── */
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.search-wrap input {
+  width: 100%;
+  background: var(--ink3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--pale);
+  font-family: 'Crimson Text', serif;
+  font-size: 1rem;
+  padding: 10px 14px 10px 38px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--gold); }
+.search-wrap input::placeholder { color: var(--dim); font-style: italic; }
+.search-icon {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--dim);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  padding: 9px 16px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--ink3);
+  color: var(--mist);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn:hover { color: var(--gold); border-color: var(--gold); background: var(--glow); }
+.btn.active { background: rgba(196,164,101,0.15); color: var(--gold); border-color: var(--gold); }
+.btn-refresh {
+  background: rgba(46,154,120,0.12);
+  border-color: rgba(46,154,120,0.35);
+  color: var(--teal);
+}
+.btn-refresh:hover { background: rgba(46,154,120,0.22); border-color: var(--teal); color: #fff; }
+.btn-export {
+  background: rgba(192,71,31,0.12);
+  border-color: rgba(192,71,31,0.35);
+  color: #e07050;
+}
+.btn-export:hover { background: rgba(192,71,31,0.22); border-color: var(--rust); color: #fff; }
+.btn-refresh svg, .btn-export svg { vertical-align: middle; margin-right: 5px; }
+
+/* ── Table Wrapper ── */
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.table-header-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.75rem;
+  color: var(--mist);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+#session-count-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--dim);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+thead th {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.68rem;
+  color: var(--mist);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  background: rgba(0,0,0,0.2);
+}
+thead th.th-center { text-align: center; }
+tbody tr.session-row {
+  border-bottom: 1px solid rgba(196,164,101,0.07);
+  transition: background 0.2s;
+}
+tbody tr.session-row:hover { background: var(--glow); }
+tbody tr.session-row.expanded { background: rgba(196,164,101,0.06); }
+td {
+  padding: 12px 14px;
+  vertical-align: middle;
+}
+td.td-center { text-align: center; }
+
+/* ── Player cell ── */
+.player-cell { display: flex; align-items: center; gap: 10px; }
+.player-icon { font-size: 1.5rem; flex-shrink: 0; }
+.player-name {
+  font-family: 'Crimson Text', serif;
+  font-size: 1rem;
+  color: var(--pale);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.player-role {
+  font-size: 0.7rem;
+  color: var(--dim);
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+/* ── Score Badge ── */
+.score-badge {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  min-width: 54px;
+  text-align: center;
+}
+.score-green  { background: rgba(61,184,122,0.18); color: #3db87a; border: 1px solid rgba(61,184,122,0.3); }
+.score-gold   { background: rgba(196,164,101,0.18); color: var(--gold); border: 1px solid rgba(196,164,101,0.35); }
+.score-rust   { background: rgba(192,71,31,0.18); color: #e07050; border: 1px solid rgba(192,71,31,0.35); }
+
+/* ── Progress bar ── */
+.prog-wrap { display: flex; align-items: center; gap: 8px; min-width: 100px; }
+.prog-bar-outer {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.prog-bar-inner {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--teal-d), var(--teal));
+  transition: width 0.6s ease;
+}
+.prog-label { font-size: 0.75rem; color: var(--mist); white-space: nowrap; }
+
+/* ── Killer guess ── */
+.killer-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: 'Special Elite', monospace;
+  letter-spacing: 0.03em;
+}
+.killer-correct { background: rgba(46,154,120,0.18); color: var(--teal); border: 1px solid rgba(46,154,120,0.3); }
+.killer-wrong   { background: rgba(192,71,31,0.15); color: #e07050; border: 1px solid rgba(192,71,31,0.3); }
+.killer-none    { background: rgba(74,74,94,0.3); color: var(--dim); border: 1px solid rgba(74,74,94,0.4); }
+
+/* ── DASS mini badges ── */
+.dass-mini { display: flex; gap: 4px; justify-content: center; }
+.dass-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.6rem;
+  font-family: 'Special Elite', monospace;
+  padding: 2px 5px;
+  border-radius: 3px;
+  min-width: 28px;
+  line-height: 1.3;
+}
+.dass-badge .db-letter { font-size: 0.58rem; opacity: 0.8; }
+.dass-badge .db-val { font-size: 0.72rem; font-weight: 700; }
+.dass-norm { background: rgba(61,184,122,0.12); color: #3db87a; border: 1px solid rgba(61,184,122,0.22); }
+.dass-mild { background: rgba(212,160,23,0.15); color: var(--amber); border: 1px solid rgba(212,160,23,0.3); }
+.dass-mod  { background: rgba(196,164,101,0.15); color: var(--gold); border: 1px solid rgba(196,164,101,0.3); }
+.dass-sev  { background: rgba(192,71,31,0.18); color: #e07050; border: 1px solid rgba(192,71,31,0.3); }
+.dass-ext  { background: rgba(192,71,31,0.35); color: #ff5533; border: 1px solid rgba(192,71,31,0.6); }
+
+/* ── Last active ── */
+.last-active { font-size: 0.78rem; color: var(--dim); font-style: italic; white-space: nowrap; }
+
+/* ── Expand button ── */
+.btn-expand {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--mist);
+  border-radius: 4px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-expand:hover { border-color: var(--gold); color: var(--gold); }
+.btn-expand.open { transform: rotate(180deg); border-color: var(--gold); color: var(--gold); background: var(--glow); }
+
+/* ── Expanded detail row ── */
+.detail-row { display: none; }
+.detail-row.visible { display: table-row; }
+.detail-cell {
+  padding: 0 !important;
+  background: rgba(5,5,8,0.7);
+  border-bottom: 1px solid var(--border);
+}
+.detail-inner {
+  padding: 24px;
+  border-top: 1px solid var(--border);
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.detail-section {
+  background: rgba(20,20,31,0.6);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+  backdrop-filter: blur(4px);
+}
+.detail-section.full-width { grid-column: 1 / -1; }
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Module Scores list ── */
+.module-list { display: flex; flex-direction: column; gap: 7px; }
+.module-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.module-name {
+  flex: 1;
+  color: var(--pale);
+  font-family: 'Crimson Text', serif;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.module-score-bar {
+  width: 90px;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.module-score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--teal-d), var(--teal));
+}
+.module-score-num {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.75rem;
+  color: var(--gold);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Domain bar charts ── */
+.domain-list { display: flex; flex-direction: column; gap: 9px; }
+.domain-item { display: flex; align-items: center; gap: 10px; }
+.domain-name {
+  font-size: 0.78rem;
+  color: var(--mist);
+  width: 130px;
+  flex-shrink: 0;
+  font-family: 'Special Elite', monospace;
+  letter-spacing: 0.02em;
+}
+.domain-bar-outer {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.domain-bar-inner {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+.domain-pct {
+  font-size: 0.72rem;
+  color: var(--gold);
+  font-family: 'Special Elite', monospace;
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.domain-bar-inner.bar-good   { background: linear-gradient(90deg, #1d6650, #3db87a); }
+.domain-bar-inner.bar-mid    { background: linear-gradient(90deg, #7a5a10, var(--gold)); }
+.domain-bar-inner.bar-low    { background: linear-gradient(90deg, #7a2010, var(--rust)); }
+
+/* ── DASS breakdown ── */
+.dass-breakdown { display: flex; gap: 14px; flex-wrap: wrap; }
+.dass-block {
+  flex: 1;
+  min-width: 130px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.dass-block-letter {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.dass-block-score {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.dass-block-level {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-family: 'Special Elite', monospace;
+}
+.dass-block-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.dass-block-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+.db-depression { color: #7aa4d4; }
+.db-depression .dass-block-bar-fill { background: #7aa4d4; }
+.db-anxiety    { color: #d4a07a; }
+.db-anxiety    .dass-block-bar-fill { background: #d4a07a; }
+.db-stress     { color: #d47aa0; }
+.db-stress     .dass-block-bar-fill { background: #d47aa0; }
+
+/* ── Clinical Flags ── */
+.flags-list { display: flex; flex-direction: column; gap: 10px; }
+.flag-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--pale);
+}
+.flag-item.flag-warn  { background: rgba(192,71,31,0.10); border-color: var(--rust); }
+.flag-item.flag-note  { background: rgba(212,160,23,0.10); border-color: var(--amber); }
+.flag-item.flag-info  { background: rgba(46,154,120,0.10); border-color: var(--teal); }
+.flag-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.no-flags {
+  font-style: italic;
+  color: var(--teal);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── RT Stats ── */
+.rt-stats { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.rt-stat-card {
+  flex: 1;
+  min-width: 90px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.rt-stat-label { font-size: 0.65rem; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Special Elite', monospace; }
+.rt-stat-val { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--gold); margin-top: 4px; }
+.rt-dist-label { font-size: 0.75rem; color: var(--mist); margin-bottom: 8px; font-family: 'Special Elite', monospace; letter-spacing: 0.06em; }
+.rt-dist-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+.rt-dist-bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; }
+.rt-dist-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background: rgba(196,164,101,0.35);
+  transition: height 0.5s ease;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.rt-dist-tick { font-size: 0.58rem; color: var(--dim); margin-top: 3px; }
+
+/* ── Session Timeline ── */
+.timeline { display: flex; flex-direction: column; gap: 10px; }
+.timeline-item { display: flex; align-items: flex-start; gap: 12px; }
+.timeline-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(196,164,101,0.4);
+}
+.timeline-dot.dim { background: var(--dim); box-shadow: none; }
+.timeline-content { flex: 1; }
+.timeline-ts { font-size: 0.7rem; color: var(--dim); font-family: 'Special Elite', monospace; }
+.timeline-desc { font-size: 0.85rem; color: var(--pale); line-height: 1.4; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--dim);
+}
+.empty-state .es-icon { font-size: 3rem; margin-bottom: 16px; }
+.empty-state p { font-family: 'Crimson Text', serif; font-style: italic; font-size: 1.1rem; }
+
+/* ── Loading spinner ── */
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state p { color: var(--dim); font-style: italic; font-family: 'Crimson Text', serif; }
+
+/* ── Toast ── */
+.toast-container {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ink3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-family: 'Crimson Text', serif;
+  font-size: 0.92rem;
+  color: var(--pale);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  animation: toastIn 0.3s ease forwards;
+  backdrop-filter: blur(8px);
+}
+.toast.toast-out { animation: toastOut 0.3s ease forwards; }
+.toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+.toast-msg { flex: 1; line-height: 1.4; }
+.toast.t-success .toast-icon { color: var(--teal); }
+.toast.t-info    .toast-icon { color: var(--gold); }
+.toast.t-warn    .toast-icon { color: var(--rust); }
+@keyframes toastIn  { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; transform: translateX(0); }  to { opacity: 0; transform: translateX(30px); } }
+
+/* ── Auto-refresh indicator ── */
+.refresh-bar-wrap {
+  height: 2px;
+  background: rgba(196,164,101,0.1);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.refresh-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  border-radius: 1px;
+  animation: refreshCountdown 30s linear;
+}
+@keyframes refreshCountdown { from { width: 100%; } to { width: 0%; } }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--ink2); }
+::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-d); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page-wrap { padding: 0 12px 40px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  table { font-size: 0.8rem; }
+  td, th { padding: 9px 8px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .domain-name { width: 90px; font-size: 0.7rem; }
+}
+
+/* ── Admin Controls & Login Overlay ── */
+#admin-login-overlay {
+  transition: opacity 0.4s ease;
+}
+.btn-control-danger {
+  padding: 8px 14px;
+  background: rgba(139, 58, 58, 0.15);
+  border: 1px solid var(--rust);
+  color: #ff6b6b;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--ff-t);
+  font-size: 0.78rem;
+  transition: all 0.3s;
+}
+.btn-control-danger:hover {
+  background: var(--rust);
+  color: #fff;
+}
+.btn-control-reset {
+  padding: 8px 14px;
+  background: rgba(196,164,101,0.08);
+  border: 1px solid rgba(196,164,101,0.3);
+  color: var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--ff-t);
+  font-size: 0.78rem;
+  transition: all 0.3s;
+}
+.btn-control-reset:hover {
+  background: var(--gold-dim);
+  color: #050508;
+}
+</style>
+</head>
+<body>
+
+<!-- Animated Canvas Background -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Admin Login Overlay -->
+<div id="admin-login-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(5,5,8,0.95); backdrop-filter:blur(10px); z-index:99999; align-items:center; justify-content:center;">
+  <div style="width:100%; max-width:400px; padding:40px; background:rgba(15, 20, 25, 0.95); border:1px solid rgba(212, 175, 55, 0.3); border-radius:8px; box-shadow:0 10px 40px rgba(0,0,0,0.8); text-align:center;">
+    <span style="font-size:3rem; display:block; margin-bottom:15px;">🔐</span>
+    <h2 style="font-family:'Playfair Display',serif; color:var(--gold); font-size:1.8rem; margin-bottom:10px; letter-spacing:0.05em;">Elaris Control Room</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:30px; font-family:'Montserrat',sans-serif;">Enter credentials to access assessment records</p>
+    <form id="admin-login-form">
+      <div style="margin-bottom:15px; text-align:left;">
+        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Username</label>
+        <input type="text" id="admin-username" placeholder="Enter username" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
+      </div>
+      <div style="margin-bottom:20px; text-align:left;">
+        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Password / Passphrase</label>
+        <input type="password" id="admin-passphrase" placeholder="••••••••••••" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
+      </div>
+      <div id="admin-login-error" style="color:#ff6b6b; font-size:0.85rem; margin-bottom:20px; display:none;"></div>
+      <button type="submit" style="width:100%; padding:14px; background:var(--gold-dim); border:1px solid var(--gold); color:#050508; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Verify Identity</button>
+    </form>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ── Header ── -->
+  <header class="admin-header">
+    <div class="header-left">
+      <h1>🔐 Control Room</h1>
+      <p>Research Dashboard — All Player Sessions &nbsp;<span class="live-dot"></span>&nbsp; Live</p>
+    </div>
+    <div class="header-right" style="display:flex; align-items:center; gap:12px;">
+      <a href="login.html" style="color:var(--gold); text-decoration:none; font-size:0.95rem;">← Return to Island</a>
+      <button class="btn" onclick="adminLogout()" style="background:rgba(196,164,101,0.08); border:1px solid rgba(196,164,101,0.2); color:var(--gold); padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; cursor: pointer;">Log Out</button>
+    </div>
+  </header>
+
+  <!-- ── Auto-refresh progress bar ── -->
+  <div class="refresh-bar-wrap" id="refresh-bar-wrap">
+    <div class="refresh-bar" id="refresh-bar"></div>
+  </div>
+
+  <!-- ── Stats Bar ── -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon">🗃️</div>
+      <div class="stat-label">Total Sessions</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧠</div>
+      <div class="stat-label">Avg Cognitive Score</div>
+      <div class="stat-value" id="stat-avg-score">—</div>
+      <div class="stat-sub">out of 100</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-label">Completion Rate</div>
+      <div class="stat-value" id="stat-completion">—</div>
+      <div class="stat-sub">finished all 10 modules</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔍</div>
+      <div class="stat-label">Murder Conviction Rate</div>
+      <div class="stat-value" id="stat-correct-guess">—</div>
+      <div class="stat-sub">correct accusations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">Cohort DASS Average</div>
+      <div class="stat-value" id="stat-avg-stress">—</div>
+      <div class="stat-sub">D / A / S averages</div>
+    </div>
+  </div>
+
+  <!-- ── Controls Row ── -->
+  <div class="controls-row">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="Search by player name…" oninput="applyFilters()" />
+    </div>
+    <div class="filter-group">
+      <button class="btn active" data-filter="all"            onclick="setFilter(this,'all')">All</button>
+      <button class="btn"        data-filter="completed"      onclick="setFilter(this,'completed')">Completed</button>
+      <button class="btn"        data-filter="correct-guess"  onclick="setFilter(this,'correct-guess')">Correct Accusation</button>
+      <button class="btn"        data-filter="incorrect-guess"onclick="setFilter(this,'incorrect-guess')">Incorrect Accusation</button>
+      <button class="btn"        data-filter="no-accusation"  onclick="setFilter(this,'no-accusation')">No Accusation</button>
+      <button class="btn"        data-filter="today"          onclick="setFilter(this,'today')">Today</button>
+    </div>
+    <button class="btn btn-refresh" onclick="refreshSessions()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Refresh
+    </button>
+    <button class="btn btn-export" onclick="exportCSV()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </button>
+    <button class="btn" onclick="exportJSON()" style="border:1px solid var(--border); color:var(--gold); margin-left: 8px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export JSON
+    </button>
+    <button class="btn" onclick="wipeAllSessions()" style="background:rgba(139, 58, 58, 0.15); border:1px solid var(--rust); color:#ff6b6b; margin-left: auto;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Clear All Sessions
+    </button>
+  </div>
+
+  <!-- ── Sessions Table ── -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-header-label">⚓ Player Sessions</span>
+      <span id="session-count-label">Loading…</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="sessions-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th class="th-center">Score</th>
+            <th>Progress</th>
+            <th class="th-center">Modules</th>
+            <th class="th-center">Correct/Attempts</th>
+            <th class="th-center">Killer Guess</th>
+            <th class="th-center">DASS</th>
+            <th>Last Active</th>
+            <th class="th-center"></th>
+          </tr>
+        </thead>
+        <tbody id="sessions-tbody">
+          <tr>
+            <td colspan="9">
+              <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Summoning session data from the island…</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   CANVAS BACKGROUND — Stars + Waves
+═══════════════════════════════════════════════════════════════════ */
+(function initCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, stars = [], waves = [];
+  let frame = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
+    buildWaves();
+  }
+
+  function buildStars() {
+    stars = [];
+    const count = Math.floor((W * H) / 5000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x:    Math.random() * W,
+        y:    Math.random() * H,
+        r:    Math.random() * 1.4 + 0.2,
+        a:    Math.random(),
+        s:    Math.random() * 0.004 + 0.001,
+        ph:   Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function buildWaves() {
+    waves = [];
+    for (let i = 0; i < 4; i++) {
+      waves.push({
+        amp:    12 + i * 6,
+        freq:   0.006 - i * 0.001,
+        speed:  0.0006 + i * 0.0003,
+        y:      H * (0.6 + i * 0.1),
+        color:  `rgba(${10 + i * 5},${20 + i * 8},${40 + i * 12},${0.35 - i * 0.06})`
+      });
+    }
+  }
+
+  function draw() {
+    frame++;
+    ctx.clearRect(0, 0, W, H);
+
+    // Deep gradient background
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0,    '#050508');
+    grad.addColorStop(0.45, '#07070e');
+    grad.addColorStop(1,    '#090914');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    for (const s of stars) {
+      const alpha = (Math.sin(frame * s.s + s.ph) + 1) / 2 * s.a;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(196,185,155,${alpha})`;
+      ctx.fill();
+    }
+
+    // Waves
+    for (const w of waves) {
+      ctx.beginPath();
+      ctx.moveTo(0, w.y);
+      for (let x = 0; x <= W; x += 4) {
+        const y = w.y + Math.sin(x * w.freq + frame * w.speed) * w.amp;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H);
+      ctx.lineTo(0, H);
+      ctx.closePath();
+      ctx.fillStyle = w.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════════════════════════════════ */
+const API_BASE       = 'http://localhost:8080';
+const LS_KEY         = 'elaris_admin_sessions';
+const REFRESH_MS     = 30000;
+const MODULE_NAMES   = [
+  'The Arrival',
+  'First Witnesses',
+  'The Study Room',
+  'Forensic Analysis',
+  'Memory Fragments',
+  'Alibi Checks',
+  'The Hidden Room',
+  'Digital Traces',
+  'The Confession',
+  'The Dock'
+];
+const DOMAIN_NAMES   = {
+  attention:             'Attention',
+  recognition:           'Memory',
+  workingMemory:         'Working Memory',
+  processingSpeed:       'Processing Speed',
+  errorMonitoring:       'Inhibition',
+  cognitiveFlexibility:  'Flexibility',
+  decisionMaking:        'Planning',
+  persistence:           'Reasoning',
+  multitasking:          'Multitasking',
+  distractionResistance: 'Visuospatial'
+};
+
+let allSessions      = [];
+let filteredSessions = [];
+let activeFilter     = 'all';
+let expandedRows     = new Set();
+let refreshTimer     = null;
+
+/* --- ADMIN SECURITY & ACTIONS --- */
+function adminLogout() {
+  sessionStorage.removeItem('elaris_admin_token');
+  sessionStorage.removeItem('elaris_admin_user');
+  sessionStorage.removeItem('elaris_player_user');
+  localStorage.removeItem('elaris_user');
+  localStorage.removeItem('elaris_session');
+  window.location.href = 'login.html';
+}
+
+function getAuthHeader() {
+  const token = sessionStorage.getItem('elaris_admin_token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+async function exportJSON() {
+  try {
+    const res = await fetch(`${API_BASE}/api/sessions`, {
+      headers: getAuthHeader()
+    });
+    if (res.status === 401) {
+      sessionStorage.removeItem('elaris_admin_token');
+      document.getElementById('admin-login-overlay').style.display = 'flex';
+      return;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const str = JSON.stringify(data, null, 2);
+    const blob = new Blob([str], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'elaris_sessions_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast('JSON database backup exported - ' + data.length + ' sessions', 'success', 'down');
+  } catch (err) {
+    showToast('Export failed: ' + err.message, 'error', 'x');
+  }
+}
+
+async function wipeAllSessions() {
+  if (!confirm("WARNING: This will permanently delete all session telemetry logs! This action cannot be undone. Are you sure you want to proceed?")) {
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/clear-all`, {
+      method: 'POST',
+      headers: getAuthHeader()
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        showToast('Unauthorized - please log in again', 'error', 'x');
+        sessionStorage.removeItem('elaris_admin_token');
+        document.getElementById('admin-login-overlay').style.display = 'flex';
+        return;
+      }
+      throw new Error('HTTP ' + res.status);
+    }
+    showToast('All sessions cleared successfully', 'success', 'trash');
+    await loadSessions(true);
+  } catch (err) {
+    showToast('Failed to clear sessions: ' + err.message, 'error', 'x');
+  }
+}
+
+async function resetUserProgress(userId, playerName) {
+  if (!confirm('Are you sure you want to reset all progress for player "' + playerName + '"? This will clear their gameplay progress and remove their session telemetry. This action cannot be undone.')) {
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/reset-progress?id=` + encodeURIComponent(userId), {
+      method: 'POST',
+      headers: getAuthHeader()
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        showToast('Unauthorized - please log in again', 'error', 'x');
+        sessionStorage.removeItem('elaris_admin_token');
+        document.getElementById('admin-login-overlay').style.display = 'flex';
+        return;
+      }
+      throw new Error('HTTP ' + res.status);
+    }
+    showToast('Progress reset for ' + playerName, 'success', 'gear');
+    await loadSessions(true);
+  } catch (err) {
+    showToast('Failed to reset progress: ' + err.message, 'error', 'x');
+  }
+}
+
+async function deleteUser(userId, playerName) {
+  if (!confirm('CRITICAL WARNING: This will permanently delete user account "' + playerName + '" AND all of their session telemetry! This action cannot be undone. Are you sure you want to proceed?')) {
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/user?id=` + encodeURIComponent(userId), {
+      method: 'DELETE',
+      headers: getAuthHeader()
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        showToast('Unauthorized - please log in again', 'error', 'x');
+        sessionStorage.removeItem('elaris_admin_token');
+        document.getElementById('admin-login-overlay').style.display = 'flex';
+        return;
+      }
+      throw new Error('HTTP ' + res.status);
+    }
+    showToast('User ' + playerName + ' and their sessions deleted', 'success', 'trash');
+    await loadSessions(true);
+  } catch (err) {
+    showToast('Failed to delete user: ' + err.message, 'error', 'x');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOAST SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+function showToast(msg, type = 'info', icon = '✦') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast t-${type}`;
+  t.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('toast-out');
+    setTimeout(() => t.remove(), 350);
+  }, 3200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DATA LOADING
+═══════════════════════════════════════════════════════════════════ */
+async function loadSessions(isRefresh = false) {
+  const adminToken = sessionStorage.getItem('elaris_admin_token');
+  const playerUserStr = sessionStorage.getItem('elaris_player_user');
+  let playerUser = null;
+  if (playerUserStr) {
+    try { 
+      playerUser = JSON.parse(playerUserStr); 
+      if (playerUser) {
+        if (!playerUser.user_id && playerUser.id) playerUser.user_id = playerUser.id;
+        if (!playerUser.username && playerUser.name) playerUser.username = playerUser.name;
+      }
+    } catch (_) {}
+  }
+
+  let url = `${API_BASE}/api/sessions`;
+  if (!adminToken && playerUser && playerUser.user_id) {
+    url = `${API_BASE}/api/sessions?user_id=${encodeURIComponent(playerUser.user_id)}`;
+  }
+
+  try {
+    const headers = adminToken ? { 'Authorization': 'Bearer ' + adminToken } : {};
+    const res  = await fetch(url, {
+      cache: 'no-store',
+      headers: headers
+    });
+    if (res.status === 401) {
+      sessionStorage.removeItem('elaris_admin_token');
+      sessionStorage.removeItem('elaris_player_user');
+      document.getElementById('admin-login-overlay').style.display = 'flex';
+      return;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    allSessions = Array.isArray(data) ? data : [];
+    // Persist to localStorage if admin
+    if (adminToken) {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(allSessions)); } catch (_) {}
+    }
+    
+    // Adjust UI based on user type
+    adjustUIForRole(!!adminToken);
+
+    if (isRefresh) {
+      showToast(`Refreshed — ${allSessions.length} session${allSessions.length !== 1 ? 's' : ''} loaded`, 'success', '↻');
+    } else {
+      showToast(`${allSessions.length} session${allSessions.length !== 1 ? 's' : ''} loaded from database`, 'success', '⚓');
+    }
+  } catch (err) {
+    // Fallback: LocalStorage (only for admin)
+    if (adminToken) {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) {
+          allSessions = JSON.parse(raw);
+          showToast('API offline — showing cached data', 'warn', '⚠');
+        } else {
+          allSessions = buildDemoSessions();
+          showToast('API offline — showing demo data', 'warn', '⚠');
+        }
+      } catch (_) {
+        allSessions = buildDemoSessions();
+      }
+    } else {
+      allSessions = [];
+      showToast('Offline — failed to fetch records', 'error', '✕');
+    }
+  }
+  applyFilters();
+  updateStats();
+  scheduleAutoRefresh();
+}
+
+function adjustUIForRole(isAdmin) {
+  const titleEl = document.querySelector('.admin-header h1');
+  const subEl = document.querySelector('.admin-header p');
+  
+  // Stats cards labels
+  const guessCard = document.getElementById('stat-correct-guess');
+  const guessLabel = guessCard ? guessCard.parentNode.querySelector('.stat-label') : null;
+  const dassCard = document.getElementById('stat-avg-stress');
+  const dassLabel = dassCard ? dassCard.parentNode.querySelector('.stat-label') : null;
+  
+  // Controls
+  const jsonBtn = document.querySelector('button[onclick="exportJSON()"]');
+  const clearBtn = document.querySelector('button[onclick="wipeAllSessions()"]');
+  const filterGroup = document.querySelector('.filter-group');
+  
+  if (isAdmin) {
+    if (titleEl) titleEl.innerHTML = '🔐 Control Room';
+    if (subEl) subEl.innerHTML = 'Research Dashboard — All Player Sessions &nbsp;<span class="live-dot"></span>&nbsp; Live';
+    if (guessLabel) guessLabel.textContent = 'Murder Conviction Rate';
+    if (dassLabel) dassLabel.textContent = 'Cohort DASS Average';
+    if (jsonBtn) jsonBtn.style.display = '';
+    if (clearBtn) clearBtn.style.display = '';
+    if (filterGroup) filterGroup.style.display = '';
+  } else {
+    if (titleEl) titleEl.innerHTML = '⚓ Player Records Portal';
+    if (subEl) subEl.innerHTML = 'Research Dashboard — Past Assessment Sessions';
+    if (guessLabel) guessLabel.textContent = 'Accusation Accuracy';
+    if (dassLabel) dassLabel.textContent = 'Your DASS Average';
+    if (jsonBtn) jsonBtn.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (filterGroup) filterGroup.style.display = 'none'; // hide suspect/status filters for player
+  }
+}
+
+/* demo data so the dashboard never shows empty */
+function buildDemoSessions() {
+  const roles = ['Detective','Journalist','Forensic Scientist','Marine Biologist','Historian'];
+  const icons = ['🕵️','📰','🔬','🐋','📜'];
+  const killers = ['villain_rot', 'villain_ash', 'villain_vale'];
+  const killerNames = ['Director Roth', 'Lady Ashford', 'Dr. Vale'];
+  const sessions = [];
+  for (let i = 0; i < 6; i++) {
+    const ri      = i % roles.length;
+    const moduleIdx = Math.floor(Math.random() * 11);
+    const ki      = i % killerNames.length;
+    const correct = Math.random() > 0.45;
+    const dep     = Math.floor(Math.random() * 30);
+    const anx     = Math.floor(Math.random() * 25);
+    const str     = Math.floor(Math.random() * 34);
+    const domainKeys = Object.keys(DOMAIN_NAMES);
+    const domains = {};
+    domainKeys.forEach(k => { domains[k] = Math.floor(Math.random() * 100); });
+    const moduleScores = MODULE_NAMES.map((_, mi) => ({
+      module: mi,
+      score: mi < moduleIdx ? Math.floor(Math.random() * 100) : 0,
+      name: MODULE_NAMES[mi]
+    }));
+    const rtSamples = Array.from({length: 20}, () => Math.floor(Math.random() * 3000 + 400));
+    const now = Date.now();
+    sessions.push({
+      id:            `demo_${i}`,
+      user_id:       `u_demo_${i}`,
+      player_name:   ['Alice Mercer','Bertrand Hollow','Clara Voss','Davin Moor','Elara Synn','Felix Crane'][i] || `Player ${i}`,
+      player_role:   roles[ri],
+      player_icon:   icons[ri],
+      score:         Math.floor(Math.random() * 100),
+      module_idx:    moduleIdx,
+      module_scores: moduleScores,
+      domains:       domains,
+      fragments:     [],
+      dass:          { depression: dep, anxiety: anx, stress: str },
+      dass_raw:      [],
+      rt_samples:    rtSamples,
+      click_density: [],
+      correct_count: Math.floor(Math.random() * moduleIdx + 1),
+      attempt_count: Math.floor(Math.random() * moduleIdx + moduleIdx + 2),
+      murderer:      killers[ki],
+      murderer_name: killerNames[ki],
+      killer_guess:  correct ? killers[ki] : killers[(ki + 1) % killers.length],
+      session_start: Math.floor((now - Math.random() * 86400000 * 5) / 1000),
+      last_updated:  Math.floor((now - Math.random() * 3600000) / 1000)
+    });
+  }
+  return sessions;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUTO-REFRESH
+═══════════════════════════════════════════════════════════════════ */
+function scheduleAutoRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  // Restart progress bar animation
+  const bar = document.getElementById('refresh-bar');
+  if (bar) {
+    bar.style.animation = 'none';
+    void bar.offsetWidth;
+    bar.style.animation = 'refreshCountdown 30s linear';
+  }
+  refreshTimer = setTimeout(() => loadSessions(true), REFRESH_MS);
+}
+
+function refreshSessions() {
+  showToast('Refreshing sessions…', 'info', '↻');
+  loadSessions(true);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FILTERS & SEARCH
+═══════════════════════════════════════════════════════════════════ */
+function setFilter(btn, filter) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-group .btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayTs = todayStart.getTime() / 1000;
+
+  filteredSessions = allSessions.filter(s => {
+    if (q && !(s.player_name || '').toLowerCase().includes(q)) return false;
+    if (activeFilter === 'completed' && (s.module_idx || 0) < 10) return false;
+    if (activeFilter === 'correct-guess' && (!s.killer_guess || s.killer_guess !== s.murderer)) return false;
+    if (activeFilter === 'incorrect-guess' && (!s.killer_guess || s.killer_guess === s.murderer)) return false;
+    if (activeFilter === 'no-accusation' && s.killer_guess) return false;
+    if (activeFilter === 'today' && (s.last_updated || 0) < todayTs) return false;
+    return true;
+  });
+
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════════════════════════ */
+function updateStats() {
+  const n = allSessions.length;
+  document.getElementById('stat-total').textContent = n;
+
+  if (n === 0) {
+    ['stat-avg-score','stat-completion','stat-correct-guess','stat-avg-stress']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '—';
+      });
+    return;
+  }
+
+  const avgScore = Math.round(allSessions.reduce((a, s) => a + (s.score || 0), 0) / n);
+  document.getElementById('stat-avg-score').textContent = avgScore;
+
+  const completed = allSessions.filter(s => (s.module_idx || 0) >= 10).length;
+  document.getElementById('stat-completion').textContent = Math.round(completed / n * 100) + '%';
+
+  const correctGuess = allSessions.filter(s => s.killer_guess && s.killer_guess === s.murderer).length;
+  const convictionRate = n > 0 ? Math.round((correctGuess / n) * 100) : 0;
+  document.getElementById('stat-correct-guess').textContent = convictionRate + '%';
+
+  const dassSum = allSessions.reduce((acc, s) => {
+    const d = parseDASS(s);
+    acc.d += d.depression || 0;
+    acc.a += d.anxiety || 0;
+    acc.s += d.stress || 0;
+    return acc;
+  }, { d: 0, a: 0, s: 0 });
+
+  const avgDep = Math.round(dassSum.d / n);
+  const avgAnx = Math.round(dassSum.a / n);
+  const avgStr = Math.round(dassSum.s / n);
+  document.getElementById('stat-avg-stress').textContent = `D:${avgDep} · A:${avgAnx} · S:${avgStr}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLE RENDERING
+═══════════════════════════════════════════════════════════════════ */
+function renderTable() {
+  const tbody = document.getElementById('sessions-tbody');
+  const label = document.getElementById('session-count-label');
+
+  label.textContent = `${filteredSessions.length} of ${allSessions.length} session${allSessions.length !== 1 ? 's' : ''}`;
+
+  if (filteredSessions.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="9">
+        <div class="empty-state">
+          <div class="es-icon">🏝️</div>
+          <p>No sessions match your current filters.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  const rows = filteredSessions.map(s => renderSessionRow(s)).join('');
+  tbody.innerHTML = rows;
+}
+
+function renderSessionRow(s) {
+  const sid       = s.id;
+  const isExp     = expandedRows.has(sid);
+  const dass      = parseDASS(s);
+  const pct       = Math.min(100, Math.round((s.module_idx || 0) / 10 * 100));
+  const isCorrect = s.killer_guess && s.killer_guess === s.murderer;
+  const hasGuess  = !!s.killer_guess;
+
+  // Score badge class
+  const score = s.score || 0;
+  const scoreCls = score >= 70 ? 'score-green' : score >= 40 ? 'score-gold' : 'score-rust';
+
+  // Killer guess tag
+  let killerHtml;
+  if (!hasGuess) {
+    killerHtml = `<span class="killer-tag killer-none">— No guess</span>`;
+  } else if (isCorrect) {
+    killerHtml = `<span class="killer-tag killer-correct">✓ ${escHtml(s.murderer_name || s.killer_guess)}</span>`;
+  } else {
+    killerHtml = `<span class="killer-tag killer-wrong">✗ ${escHtml(s.killer_guess)}</span>`;
+  }
+
+  // DASS mini badges
+  const dMini  = dassBadge('D', dass.depression, 'depression');
+  const aMini  = dassBadge('A', dass.anxiety,    'anxiety');
+  const sMini  = dassBadge('S', dass.stress,     'stress');
+
+  // Last active
+  const lastActive = formatRelTime(s.last_updated);
+
+  return `
+    <tr class="session-row${isExp ? ' expanded' : ''}" id="row-${sid}">
+      <td>
+        <div class="player-cell">
+          <div class="player-icon">${s.player_icon || '👤'}</div>
+          <div>
+            <div class="player-name">${escHtml(s.player_name || 'Unknown')}</div>
+            <div class="player-role">${escHtml(s.player_role || 'Investigator')}</div>
+          </div>
+        </div>
+      </td>
+      <td class="td-center"><span class="score-badge ${scoreCls}">${score}</span></td>
+      <td>
+        <div class="prog-wrap">
+          <div class="prog-bar-outer">
+            <div class="prog-bar-inner" style="width:${pct}%"></div>
+          </div>
+          <span class="prog-label">${pct}%</span>
+        </div>
+      </td>
+      <td class="td-center" style="font-family:'Cinzel',serif;font-size:0.85rem;color:var(--pale)">${s.module_idx || 0}<span style="color:var(--dim)">/10</span></td>
+      <td class="td-center" style="font-family:'Special Elite',monospace;font-size:0.8rem;color:var(--mist)">${s.correct_count || 0}/${s.attempt_count || 0}</td>
+      <td class="td-center">${killerHtml}</td>
+      <td class="td-center"><div class="dass-mini">${dMini}${aMini}${sMini}</div></td>
+      <td><span class="last-active">${lastActive}</span></td>
+      <td class="td-center">
+        <button class="btn-expand${isExp ? ' open' : ''}" onclick="toggleExpand('${sid}')" title="${isExp ? 'Collapse' : 'Expand details'}">▾</button>
+      </td>
+    </tr>
+    <tr class="detail-row${isExp ? ' visible' : ''}" id="detail-${sid}">
+      <td colspan="9" class="detail-cell">
+        ${isExp ? buildDetailHTML(s) : ''}
+      </td>
+    </tr>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EXPAND / COLLAPSE
+═══════════════════════════════════════════════════════════════════ */
+function toggleExpand(sid) {
+  const s = allSessions.find(x => x.id === sid);
+  if (!s) return;
+
+  if (expandedRows.has(sid)) {
+    expandedRows.delete(sid);
+  } else {
+    expandedRows.add(sid);
+  }
+
+  // Re-render just this row pair for efficiency
+  const sessionRow = document.getElementById(`row-${sid}`);
+  const detailRow  = document.getElementById(`detail-${sid}`);
+  if (!sessionRow || !detailRow) { renderTable(); return; }
+
+  const isExp = expandedRows.has(sid);
+  sessionRow.classList.toggle('expanded', isExp);
+  detailRow.classList.toggle('visible', isExp);
+
+  const expandBtn = sessionRow.querySelector('.btn-expand');
+  if (expandBtn) expandBtn.classList.toggle('open', isExp);
+
+  const cell = detailRow.querySelector('.detail-cell');
+  if (cell) {
+    cell.innerHTML = isExp ? buildDetailHTML(s) : '';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DETAIL HTML BUILDER
+═══════════════════════════════════════════════════════════════════ */
+function buildDetailHTML(s) {
+  const isAdmin = !!sessionStorage.getItem('elaris_admin_token');
+  let controlsHtml = '';
+  if (isAdmin) {
+    controlsHtml = `
+      <div class="account-controls-section" style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(196,164,101,.15); display:flex; align-items:center; gap:12px; flex-wrap: wrap;">
+        <span style="font-family:'Cinzel',serif; font-size:0.78rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-right:auto;">⚙️ Administrative Control Panel</span>
+        <button class="btn-control-reset" onclick="resetUserProgress('${s.user_id}', '${escHtml(s.player_name)}')">Reset User Progress</button>
+        <button class="btn-control-danger" onclick="deleteUser('${s.user_id}', '${escHtml(s.player_name)}')">🗑️ Delete User & Sessions</button>
+      </div>`;
+  }
+
+  return `
+    <div class="detail-inner">
+      <div class="detail-grid">
+        ${buildModuleScores(s)}
+        ${buildDomainProfile(s)}
+        ${buildDASSBreakdown(s)}
+        ${buildClinicalFlags(s)}
+        ${buildRTSection(s)}
+        ${buildTimeline(s)}
+      </div>
+      ${controlsHtml}
+    </div>`;
+}
+
+/* 1 · Module Scores */
+function buildModuleScores(s) {
+  let scores = [];
+  try {
+    const raw = Array.isArray(s.module_scores) ? s.module_scores : JSON.parse(s.module_scores || '[]');
+    scores = raw;
+  } catch (_) {}
+
+  const items = MODULE_NAMES.map((name, i) => {
+    let sc = null;
+    if (Array.isArray(scores)) {
+      if (typeof scores[i] === 'number') {
+        sc = scores[i];
+      } else {
+        const entry = scores.find(e => (e.module === i || e.index === i)) || {};
+        if (typeof entry.score === 'number') {
+          sc = entry.score;
+        }
+      }
+    }
+    const done  = i < (s.module_idx || 0);
+    const pct   = sc !== null ? Math.min(100, sc) : (done ? 50 : 0);
+    const label = sc !== null ? sc : (done ? '?' : '—');
+    return `
+      <div class="module-item">
+        <span style="color:var(--dim);font-size:0.72rem;font-family:'Special Elite',monospace;width:18px;text-align:right;flex-shrink:0">${i+1}</span>
+        <span class="module-name" title="${escHtml(name)}">${escHtml(name)}</span>
+        <div class="module-score-bar">
+          <div class="module-score-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <span class="module-score-num">${label}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">📋 Module Scores</div>
+      <div class="module-list">${items}</div>
+    </div>`;
+}
+
+/* 2 · Domain Profile */
+function buildDomainProfile(s) {
+  let domains = {};
+  try {
+    domains = typeof s.domains === 'object' && !Array.isArray(s.domains)
+      ? s.domains
+      : JSON.parse(s.domains || '{}');
+  } catch (_) {}
+
+  const items = Object.entries(DOMAIN_NAMES).map(([key, label]) => {
+    const val = typeof domains[key] === 'number' ? domains[key] : 0;
+    const pct = Math.min(100, Math.round(val));
+    const cls = pct >= 60 ? 'bar-good' : pct >= 35 ? 'bar-mid' : 'bar-low';
+    return `
+      <div class="domain-item">
+        <span class="domain-name">${escHtml(label)}</span>
+        <div class="domain-bar-outer">
+          <div class="domain-bar-inner ${cls}" style="width:${pct}%"></div>
+        </div>
+        <span class="domain-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">🧬 Domain Profile</div>
+      <div class="domain-list">${items}</div>
+    </div>`;
+}
+
+/* 3 · DASS Breakdown */
+function buildDASSBreakdown(s) {
+  const d = parseDASS(s);
+  const dep = d.depression || 0;
+  const anx = d.anxiety    || 0;
+  const str = d.stress     || 0;
+
+  const depLevel = dassLevel('depression', dep);
+  const anxLevel = dassLevel('anxiety',    anx);
+  const strLevel = dassLevel('stress',     str);
+
+  const depPct = Math.min(100, Math.round(dep / 42 * 100));
+  const anxPct = Math.min(100, Math.round(anx / 36 * 100));
+  const strPct = Math.min(100, Math.round(str / 42 * 100));
+
+  const block = (letter, score, level, pct, cls) => `
+    <div class="dass-block ${cls}">
+      <div class="dass-block-letter">${letter}</div>
+      <div class="dass-block-score">${score}</div>
+      <div class="dass-block-level">${level}</div>
+      <div class="dass-block-bar">
+        <div class="dass-block-bar-fill" style="width:${pct}%"></div>
+      </div>
+    </div>`;
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">🧪 DASS-21 Breakdown</div>
+      <div class="dass-breakdown">
+        ${block('Depression', dep, depLevel, depPct, 'db-depression')}
+        ${block('Anxiety',    anx, anxLevel, anxPct, 'db-anxiety')}
+        ${block('Stress',     str, strLevel, strPct, 'db-stress')}
+      </div>
+    </div>`;
+}
+
+/* 4 · Clinical Flags */
+function buildClinicalFlags(s) {
+  const d  = parseDASS(s);
+  let domains = {};
+  try {
+    domains = typeof s.domains === 'object' && !Array.isArray(s.domains)
+      ? s.domains
+      : JSON.parse(s.domains || '{}');
+  } catch (_) {}
+
+  const flags = [];
+  const dep = d.depression || 0;
+  const anx = d.anxiety    || 0;
+  const str = d.stress     || 0;
+
+  if (anx > 14) {
+    flags.push({
+      cls:  'flag-warn',
+      icon: '⚠️',
+      text: '<strong>Elevated Anxiety Indicators:</strong> User showed rapid click density and high distraction ratio in modules 2, 7. DASS Anxiety score ' + anx + ' exceeds moderate threshold.'
+    });
+  }
+  if (dep > 13) {
+    flags.push({
+      cls:  'flag-warn',
+      icon: '🔴',
+      text: '<strong>Possible Depressive Markers:</strong> Slow processing speed and low persistence scores detected. DASS Depression score ' + dep + ' in moderate-to-severe range.'
+    });
+  }
+  if (str > 18) {
+    flags.push({
+      cls:  'flag-note',
+      icon: '⚡',
+      text: '<strong>High Stress Response:</strong> Failed 60%+ of 2-attempt challenges. DASS Stress score ' + str + ' exceeds mild threshold.'
+    });
+  }
+  if ((domains.workingMemory || 0) < 30) {
+    flags.push({
+      cls:  'flag-info',
+      icon: '🧠',
+      text: '<strong>Cognitive Concern:</strong> Working memory score below 30% (' + (domains.workingMemory || 0) + '%). Consider further assessment.'
+    });
+  }
+
+  const html = flags.length === 0
+    ? `<div class="no-flags">✓ &nbsp;No clinical flags — all DASS subscales within normal-to-mild range and cognitive domains above threshold.</div>`
+    : flags.map(f => `<div class="flag-item ${f.cls}"><span class="flag-icon">${f.icon}</span><div>${f.text}</div></div>`).join('');
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">🚩 Clinical Flags</div>
+      <div class="flags-list">${html}</div>
+    </div>`;
+}
+
+/* 5 · Response Times */
+function buildRTSection(s) {
+  let samples = [];
+  try {
+    samples = Array.isArray(s.rt_samples) ? s.rt_samples : JSON.parse(s.rt_samples || '[]');
+    samples = samples.map(Number).filter(x => !isNaN(x) && x > 0);
+  } catch (_) {}
+
+  if (samples.length === 0) {
+    return `
+      <div class="detail-section">
+        <div class="section-title">⏱ Response Times</div>
+        <p style="color:var(--dim);font-style:italic;font-size:0.85rem">No response time data recorded.</p>
+      </div>`;
+  }
+
+  const avg     = Math.round(samples.reduce((a, b) => a + b, 0) / samples.length);
+  const fastest = Math.min(...samples);
+  const slowest = Math.max(...samples);
+
+  // Distribution: 8 buckets from fastest to slowest
+  const buckets = 8;
+  const bucketSize = (slowest - fastest) / buckets || 1;
+  const counts = Array(buckets).fill(0);
+  samples.forEach(v => {
+    const idx = Math.min(buckets - 1, Math.floor((v - fastest) / bucketSize));
+    counts[idx]++;
+  });
+  const maxCount = Math.max(...counts);
+
+  const distBars = counts.map((c, i) => {
+    const h = maxCount > 0 ? Math.round(c / maxCount * 46) : 0;
+    const ms = Math.round(fastest + i * bucketSize);
+    return `
+      <div class="rt-dist-bar-wrap">
+        <div class="rt-dist-bar" style="height:${h}px"></div>
+        <div class="rt-dist-tick">${ms < 1000 ? ms : (ms/1000).toFixed(1)+'s'}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">⏱ Response Times</div>
+      <div class="rt-stats">
+        <div class="rt-stat-card">
+          <div class="rt-stat-label">Average RT</div>
+          <div class="rt-stat-val">${avg < 1000 ? avg + 'ms' : (avg/1000).toFixed(2) + 's'}</div>
+        </div>
+        <div class="rt-stat-card">
+          <div class="rt-stat-label">Fastest RT</div>
+          <div class="rt-stat-val">${fastest < 1000 ? fastest + 'ms' : (fastest/1000).toFixed(2) + 's'}</div>
+        </div>
+        <div class="rt-stat-card">
+          <div class="rt-stat-label">Slowest RT</div>
+          <div class="rt-stat-val">${slowest < 1000 ? slowest + 'ms' : (slowest/1000).toFixed(2) + 's'}</div>
+        </div>
+        <div class="rt-stat-card">
+          <div class="rt-stat-label">Samples</div>
+          <div class="rt-stat-val">${samples.length}</div>
+        </div>
+      </div>
+      <div class="rt-dist-label">RT DISTRIBUTION</div>
+      <div class="rt-dist-bars">${distBars}</div>
+    </div>`;
+}
+
+/* 6 · Session Timeline */
+function buildTimeline(s) {
+  const startTs = s.session_start || 0;
+  const lastTs  = s.last_updated  || 0;
+  const modIdx  = s.module_idx    || 0;
+
+  const startDate = startTs ? new Date(startTs * 1000) : null;
+  const lastDate  = lastTs  ? new Date(lastTs  * 1000) : null;
+
+  const durationMs = startTs && lastTs ? (lastTs - startTs) * 1000 : null;
+  const durationStr = durationMs !== null ? formatDuration(durationMs) : 'Unknown';
+
+  const startStr   = startDate ? formatDateTime(startDate) : 'Unknown';
+  const lastStr    = lastDate  ? formatDateTime(lastDate)  : 'Unknown';
+
+  // Build module completion timeline (interpolate if no per-module timestamps)
+  const modItems = [];
+  for (let i = 0; i < modIdx; i++) {
+    const frac = modIdx > 1 ? i / (modIdx - 1) : 0;
+    const modTs = startTs && lastTs ? startTs + Math.round(frac * (lastTs - startTs)) : 0;
+    modItems.push(`
+      <div class="timeline-item">
+        <div class="timeline-dot${i === modIdx - 1 ? '' : ' dim'}"></div>
+        <div class="timeline-content">
+          <div class="timeline-ts">${modTs ? formatDateTime(new Date(modTs * 1000)) : '—'}</div>
+          <div class="timeline-desc">Module ${i + 1}: ${escHtml(MODULE_NAMES[i] || `Module ${i+1}`)}</div>
+        </div>
+      </div>`);
+  }
+
+  return `
+    <div class="detail-section">
+      <div class="section-title">🕐 Session Timeline</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-ts">${startStr}</div>
+            <div class="timeline-desc"><strong>Session Started</strong></div>
+          </div>
+        </div>
+        ${modItems.join('')}
+        <div class="timeline-item">
+          <div class="timeline-dot${modIdx >= 10 ? '' : ' dim'}"></div>
+          <div class="timeline-content">
+            <div class="timeline-ts">${lastStr}</div>
+            <div class="timeline-desc">
+              <strong>Last Activity</strong> — Duration: ${durationStr} — Modules: ${modIdx}/10
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════════════════════════════════════ */
+function exportCSV() {
+  if (filteredSessions.length === 0) {
+    showToast('No sessions to export', 'warn', '⚠');
+    return;
+  }
+
+  const headers = [
+    'ID','UserID','PlayerName','PlayerRole','Score','ModuleIdx',
+    'CorrectCount','AttemptCount','Murderer','MurdererName','KillerGuess','GuessCorrect',
+    'DASS_Depression','DASS_Anxiety','DASS_Stress',
+    'DepLevel','AnxLevel','StrLevel',
+    'SessionStart','LastUpdated','DurationSecs'
+  ];
+
+  // Domain columns
+  Object.keys(DOMAIN_NAMES).forEach(k => headers.push('Domain_' + k));
+
+  const rows = filteredSessions.map(s => {
+    const d    = parseDASS(s);
+    let domains = {};
+    try {
+      domains = typeof s.domains === 'object' && !Array.isArray(s.domains)
+        ? s.domains
+        : JSON.parse(s.domains || '{}');
+    } catch (_) {}
+
+    const dur = (s.session_start && s.last_updated)
+      ? (s.last_updated - s.session_start)
+      : '';
+
+    const row = [
+      s.id, s.user_id, s.player_name, s.player_role,
+      s.score, s.module_idx,
+      s.correct_count, s.attempt_count,
+      s.murderer, s.murderer_name, s.killer_guess,
+      (s.killer_guess && s.killer_guess === s.murderer ? 'true' : 'false'),
+      d.depression, d.anxiety, d.stress,
+      dassLevel('depression', d.depression || 0),
+      dassLevel('anxiety',    d.anxiety    || 0),
+      dassLevel('stress',     d.stress     || 0),
+      s.session_start ? new Date(s.session_start * 1000).toISOString() : '',
+      s.last_updated  ? new Date(s.last_updated  * 1000).toISOString() : '',
+      dur
+    ];
+
+    Object.keys(DOMAIN_NAMES).forEach(k => {
+      row.push(typeof domains[k] === 'number' ? domains[k] : '');
+    });
+
+    return row.map(v => {
+      const sv = String(v ?? '');
+      return sv.includes(',') || sv.includes('"') || sv.includes('\n')
+        ? `"${sv.replace(/"/g, '""')}"`
+        : sv;
+    }).join(',');
+  });
+
+  const csv  = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href     = url;
+  link.download = `elaris_sessions_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast(`CSV exported — ${filteredSessions.length} sessions`, 'success', '⬇');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('admin-login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-passphrase').value;
+      const errDiv = document.getElementById('admin-login-error');
+      if (errDiv) {
+        errDiv.style.display = 'none';
+        errDiv.textContent = '';
+      }
+      try {
+        let res, data;
+        if (username === 'admin') {
+          res = await fetch(`${API_BASE}/api/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          if (!res.ok) {
+            let errMsg = 'Invalid credentials';
+            try {
+              const d = await res.json();
+              if (d && d.error) errMsg = d.error;
+            } catch (_) {}
+            throw new Error(errMsg);
+          }
+          data = await res.json();
+          sessionStorage.setItem('elaris_admin_token', data.token);
+          sessionStorage.setItem('elaris_admin_user', 'admin');
+          sessionStorage.removeItem('elaris_player_user');
+        } else {
+          // Standard player login
+          res = await fetch(`${API_BASE}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          if (!res.ok) {
+            let errMsg = 'Invalid credentials';
+            try {
+              const d = await res.json();
+              if (d && d.error) errMsg = d.error;
+            } catch (_) {}
+            throw new Error(errMsg);
+          }
+          data = await res.json();
+          sessionStorage.setItem('elaris_player_user', JSON.stringify(data));
+          sessionStorage.removeItem('elaris_admin_token');
+          sessionStorage.removeItem('elaris_admin_user');
+        }
+        
+        document.getElementById('admin-login-overlay').style.display = 'none';
+        showToast('Access granted', 'success', '🔐');
+        await loadSessions(false);
+      } catch (err) {
+        if (errDiv) {
+          errDiv.textContent = err.message;
+          errDiv.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  const adminToken = sessionStorage.getItem('elaris_admin_token');
+  const playerUser = sessionStorage.getItem('elaris_player_user') || localStorage.getItem('elaris_user');
+  
+  if (adminToken) {
+    sessionStorage.setItem('elaris_admin_user', 'admin');
+    document.getElementById('admin-login-overlay').style.display = 'none';
+    loadSessions(false);
+  } else if (playerUser) {
+    const user = JSON.parse(playerUser);
+    const uName = user.name || user.username || '';
+    const uID = user.user_id || user.id || '';
+    if (uName === 'admin') {
+      document.getElementById('admin-login-overlay').style.display = 'flex';
+    } else if (uID) {
+      user.user_id = uID;
+      user.id = uID;
+      user.username = uName;
+      user.name = uName;
+      sessionStorage.setItem('elaris_player_user', JSON.stringify(user));
+      document.getElementById('admin-login-overlay').style.display = 'none';
+      loadSessions(false);
+    } else {
+      document.getElementById('admin-login-overlay').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('admin-login-overlay').style.display = 'flex';
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════════════ */
+function parseDASS(s) {
+  try {
+    const raw = typeof s.dass === 'object' && s.dass !== null && !Array.isArray(s.dass)
+      ? s.dass
+      : JSON.parse(s.dass || '{}');
+    return {
+      depression: typeof raw.depression === 'number' ? raw.depression : 0,
+      anxiety:    typeof raw.anxiety    === 'number' ? raw.anxiety    : 0,
+      stress:     typeof raw.stress     === 'number' ? raw.stress     : 0
+    };
+  } catch (_) { return { depression: 0, anxiety: 0, stress: 0 }; }
+}
+
+/* DASS-21 clinical cut scores */
+function dassLevel(subscale, score) {
+  if (subscale === 'depression') {
+    if (score <= 9)  return 'Normal';
+    if (score <= 13) return 'Mild';
+    if (score <= 20) return 'Moderate';
+    if (score <= 27) return 'Severe';
+    return 'Extremely Severe';
+  }
+  if (subscale === 'anxiety') {
+    if (score <= 7)  return 'Normal';
+    if (score <= 9)  return 'Mild';
+    if (score <= 14) return 'Moderate';
+    if (score <= 19) return 'Severe';
+    return 'Extremely Severe';
+  }
+  // stress
+  if (score <= 14) return 'Normal';
+  if (score <= 18) return 'Mild';
+  if (score <= 25) return 'Moderate';
+  if (score <= 33) return 'Severe';
+  return 'Extremely Severe';
+}
+
+function dassLevelCls(level) {
+  switch (level) {
+    case 'Normal':           return 'dass-norm';
+    case 'Mild':             return 'dass-mild';
+    case 'Moderate':         return 'dass-mod';
+    case 'Severe':           return 'dass-sev';
+    case 'Extremely Severe': return 'dass-ext';
+    default:                 return 'dass-norm';
+  }
+}
+
+function dassBadge(letter, score, subscale) {
+  const level = dassLevel(subscale, score || 0);
+  const cls   = dassLevelCls(level);
+  return `
+    <div class="dass-badge ${cls}" title="${subscale}: ${score} — ${level}">
+      <span class="db-letter">${letter}</span>
+      <span class="db-val">${score ?? '—'}</span>
+    </div>`;
+}
+
+function formatRelTime(ts) {
+  if (!ts) return '—';
+  const now  = Date.now() / 1000;
+  const diff = now - ts;
+  if (diff < 60)         return 'just now';
+  if (diff < 3600)       return Math.round(diff / 60) + 'm ago';
+  if (diff < 86400)      return Math.round(diff / 3600) + 'h ago';
+  if (diff < 86400 * 7)  return Math.round(diff / 86400) + 'd ago';
+  return new Date(ts * 1000).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+function formatDateTime(date) {
+  return date.toLocaleString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function formatDuration(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 60)   return s + 's';
+  const m = Math.floor(s / 60), rs = s % 60;
+  if (m < 60)   return m + 'm ' + rs + 's';
+  const h = Math.floor(m / 60), rm = m % 60;
+  return h + 'h ' + rm + 'm';
+}
+
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+</script>
+</body>
+</html>

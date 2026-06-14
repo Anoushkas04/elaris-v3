@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elaris Island - Pre-Boarding Assessment</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+    :root {
+      --bg: #050508;
+      --bg-panel: rgba(15, 20, 25, 0.85);
+      --text: #e0e0d8;
+      --text-muted: #8a8a80;
+      --gold: #d4af37;
+      --gold-dim: #8c7322;
+      --rust: #8b3a3a;
+      --ff-h: 'Playfair Display', serif;
+      --ff-t: 'Montserrat', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff-t);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: radial-gradient(circle at 50% 50%, rgba(20, 25, 30, 0.4) 0%, #050508 100%);
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      background: var(--bg-panel);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    h1 {
+      font-family: var(--ff-h);
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+    .hidden { display: none !important; }
+    
+    /* ─── PHQ-9 UI ─── */
+    #phq-q-container {
+      margin: 20px 0;
+      min-height: 120px;
+    }
+    .question-text {
+      font-size: 1.2rem;
+      font-family: var(--ff-h);
+      margin-bottom: 30px;
+      line-height: 1.4;
+    }
+    .btn-opt {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: rgba(212, 175, 55, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--text);
+      font-family: var(--ff-t);
+      font-size: 0.95rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: left;
+    }
+    .btn-opt:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--gold);
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 30px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ─── IDENTITY UI ─── */
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .id-card {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(212,175,55,0.2);
+      padding: 15px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .id-card:hover {
+      border-color: var(--gold);
+      background: rgba(212,175,55,0.05);
+    }
+    .id-card.selected {
+      border-color: var(--gold);
+      background: rgba(212,175,55,0.15);
+      box-shadow: 0 0 15px rgba(212,175,55,0.2);
+    }
+    .id-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
+    .id-name { font-weight: 600; font-size: 0.9rem; color: var(--gold); margin-bottom: 5px; }
+    .id-trait { font-size: 0.75rem; color: var(--text-muted); line-height: 1.2; }
+    
+    .btn-submit {
+      margin-top: 25px;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--ff-t);
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    .btn-submit:hover { background: #e5c358; }
+    .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 10px 20px;
+      margin-top: 15px;
+      font-family: var(--ff-t);
+      font-size: 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-secondary:hover { background: rgba(212,175,55,0.1); }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container" id="phq-screen">
+    <h1>Character Profiling</h1>
+    <p class="subtitle" id="phq-subtitle">We need to understand your instincts. Answer truthfully so we can assign a character that truly reflects you.</p>
+    
+    <div id="phq-q-container">
+      <div class="question-text" id="q-text"></div>
+      <div id="opts-container"></div>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" id="p-fill"></div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="identity-screen">
+    <h1>Your Manifest Match</h1>
+    <p class="subtitle">Based on your clearance, the Architect recommends these roles aboard the vessel.</p>
+    
+    <div class="identity-grid" id="rec-grid"></div>
+    
+    <button class="btn-secondary" id="btn-others">Show All Roles</button>
+    
+    <div class="identity-grid hidden" id="all-grid"></div>
+    
+    <button class="btn-submit" id="btn-confirm" disabled>Confirm Identity</button>
+  </div>
+
+  <script>
+    /* ── CANVAS BACKGROUND ── */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [], waves = [];
+    
+    function initCanvas() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 140; i++) {
+        stars.push({
+          x: Math.random() * W, y: Math.random() * H * 0.8,
+          r: Math.random() * 1.5 + 0.3,
+          baseOp: Math.random() * 0.55 + 0.15, op: 0,
+          driftX: (Math.random() - 0.5) * 0.1,
+          twinkle: Math.random() * Math.PI * 2,
+          twSpeed: Math.random() * 0.012 + 0.004
+        });
+      }
+      waves = [
+        { amp: 38, period: 0.012, speed: 0.0008, phase: 0,   color: 'rgba(46,154,120,0.12)', yOff: 0.82 },
+        { amp: 28, period: 0.018, speed: 0.0012, phase: 2.1, color: 'rgba(30,100,160,0.09)', yOff: 0.87 },
+        { amp: 20, period: 0.024, speed: 0.0018, phase: 4.5, color: 'rgba(46,154,120,0.07)', yOff: 0.92 },
+      ];
+    }
+    
+    function drawCanvas(t) {
+      ctx.clearRect(0, 0, W, H);
+      const vg = ctx.createRadialGradient(W/2, H/2, H*0.1, W/2, H/2, H*0.9);
+      vg.addColorStop(0, 'transparent');
+      vg.addColorStop(1, 'rgba(5,5,8,0.55)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, W, H);
+      
+      for (const s of stars) {
+        s.twinkle += s.twSpeed;
+        s.op = s.baseOp + Math.sin(s.twinkle) * 0.22;
+        s.x += s.driftX;
+        if (s.x < -2) s.x = W + 2;
+        if (s.x > W+2) s.x = -2;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240,226,184,${Math.max(0, Math.min(1, s.op))})`;
+        ctx.fill();
+      }
+      
+      for (const w of waves) {
+        w.phase += w.speed;
+        ctx.beginPath();
+        ctx.moveTo(0, H);
+        for (let x = 0; x <= W; x += 3) {
+          const y = H * w.yOff + Math.sin(x * w.period + w.phase) * w.amp
+                  + Math.sin(x * w.period * 1.7 + w.phase * 1.3) * (w.amp * 0.4);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W, H);
+        ctx.fillStyle = w.color;
+        ctx.fill();
+      }
+      requestAnimationFrame(drawCanvas);
+    }
+    
+    window.addEventListener('resize', initCanvas);
+    initCanvas();
+    requestAnimationFrame(drawCanvas);
+
+    /* ── LOGIC ── */
+    const userJson = localStorage.getItem('elaris_user');
+    if (!userJson) window.location.href = 'login.html';
+    const user = JSON.parse(userJson);
+    
+    const PHQ_QUESTIONS = [
+      "Do you find it difficult to wind down after a tense situation, carrying the nervous energy with you?",
+      "When the room goes quiet, are you hyper-aware of your own physical reactions, like a dry mouth or racing pulse?",
+      "Is it a struggle to find genuine enthusiasm for the events happening around you?",
+      "Do you tend to over-react or lose patience when plans are suddenly delayed or changed?",
+      "Have you felt sudden moments of panic or trembling when faced with the unknown?",
+      "Do you ever feel that your efforts are meaningless, leaving you with little to look forward to?",
+      "Are you easily agitated, finding it hard to tolerate interruptions to your focus?",
+      "Do you worry about losing control of your surroundings, even when there's no immediate danger?",
+      "Do you struggle to shake off feelings of worthlessness or feeling 'down' even in good company?"
+    ];
+    
+    const OPTIONS = [
+      { text: "Not at all", val: 0 },
+      { text: "Several days", val: 1 },
+      { text: "More than half the days", val: 2 },
+      { text: "Nearly every day", val: 3 }
+    ];
+    
+    const IDENTITIES = [
+      { id: 'doctor', name: 'Doctor', icon: '🩺', trait: 'Heals, observes,<br/>conceals' },
+      { id: 'influencer', name: 'Influencer', icon: '📱', trait: 'Everyone\'s watching,<br/>no one\'s seen' },
+      { id: 'ceo', name: 'CEO', icon: '💼', trait: 'Wealth buys silence<br/>not safety' },
+      { id: 'musician', name: 'Musician', icon: '🎸', trait: 'Hears everything,<br/>says nothing' },
+      { id: 'comedian', name: 'Comedian', icon: '🎭', trait: 'Laughs loudest<br/>to hide pain' },
+      { id: 'academic', name: 'Academic', icon: '📚', trait: 'Smart enough<br/>to be suspicious' },
+      { id: 'therapist', name: 'Therapist', icon: '🧠', trait: 'Knows your fears<br/>before you do' },
+      { id: 'detective', name: 'Detective', icon: '🔍', trait: 'Every clue<br/>has a shadow' },
+      { id: 'gamer', name: 'Gamer', icon: '🎮', trait: 'Treats life like<br/>a last save point' }
+    ];
+    
+    let qIndex = 0;
+    let phqScore = 0;
+    
+    const qText = document.getElementById('q-text');
+    const optsContainer = document.getElementById('opts-container');
+    const pFill = document.getElementById('p-fill');
+    
+    function showQuestion() {
+      if (qIndex >= PHQ_QUESTIONS.length) {
+        finishPhq();
+        return;
+      }
+      qText.textContent = PHQ_QUESTIONS[qIndex];
+      optsContainer.innerHTML = '';
+      OPTIONS.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-opt';
+        btn.textContent = opt.text;
+        btn.onclick = () => {
+          phqScore += opt.val;
+          qIndex++;
+          pFill.style.width = ((qIndex / PHQ_QUESTIONS.length) * 100) + '%';
+          showQuestion();
+        };
+        optsContainer.appendChild(btn);
+      });
+    }
+    
+    async function finishPhq() {
+      localStorage.setItem('elaris_phq9', phqScore.toString());
+      
+      if (user.identity) {
+        // Returning user with permanent avatar
+        window.location.href = 'game.html';
+      } else {
+        // New user needs avatar recommendation
+        document.getElementById('phq-screen').classList.add('hidden');
+        document.getElementById('identity-screen').classList.remove('hidden');
+        buildRecommendations();
+      }
+    }
+    
+    let selectedId = null;
+    
+    function buildRecommendations() {
+      let recIds = [];
+      if (phqScore <= 4) {
+        recIds = ['ceo', 'influencer', 'musician'];
+      } else if (phqScore <= 14) {
+        recIds = ['doctor', 'academic', 'detective'];
+      } else {
+        recIds = ['therapist', 'comedian', 'gamer'];
+      }
+      
+      const recs = IDENTITIES.filter(i => recIds.includes(i.id));
+      const recGrid = document.getElementById('rec-grid');
+      const allGrid = document.getElementById('all-grid');
+      
+      recs.forEach(i => recGrid.appendChild(createCard(i)));
+      IDENTITIES.forEach(i => allGrid.appendChild(createCard(i)));
+    }
+    
+    function createCard(ident) {
+      const div = document.createElement('div');
+      div.className = 'id-card';
+      div.dataset.id = ident.id;
+      div.innerHTML = `
+        <span class="id-icon">${ident.icon}</span>
+        <div class="id-name">${ident.name}</div>
+        <div class="id-trait">${ident.trait}</div>
+      `;
+      div.onclick = () => selectCard(ident.id, ident.name);
+      return div;
+    }
+    
+    function selectCard(id, name) {
+      document.querySelectorAll('.id-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll(`.id-card[data-id="${id}"]`).forEach(c => c.classList.add('selected'));
+      selectedId = { id, name };
+      document.getElementById('btn-confirm').disabled = false;
+    }
+    
+    document.getElementById('btn-others').onclick = (e) => {
+      e.target.classList.add('hidden');
+      document.getElementById('rec-grid').classList.add('hidden');
+      document.getElementById('all-grid').classList.remove('hidden');
+    };
+    
+    document.getElementById('btn-confirm').onclick = async () => {
+      if (!selectedId) return;
+      const btn = document.getElementById('btn-confirm');
+      btn.disabled = true;
+      btn.textContent = 'Securing Manifest...';
+      
+      try {
+        await fetch('/api/update-identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.user_id || user.id,
+            identity: selectedId.id,
+            identityName: selectedId.name
+          })
+        });
+        
+        user.identity = selectedId.id;
+        user.identityName = selectedId.name;
+        localStorage.setItem('elaris_user', JSON.stringify(user));
+        
+        window.location.href = 'game.html';
+      } catch (e) {
+        btn.textContent = 'Error. Try Again.';
+        btn.disabled = false;
+      }
+    };
+    
+    // Start flow
+    showQuestion();
+    
+  </script>
+</body>
+</html>

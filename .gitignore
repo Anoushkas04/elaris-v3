@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Databases
+*.db
+data/*.db
+data/elaris.db
+
+# Go binaries
+backend/server
+backend/elaris-v2
+backend/backend
+
+# Temporary JS files
+temp_js_check.js
+temp_admin_check.js
+frontend/temp_js_check.js
+
+# Node / JS dependencies (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
