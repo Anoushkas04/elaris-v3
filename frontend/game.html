@@ -2104,29 +2104,59 @@
       if (!npc) return;
       const stage = $('char-stage');
       stage.classList.add('on');
-      // Remove old
-      Object.values(activeChars).forEach(el => { el.classList.remove('enter'); setTimeout(()=>{if(el.parentElement)el.remove();},600); });
-      activeChars = {};
-      const wrap = document.createElement('div');
-      wrap.className = 'char-wrap';
-      wrap.style.left = npc.x || '50%';
-      if(!npc.x) {
-        wrap.style.transform = 'translate(-50%, 180px)';
-      }
+
+      // Check if there is already a wrap for this character in the stage
+      let wrap = stage.querySelector('.char-wrap-' + npcId);
+      
+      // Remove other active characters
+      Object.entries(activeChars).forEach(([id, el]) => {
+        if (id !== npcId) {
+          el.classList.remove('enter');
+          if (el.removeTimeoutId) clearTimeout(el.removeTimeoutId);
+          el.removeTimeoutId = setTimeout(() => {
+            if (el.parentElement) el.remove();
+          }, 600);
+          delete activeChars[id];
+        }
+      });
+
       const bubble = message ? `<div class="char-bubble"><span class="char-name">${npc.name}</span>${message}</div>` : '';
-      
-      // Use sketch image from assets folder instead of SVG
       const portraitImg = npc.image || 'assets/portrait_general_1780832290626.png';
-      wrap.innerHTML = bubble + `<img class="char-sketch-img" src="${portraitImg}" style="width: 140px; height: 160px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));" onerror="this.src='assets/portrait_general_1780832290626.png'">`;
-      
-      stage.appendChild(wrap);
-      activeChars[npcId] = wrap;
-      requestAnimationFrame(()=>{ 
-        if(!npc.x) {
+      const innerContent = bubble + `<img class="char-sketch-img" src="${portraitImg}" style="width: 140px; height: 160px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));" onerror="this.src='assets/portrait_general_1780832290626.png'">`;
+
+      if (wrap) {
+        // Cancel any pending removal timeout
+        if (wrap.removeTimeoutId) {
+          clearTimeout(wrap.removeTimeoutId);
+          wrap.removeTimeoutId = null;
+        }
+        // Update content (like dialogue bubble)
+        wrap.innerHTML = innerContent;
+        wrap.classList.add('enter');
+        if (!npc.x) {
           wrap.style.transform = 'translate(-50%, 0)';
         }
-        wrap.classList.add('enter'); 
-      });
+        activeChars[npcId] = wrap;
+      } else {
+        // Create new
+        wrap = document.createElement('div');
+        wrap.className = `char-wrap char-wrap-${npcId}`;
+        wrap.style.left = npc.x || '50%';
+        if (!npc.x) {
+          wrap.style.transform = 'translate(-50%, 180px)';
+        }
+        wrap.innerHTML = innerContent;
+        stage.appendChild(wrap);
+        activeChars[npcId] = wrap;
+        
+        requestAnimationFrame(() => {
+          if (!npc.x) {
+            wrap.style.transform = 'translate(-50%, 0)';
+          }
+          wrap.classList.add('enter');
+        });
+      }
+
       if (speak && message) {
         const plain = message.replace(/<[^>]+>/g,'');
         TTS.say(plain, npc.speak_pitch || 1, npc.speak_rate || .88);
@@ -2138,16 +2168,24 @@
       const stage = $('char-stage');
       const keys = Object.keys(activeChars);
       if (keys.length === 0) {
-        if (stage) stage.classList.remove('on');
+        // Clean up any stray wraps still in the stage that might be in fade-out
+        const elements = stage.querySelectorAll('.char-wrap');
+        if (elements.length === 0) {
+          if (stage) stage.classList.remove('on');
+        }
       } else {
         let count = 0;
-        Object.values(activeChars).forEach(el => {
+        Object.entries(activeChars).forEach(([npcId, el]) => {
           el.classList.remove('enter');
-          setTimeout(()=>{
-            if(el.parentElement) el.remove();
+          if (el.removeTimeoutId) clearTimeout(el.removeTimeoutId);
+          el.removeTimeoutId = setTimeout(() => {
+            if (el.parentElement) el.remove();
             count++;
             if (count === keys.length) {
-              if (stage) stage.classList.remove('on');
+              // Only turn off stage if no characters remain
+              if (!stage.querySelector('.char-wrap')) {
+                if (stage) stage.classList.remove('on');
+              }
             }
           }, 600);
         });
