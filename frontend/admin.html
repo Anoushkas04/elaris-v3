@@ -779,18 +779,14 @@ td.td-center { text-align: center; }
   <div style="width:100%; max-width:400px; padding:40px; background:rgba(15, 20, 25, 0.95); border:1px solid rgba(212, 175, 55, 0.3); border-radius:8px; box-shadow:0 10px 40px rgba(0,0,0,0.8); text-align:center;">
     <span style="font-size:3rem; display:block; margin-bottom:15px;">🔐</span>
     <h2 style="font-family:'Playfair Display',serif; color:var(--gold); font-size:1.8rem; margin-bottom:10px; letter-spacing:0.05em;">Elaris Control Room</h2>
-    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:30px; font-family:'Montserrat',sans-serif;">Enter credentials to access assessment records</p>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:30px; font-family:'Montserrat',sans-serif;">Enter passphrase to unlock the Control Room</p>
     <form id="admin-login-form">
-      <div style="margin-bottom:15px; text-align:left;">
-        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Username</label>
-        <input type="text" id="admin-username" placeholder="Enter username" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
-      </div>
       <div style="margin-bottom:20px; text-align:left;">
-        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Password / Passphrase</label>
-        <input type="password" id="admin-passphrase" placeholder="••••••••••••" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
+        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Control Passphrase</label>
+        <input type="password" id="admin-passphrase" placeholder="Enter security passphrase" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
       </div>
       <div id="admin-login-error" style="color:#ff6b6b; font-size:0.85rem; margin-bottom:20px; display:none;"></div>
-      <button type="submit" style="width:100%; padding:14px; background:var(--gold-dim); border:1px solid var(--gold); color:#050508; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Verify Identity</button>
+      <button type="submit" style="width:100%; padding:14px; background:var(--gold-dim); border:1px solid var(--gold); color:#050508; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Unlock Control Room</button>
     </form>
   </div>
 </div>
@@ -2063,28 +2059,20 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const username = document.getElementById('admin-username').value.trim();
       const password = document.getElementById('admin-passphrase').value;
       const errDiv = document.getElementById('admin-login-error');
       if (errDiv) {
         errDiv.style.display = 'none';
         errDiv.textContent = '';
       }
-      if (username !== 'admin') {
-        if (errDiv) {
-          errDiv.textContent = 'Access Denied: Only the administrator account can log in.';
-          errDiv.style.display = 'block';
-        }
-        return;
-      }
       try {
         const res = await fetch(`${API_BASE}/api/admin/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username: 'admin', password })
         });
         if (!res.ok) {
-          let errMsg = 'Invalid credentials';
+          let errMsg = 'Invalid passphrase';
           try {
             const d = await res.json();
             if (d && d.error) errMsg = d.error;
