@@ -615,7 +615,6 @@
       text-transform: uppercase;
     }
 
-    /* ━━━━━━━━━━━━━━━━━━━━  PROTOCOL WARNING TOAST  ━━━━━━━━━━━━━━━━━ */
     .proto-warning {
       position: fixed;
       bottom: 24px;
@@ -632,10 +631,18 @@
       color: #c89070;
       z-index: 999;
       box-shadow: 0 8px 32px rgba(0,0,0,0.70), 0 0 0 1px rgba(192,71,31,0.20);
-      transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.5s ease, visibility 0.5s;
       backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
-    .proto-warning.show { transform: translateX(-50%) translateY(0); }
+    .proto-warning.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
     .proto-warning strong { color: var(--rust); font-family: var(--ff-m); font-style: normal; font-size: 0.80rem; letter-spacing: 0.08em; }
     .proto-warning code { font-family: var(--ff-m); font-size: 0.82rem; color: var(--gold); background: rgba(196,164,101,0.12); padding: 1px 5px; border-radius: 3px; }
 
