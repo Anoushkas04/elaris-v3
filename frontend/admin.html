@@ -1269,6 +1269,7 @@ function adjustUIForRole(isAdmin) {
   const jsonBtn = document.querySelector('button[onclick="exportJSON()"]');
   const clearBtn = document.querySelector('button[onclick="wipeAllSessions()"]');
   const filterGroup = document.querySelector('.filter-group');
+  const searchWrap = document.querySelector('.search-wrap');
   
   if (isAdmin) {
     if (titleEl) titleEl.innerHTML = '🔐 Control Room';
@@ -1278,6 +1279,7 @@ function adjustUIForRole(isAdmin) {
     if (jsonBtn) jsonBtn.style.display = '';
     if (clearBtn) clearBtn.style.display = '';
     if (filterGroup) filterGroup.style.display = '';
+    if (searchWrap) searchWrap.style.display = '';
   } else {
     if (titleEl) titleEl.innerHTML = '⚓ Player Records Portal';
     if (subEl) subEl.innerHTML = 'Research Dashboard — Past Assessment Sessions';
@@ -1286,6 +1288,7 @@ function adjustUIForRole(isAdmin) {
     if (jsonBtn) jsonBtn.style.display = 'none';
     if (clearBtn) clearBtn.style.display = 'none';
     if (filterGroup) filterGroup.style.display = 'none'; // hide suspect/status filters for player
+    if (searchWrap) searchWrap.style.display = 'none';
   }
 }
 
@@ -2121,27 +2124,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const adminToken = sessionStorage.getItem('elaris_admin_token');
-  const playerUser = sessionStorage.getItem('elaris_player_user') || localStorage.getItem('elaris_user');
+  const playerUser = sessionStorage.getItem('elaris_player_user');
   
   if (adminToken) {
     sessionStorage.setItem('elaris_admin_user', 'admin');
     document.getElementById('admin-login-overlay').style.display = 'none';
     loadSessions(false);
   } else if (playerUser) {
-    const user = JSON.parse(playerUser);
-    const uName = user.name || user.username || '';
-    const uID = user.user_id || user.id || '';
-    if (uName === 'admin') {
-      document.getElementById('admin-login-overlay').style.display = 'flex';
-    } else if (uID) {
-      user.user_id = uID;
-      user.id = uID;
-      user.username = uName;
-      user.name = uName;
-      sessionStorage.setItem('elaris_player_user', JSON.stringify(user));
-      document.getElementById('admin-login-overlay').style.display = 'none';
-      loadSessions(false);
-    } else {
+    try {
+      const user = JSON.parse(playerUser);
+      const uName = user.name || user.username || '';
+      const uID = user.user_id || user.id || '';
+      if (uName === 'admin') {
+        document.getElementById('admin-login-overlay').style.display = 'flex';
+      } else if (uID) {
+        user.user_id = uID;
+        user.id = uID;
+        user.username = uName;
+        user.name = uName;
+        sessionStorage.setItem('elaris_player_user', JSON.stringify(user));
+        document.getElementById('admin-login-overlay').style.display = 'none';
+        loadSessions(false);
+      } else {
+        document.getElementById('admin-login-overlay').style.display = 'flex';
+      }
+    } catch (_) {
       document.getElementById('admin-login-overlay').style.display = 'flex';
     }
   } else {
