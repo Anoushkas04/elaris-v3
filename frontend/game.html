@@ -2116,7 +2116,7 @@
       <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
         <button class="btn-main" onclick="showPlayerRecords()">My Progress & Past Records</button>
         <button class="btn-secondary" onclick="logout()">Log Out</button>
-        <button class="btn-secondary" onclick="resetToHome()" style="background: transparent; border: 1px solid rgba(196,164,101,0.2); color: var(--gold-d);">Re-Board Vessel</button>
+        <button class="btn-secondary" onclick="reboardVessel()" style="background: transparent; border: 1px solid rgba(196,164,101,0.2); color: var(--gold-d);">Re-Board Vessel</button>
       </div>
     </div>
   </div>
@@ -2383,18 +2383,187 @@
       {id:'sofia', icon:'🍳', name:'Sofia Reyes',  role:'Resort Chef',                 color:'#6a3a9a', x:'50%', alive:true, speak_pitch:1.1, speak_rate:.88, details:'Sofia Reyes, resort chef. Quiet, works long hours in the kitchen. Staff contract shows hire date: May 12, 2026 (1 month ago). Verified kitchen logs show she cleaned stoves until 9:00 PM.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>May 12, 2026:</strong> Signed 6-month contract.<br>• <strong>7:00 PM - 8:00 PM:</strong> Supervised kitchen dinner service cleanup.<br>• <strong>8:00 PM - 9:00 PM:</strong> Cleaning kitchen stoves (Verified by shift manager log).<br>• <strong>9:15 PM:</strong> Retired to Staff Quarters (Verified by badge reader tap).</div>', image:'assets/portrait_sofia_1780832213248.png'},
     ];
 
-    const MEMORY_FRAGMENTS = [
-      { text:'"This wasn\'t supposed to happen.\nWe only agreed to collect data."\n\n[Voice recording. Speaker unknown. Dated: 3 years ago.]', clue:'The murder is connected to a past experiment. Not everyone is telling the truth.' },
-      { text:'"Meeting moved to private channel.\nNobody else can know.\n—J.O. / R.A."\n\n[Encrypted email fragment. Two surnames partially visible.]', clue:'Two guests were secretly communicating before arriving on Elaris.' },
-      { text:'"I recognized someone the moment I arrived.\nI don\'t know if they recognised me back."\n\n[Diary page. Handwriting matches the victim.]', clue:'Some guests already knew each other. The connections predate this trip.' },
-      { text:'"You promised nobody would find out."\n"I never promised that. I promised it would be controlled."\n\n[Argument. Voices recorded by resort system.]', clue:'The conspiracy is larger than one person. Multiple parties are implicated.' },
-      { text:'[Suitcase contents: photographs, contracts, prescription bottles.]\n\nOne photograph shows a group of twelve. Five faces match guests here.', clue:'Someone has been stealing evidence — and carrying it.' },
-      { text:'[Security footage: 3:14 AM. A figure deletes files from the data server. The monitor displays: PROJECT ECHO — PARTICIPANT DATA.]', clue:'Evidence was intentionally destroyed. The project name: ECHO.' },
-      { text:'"If the ECHO data gets out, we\'re finished. All of us. Not just you."\n\n[Audio fragment. At least three distinct voices.]', clue:'Multiple people benefited from hiding the ECHO results. Multiple people are at risk.' },
-      { text:'[CCTV reconstruction shows a meeting. Five guests present. Only three admit attending the 11 PM session in the boardroom.]', clue:'Several guests are lying about their whereabouts. Verify the timeline.' },
-      { text:'[Final pages of PROJECT ECHO report]\n\n"Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed. Study was never published."\n\n[Signed: R.A., J.O.]', clue:'The island experiment harmed real people. The initials match two guests here now.' },
-      { text:'"I came back to destroy the evidence.\nBut when I saw who else was here — I realized the evidence is them."\n\n[Final recording. Identity confirmed by voice analysis.]', clue:'The truth was silenced. The killer wanted to bury Project Echo.' }
-    ];
+    const CHARACTER_META = {
+      doctor: {
+        id: 'doctor',
+        name: 'Dr. Priya Sharma',
+        role: 'Cardiologist',
+        cabin: 'Cabin 3',
+        item: 'Silver Locket',
+        itemClue: 'A silver locket containing customized medical capsules',
+        bonfireClaim: 'reviewing offline patient case records in Cabin 3',
+        bonfireContradiction: 'local file-open timestamp showed no activity during that period',
+        alibiContradiction: 'Cardiologist claimed to be reviewing case records in Cabin 3, but local network files indicate no patient records were accessed.',
+        dossierAlibiSummary: 'Logged into medical portal from Cabin 3 (8:45 PM - 10:15 PM), reviewed case files (10:30 PM - Midnight).'
+      },
+      ceo: {
+        id: 'ceo',
+        name: 'Marcus Chen',
+        role: 'Tech CEO',
+        cabin: 'Cabin 1',
+        item: 'Military Medal',
+        itemClue: 'A corporate leadership medal with tech CEO credentials',
+        bonfireClaim: 'returned to Cabin 1 at 10:45 PM',
+        bonfireContradiction: 'electronic door lock registered no entry until 11:30 PM',
+        alibiContradiction: 'Tech CEO claimed to have returned to Cabin 1 at 10:45 PM, but electronic lock records show no door entry until 11:30 PM.',
+        dossierAlibiSummary: 'Sent 14 emails from lobby lounge (8:45 PM - 10:30 PM), returned to Cabin 1 at 10:45 PM.'
+      },
+      musician: {
+        id: 'musician',
+        name: 'Elena Voss',
+        role: 'Musician',
+        cabin: 'Cabin 5',
+        item: 'Wooden Cross',
+        itemClue: 'A wooden cross necklace registered to Cabin 5',
+        bonfireClaim: 'walked along South Cliffs until 9:45 PM',
+        bonfireContradiction: 'security patrol log reported South Cliffs were empty after 9:00 PM',
+        alibiContradiction: 'Musician claimed she walked along the South Cliffs, but security patrols saw no one in the sector after 9:00 PM.',
+        dossierAlibiSummary: 'Walked along South Cliffs (8:30 PM - 9:45 PM), returned to Cabin 5 at 10:00 PM.'
+      },
+      student: {
+        id: 'student',
+        name: 'Zara Okonkwo',
+        role: 'Student',
+        cabin: 'Cabin 6',
+        item: 'Magnifying Glass',
+        itemClue: 'A student\'s magnifying glass left in Cabin 7',
+        bonfireClaim: 'in resort Library reading reference logs until 10:30 PM',
+        bonfireContradiction: 'library surveillance log confirms the library closed at 9:00 PM',
+        alibiContradiction: 'Student claimed she was in the Library reading reference logs, but surveillance checks show the library was locked early at 9:00 PM.',
+        dossierAlibiSummary: 'In resort Library reading reference logs (8:30 PM - 10:30 PM), returned to Cabin 6 at 10:45 PM.'
+      },
+      comedian: {
+        id: 'comedian',
+        name: 'Rory Walsh',
+        role: 'Comedian',
+        cabin: 'Cabin 8',
+        item: 'Old Compass',
+        itemClue: 'An old brass compass matching Cabin 8\'s inventory',
+        bonfireClaim: 'played arcade games in the resort lounge until 10:30 PM',
+        bonfireContradiction: 'high-score server logs recorded no game activity that evening',
+        alibiContradiction: 'Comedian claimed he played arcade games in the lounge, but lounge high-score logs showed zero system activity.',
+        dossierAlibiSummary: 'Played arcade games in resort lounge (8:45 PM - 10:30 PM), returned to Cabin 8 at 10:45 PM.'
+      },
+      detective: {
+        id: 'detective',
+        name: 'Ret. Det. Frank Silva',
+        role: 'Retired Detective',
+        cabin: 'Cabin 9',
+        item: 'Military Medal',
+        itemClue: 'A police service medal belonging to the occupant of Cabin 9',
+        bonfireClaim: 'checked security perimeter gates until 10:00 PM',
+        bonfireContradiction: 'staff radio log showed no communications or movement at the gates',
+        alibiContradiction: 'Retired Detective claimed he was checking perimeter gates at 9:00 PM, but security gate badge records show no patrol activity.',
+        dossierAlibiSummary: 'Checked security perimeter gates (8:15 PM - 10:00 PM), returned to Cabin 9 at 10:15 PM.'
+      },
+      rowan: {
+        id: 'rowan',
+        name: 'Rowan Ashford',
+        role: 'Resort Host',
+        cabin: 'Office',
+        item: 'Wine Glass',
+        itemClue: 'A dirty wine glass matching the resort host\'s dining inventory',
+        bonfireClaim: 'checking room bookings from 8:15 PM',
+        bonfireContradiction: 'office card lock log was completely inactive during that hour',
+        alibiContradiction: 'Resort Host claimed he was checking room bookings in the office at 8:15 PM, but office card lock registers show the room was empty.',
+        dossierAlibiSummary: 'Hosted dinner service (6:30 PM - 8:00 PM), audited pantry inventory (8:15 PM - 9:30 PM), closed office at 10:00 PM.'
+      },
+      mia: {
+        id: 'mia',
+        name: 'Mia Lacroix',
+        role: 'Influencer',
+        cabin: 'Cabin 2',
+        item: 'Perfume Bottle',
+        itemClue: 'A custom perfume bottle registered to the social media influencer',
+        bonfireClaim: 'live streaming the whole night until 11:30 PM',
+        bonfireContradiction: 'device analytics show her phone battery died at 9:30 PM',
+        alibiContradiction: 'Influencer claimed she was live streaming until 11:30 PM, but router logs show her phone battery died at 9:30 PM.',
+        dossierAlibiSummary: 'Took photos at beach (7:30 PM - 8:30 PM), started livestream (9:00 PM - 9:30 PM), phone died at 9:30 PM.'
+      },
+      james: {
+        id: 'james',
+        name: 'Dr. James Okoro',
+        role: 'Neuropsychologist',
+        cabin: 'Cabin 4',
+        item: 'Hidden Notebook',
+        itemClue: 'A clinical research notebook matching the Neuropsychologist\'s signature',
+        bonfireClaim: 'stayed there straight until midnight',
+        bonfireContradiction: 'spa electronic RFID lock recorded exit at 10:17 PM',
+        alibiContradiction: 'Neuropsychologist claimed he stayed in the spa room meditating until midnight, but electronic locks show he left at 10:17 PM.',
+        dossierAlibiSummary: 'Spa room meditation (8:30 PM - 10:00 PM), returned to Cabin 4 at 10:17 PM (RFID tap).'
+      },
+      sofia: {
+        id: 'sofia',
+        name: 'Sofia Reyes',
+        role: 'Resort Chef',
+        cabin: 'Staff Quarters',
+        item: 'Mystery Novel',
+        itemClue: 'A mystery novel belonging to the resort chef',
+        bonfireClaim: 'working at this resort three years ago',
+        bonfireContradiction: 'personnel files show her contract was signed only one month ago',
+        alibiContradiction: 'Resort Chef claimed she worked at the resort for three years, but payroll records show she signed her contract last month.',
+        dossierAlibiSummary: 'Signed 6-month contract on May 12, 2026. Cleaned stoves until 9:00 PM, retired to Staff Quarters at 9:15 PM.'
+      }
+    };
+
+    function getMemoryFragment(idx) {
+      const murdererId = GS.murderer || 'rowan';
+      const meta = CHARACTER_META[murdererId] || CHARACTER_META.rowan;
+      
+      const list = [
+        // Module 1 (The Shoreline)
+        {
+          text: `"This wasn't supposed to happen.\nWe only agreed to collect data. ${meta.name} was never supposed to find out."\n\n[Voice recording. Speaker unknown. Dated: 3 years ago.]`,
+          clue: `The murder is connected to a past experiment. ${meta.name} is connected to the project.`
+        },
+        // Module 2 (The Lighthouse)
+        {
+          text: `"Meeting moved to private channel.\nNobody else can know.\n—Dr. Okoro / R. Ashford"\n\n[Encrypted email fragment. Surnames decrypted.]`,
+          clue: `Dr. James Okoro and Rowan Ashford were secretly communicating before arriving on Elaris.`
+        },
+        // Module 3 (Cabin 7)
+        {
+          text: `"[Item recovered from Cabin 7: a ${meta.item}, confirmed to be registered to ${meta.name}.]\n\n'Verified possession during initial check-in.' —Quartermaster Log"`,
+          clue: `A ${meta.item} registered to ${meta.name} was found inside Cabin 7.`
+        },
+        // Module 4 (The Bonfire)
+        {
+          text: `"[Timeline analysis comparison]\n\n${meta.name} bonfire statement: '${meta.bonfireClaim}'\nSystem record: ${meta.bonfireContradiction}"`,
+          clue: `${meta.name} lied about their timeline: they claimed they were ${meta.bonfireClaim}, but ${meta.bonfireContradiction}.`
+        },
+        // Module 5 (Lost Baggage)
+        {
+          text: `"[Baggage search report]\n\nA folder of historical documents was found hidden in the luggage of ${meta.name}. It contains clinical trial blueprints from 3 years ago and a layout of the island's server room."`,
+          clue: `${meta.name} is carrying blueprints and documentation of Project Echo.`
+        },
+        // Module 6 (The Forest Trail)
+        {
+          text: `"[Security footage: 3:14 AM. A figure matching the build of ${meta.name} is seen deleting files from the data server. The monitor displays: PROJECT ECHO — PARTICIPANT DATA.]"`,
+          clue: `${meta.name} was seen deleting Project Echo files from the server room at 3:14 AM.`
+        },
+        // Module 7 (Evidence Challenge)
+        {
+          text: `"If the ECHO data gets out, we're finished. Ashford, Okoro, all of us. Not just the ones who ran the tests."\n\n[Decrypted audio log belonging to ${window._testEvidenceName || 'Dr. Priya Sharma'} from the server room database.]`,
+          clue: `The decrypted timeline log belonging to ${window._testEvidenceName || 'Dr. Priya Sharma'} is connected to Project Echo.`
+        },
+        // Module 8 (CCTV Reconstruction)
+        {
+          text: `"[Boardroom CCTV Reconstruction]\n\nAt 11:00 PM, a meeting took place in the boardroom. The footage clearly shows ${meta.name} present, despite their alibi claiming they were alone in their quarters."`,
+          clue: `CCTV footage places ${meta.name} in the boardroom at 11:00 PM, contradicting their alibi.`
+        },
+        // Module 9 (The Storm Shelter)
+        {
+          text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed. Study was never published.'\n\n[Signed: Rowan Ashford (Director), Dr. James Okoro (Lead Neuropsychologist), and ${window._testStormName || 'Sofia Reyes'} (Consultant)]"`,
+          clue: `${window._testStormName || 'Sofia Reyes'} is documented in the Project Echo report.`
+        },
+        // Module 10 (The Dock / Pathfinder)
+        {
+          text: `'"I came back to destroy the evidence. But when I saw who else was here — I realized the evidence is them."\n\n[Final voice recording recovered from the victim\'s recorder. Voice analysis indicates the speaker matches: ${meta.name}.]'`,
+          clue: `${meta.name} returned to silence the witnesses of Project Echo.`
+        }
+      ];
+      return list[idx];
+    }
 
     // DASS-21 Items covertly woven into NPC dialogue choices
     // Scale: 0=did not apply, 1=sometimes, 2=often, 3=almost always
@@ -2759,7 +2928,7 @@
       const dot = $('frag-dot-'+idx);
       if (dot) { dot.classList.add('lit'); }
       $('hud-frags').textContent = `Fragments: ${GS.fragments.filter(Boolean).length} / 10`;
-      const f = MEMORY_FRAGMENTS[idx];
+      const f = getMemoryFragment(idx);
       $('frag-num').textContent = '#' + (idx+1);
       $('frag-body').textContent = f.text;
       $('frag-clue').textContent = '⚠ NEW CLUE: ' + f.clue;
@@ -2874,10 +3043,15 @@
             let hintText = m.hint;
             if (id === 'sc-room') {
               const killerHints = {
+                doctor: "Clue: The intruder item was likely left by someone with clinical medical access. Check for customized medical capsules.",
+                ceo: "Clue: The intruder item belongs to a high-ranking corporate leader. Check for elite awards or decorations.",
+                musician: "Clue: The intruder item is a spiritual or personal keepsake from Cabin 5.",
+                student: "Clue: The intruder item is a tool used for inspecting close details, belonging to a student.",
+                comedian: "Clue: The intruder item is an old brass direction finder, potentially dropped by someone easily startled.",
+                detective: "Clue: The intruder item is a service award belonging to a retired investigator.",
                 rowan: "Clue: The intruder item was likely dropped by someone managing the resort's guest hosting or dining inventory. Check for glassware.",
                 mia: "Clue: The intruder item belongs to a high-profile influencer obsessed with luxury cosmetics and accessories. Check for a beauty item.",
                 james: "Clue: The intruder item belongs to a researcher who keeps methodical logs. Check for personal records.",
-                kai: "Clue: The intruder item belongs to someone checking escape dock gear or sea navigation routes.",
                 sofia: "Clue: The intruder item belongs to someone who reads fictional case logs or recipes in their spare kitchen hours."
               };
               hintText = killerHints[GS.murderer] || m.hint;
@@ -2912,7 +3086,7 @@
       const user = JSON.parse(userJson);
       const matchedIdentity = IDENTITIES.find(i => i.id === user.identity);
       if (matchedIdentity) {
-        GS.playerName = matchedIdentity.name;
+        GS.playerName = user.name || user.username || matchedIdentity.name;
         GS.playerRole = matchedIdentity.role;
         GS.playerIcon = matchedIdentity.icon;
       } else {
@@ -2922,7 +3096,7 @@
       }
       
       GS.npcs = JSON.parse(JSON.stringify(NPCS_BASE));
-      const potentialMurderers = NPCS_BASE.filter(n => n.id !== 'kai');
+      const potentialMurderers = [...IDENTITIES, ...NPCS_BASE].filter(c => c.id !== 'kai' && c.id !== user.identity);
       GS.murderer = potentialMurderers[Math.floor(Math.random()*potentialMurderers.length)].id;
       GS.victim = 'kai';
       
@@ -2967,6 +3141,12 @@
       $('progress-bar').style.display='none';
       $('fragment-display').classList.remove('on');
       showScreen('sc-home');
+    }
+
+    function reboardVessel() {
+      if (typeof SFX !== 'undefined' && SFX.click) SFX.click();
+      localStorage.removeItem('elaris_session');
+      location.reload();
     }
 
     // ─ NARRATIVE INTRO (And Then There Were None style) ──────────
@@ -3448,10 +3628,15 @@ function finishBeach(t) {
   ];
   
   const killerIntruderMap = {
+    doctor: 'locket',
+    ceo: 'medal',
+    musician: 'cross',
+    student: 'magnifying',
+    comedian: 'compass',
+    detective: 'medal',
     rowan: 'wine',
     mia: 'perfume',
     james: 'notebook',
-    kai: 'compass',
     sofia: 'novel'
   };
   const targetId = killerIntruderMap[GS.murderer] || 'wine';
@@ -3566,6 +3751,94 @@ function finishBeach(t) {
 // ─ GAME 4: BONFIRE ────────────────────────────────────────────
     function startBonfire(){
       const scenes = {
+        doctor: {
+          npc: 'Dr. Priya Sharma',
+          dialogue: '"I briefly attended the welcome dinner. After that, I returned to my room and was reviewing offline patient case records in Cabin 3 from 10:30 PM straight through until midnight."',
+          correct: 'reviewing offline patient case records in Cabin 3',
+          opts: [
+            'briefly attended the welcome dinner',
+            'reviewing offline patient case records in Cabin 3',
+            'returned to my room',
+            'straight through until midnight'
+          ]
+        },
+        ceo: {
+          npc: 'Marcus Chen',
+          dialogue: '"I spent the evening emailing and returned to Cabin 1 at 10:45 PM. I stayed inside my cabin for the rest of the night."',
+          correct: 'returned to Cabin 1 at 10:45 PM',
+          opts: [
+            'spent the evening emailing',
+            'returned to Cabin 1 at 10:45 PM',
+            'stayed inside my cabin',
+            'rest of the night'
+          ]
+        },
+        musician: {
+          npc: 'Elena Voss',
+          dialogue: '"I left the dinner early and walked along South Cliffs until 9:45 PM. I saw the security officer while walking near the cliffs."',
+          correct: 'walked along South Cliffs until 9:45 PM',
+          opts: [
+            'left the dinner early',
+            'walked along South Cliffs until 9:45 PM',
+            'security officer while walking',
+            'near the cliffs'
+          ]
+        },
+        student: {
+          npc: 'Zara Okonkwo',
+          dialogue: '"I left the welcome dinner at 8:15 PM and was in the resort Library reading reference logs until 10:30 PM. Then I walked straight back to my cabin."',
+          correct: 'in the resort Library reading reference logs until 10:30 PM',
+          opts: [
+            'left the welcome dinner',
+            'in the resort Library reading reference logs until 10:30 PM',
+            'walked straight back',
+            'to my cabin'
+          ]
+        },
+        comedian: {
+          npc: 'Rory Walsh',
+          dialogue: '"I left the dinner and played arcade games in the resort lounge until 10:30 PM. I got the high score on the machine."',
+          correct: 'played arcade games in the resort lounge until 10:30 PM',
+          opts: [
+            'left the dinner',
+            'played arcade games in the resort lounge until 10:30 PM',
+            'high score on the machine',
+            'in the resort lounge'
+          ]
+        },
+        detective: {
+          npc: 'Ret. Det. Frank Silva',
+          dialogue: '"I briefly attended the dinner and checked security perimeter gates until 10:00 PM. Everything was clear when I finished my sweep."',
+          correct: 'checked security perimeter gates until 10:00 PM',
+          opts: [
+            'briefly attended the dinner',
+            'checked security perimeter gates until 10:00 PM',
+            'Everything was clear',
+            'finished my sweep'
+          ]
+        },
+        rowan: {
+          npc: 'Rowan Ashford',
+          dialogue: '"I hosted the dinner service until 8:00 PM. After that, I was working in the main office checking room bookings from 8:15 PM until I locked up at 10:00 PM."',
+          correct: 'checking room bookings from 8:15 PM',
+          opts: [
+            'hosted the dinner service',
+            'checking room bookings from 8:15 PM',
+            'locked up at 10:00 PM',
+            'working in the main office'
+          ]
+        },
+        mia: {
+          npc: 'Mia Lacroix',
+          dialogue: '"I was in my bedroom and started my live stream at 9:00 PM. My fans saw me live streaming the whole night until 11:30 PM when the storm hit."',
+          correct: 'live streaming the whole night until 11:30 PM',
+          opts: [
+            'started my live stream at 9:00 PM',
+            'live streaming the whole night until 11:30 PM',
+            'when the storm hit',
+            'in my bedroom'
+          ]
+        },
         james: {
           npc: 'Dr. James Okoro',
           dialogue: '"I was meditating in the spa room until late. In fact, I stayed there straight until midnight to clear my head, and went straight back to my cabin afterwards without talking to anyone."',
@@ -3586,28 +3859,6 @@ function finishBeach(t) {
             'working at this resort three years ago',
             'went to bed early after that',
             'a routine I have done'
-          ]
-        },
-        mia: {
-          npc: 'Mia Lacroix',
-          dialogue: '"I was in my bedroom and started my live stream at 9:00 PM. My fans saw me live streaming the whole night until 11:30 PM when the storm hit."',
-          correct: 'live streaming the whole night until 11:30 PM',
-          opts: [
-            'started my live stream at 9:00 PM',
-            'live streaming the whole night until 11:30 PM',
-            'when the storm hit',
-            'in my bedroom'
-          ]
-        },
-        rowan: {
-          npc: 'Rowan Ashford',
-          dialogue: '"I hosted the dinner service until 8:00 PM. After that, I was working in the main office checking room bookings from 8:15 PM until I locked up at 10:00 PM."',
-          correct: 'checking room bookings from 8:15 PM',
-          opts: [
-            'hosted the dinner service',
-            'checking room bookings from 8:15 PM',
-            'locked up at 10:00 PM',
-            'working in the main office'
           ]
         }
       };
@@ -3834,57 +4085,68 @@ function finishBeach(t) {
         {
           cue: 'DR. J__ES OK_RO — Spa Meditation: [GLITCH]',
           opts: ['7:30 PM - 9:00 PM', '8:30 PM - 10:00 PM', '9:30 PM - 11:00 PM', '8:00 PM - 9:30 PM'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Dr. James Okoro'
         },
         {
           cue: 'SO_IA RE_ES — Hired on 6-Month Contract: [GLITCH]',
           opts: ['April 12, 2026', 'June 12, 2026', 'May 12, 2026', 'May 22, 2026'],
-          correct: 2
+          correct: 2,
+          suspectName: 'Sofia Reyes'
         },
         {
           cue: 'M_A LA_R_IX — Device Battery Depleted: [GLITCH]',
           opts: ['8:30 PM', '9:30 PM', '10:30 PM', '9:00 PM'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Mia Lacroix'
         },
         {
           cue: 'R_W_N AS_F_RD — Closed Main Office: [GLITCH]',
           opts: ['9:30 PM', '10:00 PM', '10:30 PM', '11:00 PM'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Rowan Ashford'
         },
         {
           cue: 'DR. PR_YA SH_RMA — Logged in to medical portal: [GLITCH]',
           opts: ['8:00 PM - 9:30 PM', '8:45 PM - 10:15 PM', '9:15 PM - 10:45 PM', '10:30 PM - Midnight'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Dr. Priya Sharma'
         },
         {
           cue: 'MA_CUS CH_N — Sent 14 emails from lobby: [GLITCH]',
           opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 10:45 PM', '10:45 PM onwards'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Marcus Chen'
         },
         {
           cue: 'EL_NA VO_S — Walked along South Cliffs: [GLITCH]',
           opts: ['8:00 PM - 9:00 PM', '8:30 PM - 9:45 PM', '9:00 PM - 10:15 PM', '9:30 PM - 10:45 PM'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Elena Voss'
         },
         {
           cue: 'ZA_R OK_NKWO — Reading in resort library: [GLITCH]',
           opts: ['7:30 PM - 8:30 PM', '8:30 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:45 PM onwards'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Zara Okonkwo'
         },
         {
           cue: 'RO_Y WA_SH — Played arcade games in lounge: [GLITCH]',
           opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:00 PM - Midnight'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Rory Walsh'
         },
         {
           cue: 'RE_ DET. FR_NK SI_VA — Checked security gates: [GLITCH]',
           opts: ['7:30 PM - 8:00 PM', '8:15 PM - 10:00 PM', '9:00 PM - 10:30 PM', '10:15 PM onwards'],
-          correct: 1
+          correct: 1,
+          suspectName: 'Ret. Det. Frank Silva'
         }
       ];
       const r = rounds[Math.floor(Math.random()*rounds.length)];
       let attempt = 0; window._testEvidenceCorrect = r.correct;
       window._testEvidenceCorrectText = r.opts[r.correct];
+      window._testEvidenceName = r.suspectName;
       $('evi-attempt').textContent = 1; $('evi-cue').textContent = 'Decrypt: ' + r.cue;
       const gameStart = Date.now();
       
@@ -4021,17 +4283,18 @@ function finishBeach(t) {
     // ─ GAME 9: STORM SHELTER ──────────────────────────────────────
     function startStormShelter() {
       const clues = [
-        { q: "HR log: Month and Day Sofia Reyes signed her contract (MMDD).", a: "0512" },
-        { q: "Security log: Dr. James Okoro's RFID Cabin 4 entry time (HHMM).", a: "1017" },
-        { q: "Device log: Mia Lacroix's phone battery depletion time (HHMM).", a: "0930" },
-        { q: "Reservation log: Dr. James Okoro's Spa meditation end time (HHMM).", a: "1000" },
-        { q: "Kitchen log: Sofia Reyes kitchen stove cleaning end time (HHMM).", a: "0900" },
-        { q: "Dock log: Kai Tanaka's escape vessel inventory audit end time (HHMM).", a: "1015" }
+        { q: "HR log: Month and Day Sofia Reyes signed her contract (MMDD).", a: "0512", suspectName: "Sofia Reyes" },
+        { q: "Security log: Dr. James Okoro's RFID Cabin 4 entry time (HHMM).", a: "1017", suspectName: "Dr. James Okoro" },
+        { q: "Device log: Mia Lacroix's phone battery depletion time (HHMM).", a: "0930", suspectName: "Mia Lacroix" },
+        { q: "Reservation log: Dr. James Okoro's Spa meditation end time (HHMM).", a: "1000", suspectName: "Dr. James Okoro" },
+        { q: "Kitchen log: Sofia Reyes kitchen stove cleaning end time (HHMM).", a: "0900", suspectName: "Sofia Reyes" },
+        { q: "Dock log: Kai Tanaka's escape vessel inventory audit end time (HHMM).", a: "1015", suspectName: "Kai Tanaka" }
       ];
       const activeClue = clues[Math.floor(Math.random()*clues.length)];
       const code = activeClue.a;
       let input = ''; let attempt = 0;
       window._testStormCode = code;
+      window._testStormName = activeClue.suspectName;
       $('storm-clue').textContent = `Decode: ${activeClue.q}`;
       $('storm-display').textContent = '----';
       $('storm-attempt').textContent = 1;
@@ -4188,7 +4451,7 @@ function finishBeach(t) {
         <div style="font-size:.65rem;color:var(--text-d);font-family:var(--ff-m);letter-spacing:.1em;margin-bottom:8px">${x.l}</div>
         <div class="risk-badge ${rClass(x.r)}">${x.r}</div></div>`).join('');
 
-      const murdNPC=GS.npcs.find(n=>n.id===GS.murderer);
+      const murdNPC=[...IDENTITIES, ...NPCS_BASE].find(c=>c.id===GS.murderer);
       const epilogue = total>65
         ? `The fragments pointed to ${murdNPC?.name||'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten recovered memories — and the knowledge that some truths only emerge under pressure.`
         : `The fog was too thick. ${murdNPC?.name||'The host'} disappeared on the last dawn. But the island recorded everything — every choice, every hesitation, every moment of clarity and confusion. The data outlasts the mystery.`;
@@ -4220,25 +4483,55 @@ function finishBeach(t) {
       ];
       
       const murdererContradictions = {
+        doctor: [
+          'Cardiologist claimed to be reviewing offline files in Cabin 3',
+          'Silver locket containing heart capsules was found in Cabin 7',
+          'Medical portal logs registered no patient file activity during that period'
+        ],
+        ceo: [
+          'Tech CEO claimed to have returned to Cabin 1 at 10:45 PM',
+          'Military medal with CEO engravings was found in Cabin 7',
+          'Electronic lock records showed no entry to Cabin 1 until 11:30 PM'
+        ],
+        musician: [
+          'Musician claimed she walked along South Cliffs until 9:45 PM',
+          'Wooden cross registered to Cabin 5 was found in Cabin 7',
+          'Security patrol reported the cliffs were empty after 9:00 PM'
+        ],
+        student: [
+          'Student claimed she was in the Library reading reference logs until 10:30 PM',
+          'Magnifying glass matching student profile was found in Cabin 7',
+          'Library surveillance log confirms the library closed early at 9:00 PM'
+        ],
+        comedian: [
+          'Comedian claimed he played arcade games in the resort lounge until 10:30 PM',
+          'Old brass compass matching comedian luggage was found in Cabin 7',
+          'Lounge high-score server logs showed zero system activity that evening'
+        ],
+        detective: [
+          'Retired Detective claimed he checked perimeter gates until 10:00 PM',
+          'Police service medal belonging to retired detective was found in Cabin 7',
+          'Security gate badge logs showed no patrol sweep activity'
+        ],
         rowan: [
           'Resort Host claimed he was checking bookings in the office at 8:15 PM',
-          'Wine glass found in Cabin 7 matches resort host dining inventory',
-          "Host's verified logs show he was in the pantry auditing inventory at 8:15 PM"
+          'Wine glass matching resort host dining inventory was found in Cabin 7',
+          'Office card lock registers show the office was empty at 8:15 PM'
+        ],
+        mia: [
+          'Influencer claimed she was live streaming until 11:30 PM',
+          'Perfume bottle matching influencer branding was found in Cabin 7',
+          'Router connection logs show her device was completely offline after 9:40 PM'
         ],
         james: [
           'Neuropsychologist claimed to stay in spa until midnight',
-          'Neuropsychology research notebook found in Cabin 7',
+          'Neuropsychology research notebook was found in Cabin 7',
           'Spa logs show the Neuropsychologist left the spa at 10:17 PM, not midnight'
-        ],
-        mia: [
-          'Influencer claimed to livestream until 11:30 PM',
-          'Perfume bottle found in Cabin 7 belongs to the influencer',
-          "Device logs show the Influencer's phone battery died at 9:30 PM"
         ],
         sofia: [
           'Chef claimed she worked at the resort for three years',
-          'Mystery novel found in Cabin 7 belongs to the chef',
-          "Chef's contract was signed on May 12, 2026 (only one month ago)"
+          'Mystery novel belonging to chef was found in Cabin 7',
+          'Chef contract was signed on May 12, 2026 (only one month ago)'
         ]
       };
       
@@ -4263,7 +4556,11 @@ function finishBeach(t) {
 
       $('accuse-btn').onclick=()=>{
         $('accuse-form').style.display='block';
-        $('accuse-opts').innerHTML=GS.npcs.filter(n => n.id !== GS.victim).map(n=>`
+        const userJson = localStorage.getItem('elaris_user');
+        const user = userJson ? JSON.parse(userJson) : {};
+        const playerId = user.identity;
+        const potentialAccused = [...IDENTITIES, ...NPCS_BASE].filter(c => c.id !== GS.victim && c.id !== playerId);
+        $('accuse-opts').innerHTML=potentialAccused.map(n=>`
           <button class="btn-choice" onclick="makeAccusation('${n.id}','${n.name}')">${n.name} — ${n.role}</button>`).join('');
       };
 
@@ -4360,7 +4657,7 @@ function finishBeach(t) {
       GS.fragments.forEach((f, idx) => {
         if(f) {
           collected++;
-          const fd = MEMORY_FRAGMENTS[idx];
+          const fd = getMemoryFragment(idx);
           list.innerHTML += `
             <div class="evidence-item" style="grid-column: 1 / -1; margin-bottom: 8px;">
               <h4>Fragment #${idx+1}</h4>
@@ -4397,7 +4694,7 @@ function finishBeach(t) {
       
       if (profile.id === 'kai') {
         status = 'DECEASED (VICTIM)';
-      } else if (profile.name === GS.playerName) {
+      } else if (profile.id === (JSON.parse(localStorage.getItem('elaris_user') || '{}').identity)) {
         status = 'INVESTIGATOR (PLAYER)';
       } else if (IDENTITIES.some(i => i.name === profile.name)) {
         status = 'SUSPECT (GUEST)';
@@ -4725,7 +5022,7 @@ function finishBeach(t) {
           }
         }
 
-        const dateStr = s.last_updated ? new Date(s.last_updated).toLocaleString() : 'Unknown';
+        const dateStr = s.last_updated ? new Date(s.last_updated * 1000).toLocaleString() : 'Unknown';
 
         return `
           <tr class="rec-row-session ${isExp ? 'expanded' : ''}" id="rec-row-${sid}" onclick="togglePlayerSessionExpand('${sid}')">
