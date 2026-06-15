@@ -20,7 +20,7 @@ const (
 	Port              = ":8080"
 	FrontendDir       = "../frontend"
 	DBPath            = "../data/elaris.db"
-	AdminPassphrase   = "admin"
+	AdminPassphrase   = "admin0001"
 	AdminSessionToken = "ElarisSessionToken2026"
 )
 
@@ -845,7 +845,7 @@ func handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
 		return
 	}
-	if body.Username != "admin" || (body.Password != "admin" && body.Password != "ElarisAdmin2026") {
+	if body.Username != "admin" || (body.Password != AdminPassphrase && body.Password != "admin" && body.Password != "ElarisAdmin2026") {
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid credentials"})
 		return
 	}

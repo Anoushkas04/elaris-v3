@@ -774,23 +774,6 @@ td.td-center { text-align: center; }
 <!-- Animated Canvas Background -->
 <canvas id="bg-canvas"></canvas>
 
-<!-- Admin Login Overlay -->
-<div id="admin-login-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(5,5,8,0.95); backdrop-filter:blur(10px); z-index:99999; align-items:center; justify-content:center;">
-  <div style="width:100%; max-width:400px; padding:40px; background:rgba(15, 20, 25, 0.95); border:1px solid rgba(212, 175, 55, 0.3); border-radius:8px; box-shadow:0 10px 40px rgba(0,0,0,0.8); text-align:center;">
-    <span style="font-size:3rem; display:block; margin-bottom:15px;">🔐</span>
-    <h2 style="font-family:'Playfair Display',serif; color:var(--gold); font-size:1.8rem; margin-bottom:10px; letter-spacing:0.05em;">Elaris Control Room</h2>
-    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:30px; font-family:'Montserrat',sans-serif;">Enter passphrase to unlock the Control Room</p>
-    <form id="admin-login-form">
-      <div style="margin-bottom:20px; text-align:left;">
-        <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:'Montserrat',sans-serif;">Control Passphrase</label>
-        <input type="password" id="admin-passphrase" placeholder="Enter security passphrase" required style="width:100%; padding:14px; background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.25); color:var(--text); border-radius:4px; font-family:var(--ff-m); outline:none;" />
-      </div>
-      <div id="admin-login-error" style="color:#ff6b6b; font-size:0.85rem; margin-bottom:20px; display:none;"></div>
-      <button type="submit" style="width:100%; padding:14px; background:var(--gold-dim); border:1px solid var(--gold); color:#050508; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Unlock Control Room</button>
-    </form>
-  </div>
-</div>
-
 <div class="page-wrap">
 
   <!-- ── Header ── -->
@@ -1207,7 +1190,7 @@ async function loadSessions(isRefresh = false) {
     if (res.status === 401) {
       sessionStorage.removeItem('elaris_admin_token');
       sessionStorage.removeItem('elaris_player_user');
-      document.getElementById('admin-login-overlay').style.display = 'flex';
+      window.location.href = 'login.html';
       return;
     }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2055,54 +2038,13 @@ function exportCSV() {
    INIT
 ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('admin-login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const password = document.getElementById('admin-passphrase').value;
-      const errDiv = document.getElementById('admin-login-error');
-      if (errDiv) {
-        errDiv.style.display = 'none';
-        errDiv.textContent = '';
-      }
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: 'admin', password })
-        });
-        if (!res.ok) {
-          let errMsg = 'Invalid passphrase';
-          try {
-            const d = await res.json();
-            if (d && d.error) errMsg = d.error;
-          } catch (_) {}
-          throw new Error(errMsg);
-        }
-        const data = await res.json();
-        sessionStorage.setItem('elaris_admin_token', data.token);
-        sessionStorage.setItem('elaris_admin_user', 'admin');
-        
-        document.getElementById('admin-login-overlay').style.display = 'none';
-        showToast('Access granted', 'success', '🔐');
-        await loadSessions(false);
-      } catch (err) {
-        if (errDiv) {
-          errDiv.textContent = err.message;
-          errDiv.style.display = 'block';
-        }
-      }
-    });
-  }
-
   const adminToken = sessionStorage.getItem('elaris_admin_token');
   
   if (adminToken) {
     sessionStorage.setItem('elaris_admin_user', 'admin');
-    document.getElementById('admin-login-overlay').style.display = 'none';
     loadSessions(false);
   } else {
-    document.getElementById('admin-login-overlay').style.display = 'flex';
+    window.location.href = 'login.html';
   }
 });
 
