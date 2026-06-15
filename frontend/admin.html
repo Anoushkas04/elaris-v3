@@ -1568,6 +1568,7 @@ function buildDetailHTML(s) {
   return `
     <div class="detail-inner">
       <div class="detail-grid">
+        ${buildProgressGraph(s)}
         ${buildModuleScores(s)}
         ${buildDomainProfile(s)}
         ${buildDASSBreakdown(s)}
@@ -1576,6 +1577,122 @@ function buildDetailHTML(s) {
         ${buildTimeline(s)}
       </div>
       ${controlsHtml}
+    </div>`;
+}
+
+function buildProgressGraph(s) {
+  let scores = [];
+  try {
+    const raw = Array.isArray(s.module_scores) ? s.module_scores : JSON.parse(s.module_scores || '[]');
+    scores = raw;
+  } catch (_) {}
+
+  const parsedScores = [];
+  for (let i = 0; i < 10; i++) {
+    let sc = null;
+    if (Array.isArray(scores)) {
+      if (typeof scores[i] === 'number') {
+        sc = scores[i];
+      } else {
+        const entry = scores.find(e => (e.module === i || e.index === i)) || {};
+        if (typeof entry.score === 'number') {
+          sc = entry.score;
+        }
+      }
+    }
+    parsedScores.push(sc);
+  }
+
+  const points = [];
+  const W = 540;
+  const H = 140; // Height of chart plot area
+  const startX = 45;
+  const startY = 170; // Baseline Y axis coordinate
+  const dx = W / 9;   // Spacing between ticks: 60px
+  const maxY = 20;
+
+  parsedScores.forEach((score, i) => {
+    if (score !== null) {
+      const x = startX + i * dx;
+      const y = startY - (score / maxY) * H;
+      points.push({ x, y, score, moduleIdx: i, name: MODULE_NAMES[i] });
+    }
+  });
+
+  let pathD = '';
+  let areaD = '';
+  if (points.length > 0) {
+    pathD = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+    areaD = `${pathD} L ${points[points.length - 1].x} ${startY} L ${points[0].x} ${startY} Z`;
+  }
+
+  // Horizontal Gridlines and labels
+  let gridlines = '';
+  for (let sVal = 5; sVal <= 20; sVal += 5) {
+    const yVal = startY - (sVal / maxY) * H;
+    gridlines += `<line x1="${startX}" y1="${yVal}" x2="${startX + W}" y2="${yVal}" stroke="rgba(196,164,101,0.08)" stroke-dasharray="3,3" />`;
+    gridlines += `<text x="${startX - 8}" y="${yVal + 4}" fill="var(--dim)" font-size="0.65rem" font-family="'Special Elite', monospace" text-anchor="end">${sVal}</text>`;
+  }
+
+  // Vertical ticks and labels
+  let xLabels = '';
+  for (let i = 0; i < 10; i++) {
+    const x = startX + i * dx;
+    const completed = parsedScores[i] !== null;
+    xLabels += `
+      <line x1="${x}" y1="${startY}" x2="${x}" y2="${startY + 4}" stroke="var(--border)" />
+      <text x="${x}" y="${startY + 18}" fill="${completed ? 'var(--gold)' : 'var(--dim)'}" font-size="0.65rem" font-family="'Special Elite', monospace" text-anchor="middle">M${i+1}</text>
+    `;
+  }
+
+  // Interactivity dots
+  let dots = '';
+  points.forEach(p => {
+    dots += `
+      <g class="chart-point" style="cursor: pointer;">
+        <title>Module ${p.moduleIdx+1} (${p.name}): ${p.score} pts</title>
+        <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--ink)" stroke="var(--gold)" stroke-width="2" />
+        <circle cx="${p.x}" cy="${p.y}" r="2" fill="var(--gold)" />
+      </g>
+    `;
+  });
+
+  const svgContent = `
+    <svg viewBox="0 0 620 200" width="100%" height="200" style="display: block; overflow: visible;">
+      <defs>
+        <linearGradient id="chartAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.16" />
+          <stop offset="100%" stop-color="var(--gold)" stop-opacity="0.0" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Gridlines -->
+      ${gridlines}
+      
+      <!-- Axes -->
+      <line x1="${startX}" y1="${startY}" x2="${startX + W}" y2="${startY}" stroke="var(--border)" stroke-width="1" />
+      <line x1="${startX}" y1="${startY}" x2="${startX}" y2="${startY - H - 10}" stroke="var(--border)" stroke-width="1" />
+      
+      <!-- Shaded Area -->
+      ${areaD ? `<path d="${areaD}" fill="url(#chartAreaGrad)" />` : ''}
+      
+      <!-- Glowing Line Path -->
+      ${pathD ? `<path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 4px rgba(196,164,101,0.35))" />` : ''}
+      
+      <!-- X-Axis Labels -->
+      ${xLabels}
+      
+      <!-- Hover Dots -->
+      ${dots}
+    </svg>
+  `;
+
+  return `
+    <div class="detail-section full-width" style="margin-bottom: 10px;">
+      <div class="section-title">📈 Assessment Progress Curve</div>
+      <div class="chart-container" style="background: var(--ink3); border: 1px solid var(--border); border-radius: 6px; padding: 20px 15px 10px 10px; margin-top: 10px;">
+        ${svgContent}
+      </div>
     </div>`;
 }
 
