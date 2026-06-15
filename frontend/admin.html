@@ -1009,7 +1009,7 @@ td.td-center { text-align: center; }
 /* ═══════════════════════════════════════════════════════════════════
    CONSTANTS & STATE
 ═══════════════════════════════════════════════════════════════════ */
-const API_BASE       = 'http://localhost:8080';
+const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8080' : window.location.origin;
 const LS_KEY         = 'elaris_admin_sessions';
 const REFRESH_MS     = 30000;
 const MODULE_NAMES   = [
