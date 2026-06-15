@@ -2070,46 +2070,30 @@ document.addEventListener('DOMContentLoaded', () => {
         errDiv.style.display = 'none';
         errDiv.textContent = '';
       }
-      try {
-        let res, data;
-        if (username === 'admin') {
-          res = await fetch(`${API_BASE}/api/admin/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-          if (!res.ok) {
-            let errMsg = 'Invalid credentials';
-            try {
-              const d = await res.json();
-              if (d && d.error) errMsg = d.error;
-            } catch (_) {}
-            throw new Error(errMsg);
-          }
-          data = await res.json();
-          sessionStorage.setItem('elaris_admin_token', data.token);
-          sessionStorage.setItem('elaris_admin_user', 'admin');
-          sessionStorage.removeItem('elaris_player_user');
-        } else {
-          // Standard player login
-          res = await fetch(`${API_BASE}/api/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-          if (!res.ok) {
-            let errMsg = 'Invalid credentials';
-            try {
-              const d = await res.json();
-              if (d && d.error) errMsg = d.error;
-            } catch (_) {}
-            throw new Error(errMsg);
-          }
-          data = await res.json();
-          sessionStorage.setItem('elaris_player_user', JSON.stringify(data));
-          sessionStorage.removeItem('elaris_admin_token');
-          sessionStorage.removeItem('elaris_admin_user');
+      if (username !== 'admin') {
+        if (errDiv) {
+          errDiv.textContent = 'Access Denied: Only the administrator account can log in.';
+          errDiv.style.display = 'block';
         }
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) {
+          let errMsg = 'Invalid credentials';
+          try {
+            const d = await res.json();
+            if (d && d.error) errMsg = d.error;
+          } catch (_) {}
+          throw new Error(errMsg);
+        }
+        const data = await res.json();
+        sessionStorage.setItem('elaris_admin_token', data.token);
+        sessionStorage.setItem('elaris_admin_user', 'admin');
         
         document.getElementById('admin-login-overlay').style.display = 'none';
         showToast('Access granted', 'success', '🔐');
@@ -2124,33 +2108,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const adminToken = sessionStorage.getItem('elaris_admin_token');
-  const playerUser = sessionStorage.getItem('elaris_player_user');
   
   if (adminToken) {
     sessionStorage.setItem('elaris_admin_user', 'admin');
     document.getElementById('admin-login-overlay').style.display = 'none';
     loadSessions(false);
-  } else if (playerUser) {
-    try {
-      const user = JSON.parse(playerUser);
-      const uName = user.name || user.username || '';
-      const uID = user.user_id || user.id || '';
-      if (uName === 'admin') {
-        document.getElementById('admin-login-overlay').style.display = 'flex';
-      } else if (uID) {
-        user.user_id = uID;
-        user.id = uID;
-        user.username = uName;
-        user.name = uName;
-        sessionStorage.setItem('elaris_player_user', JSON.stringify(user));
-        document.getElementById('admin-login-overlay').style.display = 'none';
-        loadSessions(false);
-      } else {
-        document.getElementById('admin-login-overlay').style.display = 'flex';
-      }
-    } catch (_) {
-      document.getElementById('admin-login-overlay').style.display = 'flex';
-    }
   } else {
     document.getElementById('admin-login-overlay').style.display = 'flex';
   }
