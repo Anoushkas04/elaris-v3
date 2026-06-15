@@ -8,9 +8,10 @@ RUN CGO_ENABLED=1 go build -o server .
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates sqlite-libs
-WORKDIR /root/
-COPY --from=builder /app/server .
+WORKDIR /app
+RUN mkdir -p backend data
+COPY --from=builder /app/server ./backend/server
 COPY frontend/ ./frontend/
-RUN mkdir -p data
 EXPOSE 8080
+WORKDIR /app/backend
 CMD ["./server"]
