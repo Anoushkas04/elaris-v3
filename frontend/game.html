@@ -1445,7 +1445,7 @@
 
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN 3: NARRATIVE ━━━━━━━━━━━━━━━━━━ -->
   <div class="screen" id="sc-narrative">
-    <img src="assets/cozy_sunset_beach.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.22; pointer-events: none; z-index: -1;">
+    <img id="narrative-bg-img" src="assets/cozy_sunset_beach.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.22; pointer-events: none; z-index: -1; transition: all 1s ease;">
     <div id="proj-flash" style="position: absolute; inset: 0; background: #fff; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.15s ease;"></div>
     <div id="proj-screen" style="width: 100%; max-width: 580px; text-align: center;">
       <div id="proj-text" style="font-family: var(--ff-m); font-size: 1.4rem; color: var(--rust); letter-spacing: 0.08em; text-transform: uppercase; margin: 40px 0; text-shadow: 0 0 15px rgba(192,71,31,0.5);"></div>
@@ -2432,9 +2432,21 @@
         if(l.projector){
           $('proj-flash').classList.add('on');
           $('proj-text').textContent = l.projtext;
+          const bgImg = $('narrative-bg-img');
+          if (bgImg) {
+            bgImg.style.filter = 'brightness(0.08) contrast(2) saturate(0.05) sepia(0.3) hue-rotate(220deg)';
+            bgImg.style.opacity = '0.15';
+          }
           SFX.horror();
           TTS.say(l.projtext, 0.7, 0.65);
-          setTimeout(()=>{ $('proj-flash').classList.remove('on'); nextLine(); }, 3400);
+          setTimeout(()=>{ 
+            $('proj-flash').classList.remove('on'); 
+            if (bgImg) {
+              bgImg.style.filter = '';
+              bgImg.style.opacity = '0.22';
+            }
+            nextLine(); 
+          }, 3400);
           return;
         }
         const npc = l.npc ? GS.npcs.find(n=>n.id===l.npc) : null;
