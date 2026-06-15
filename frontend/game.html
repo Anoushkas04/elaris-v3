@@ -1383,6 +1383,379 @@
       border-radius: 4px;
       margin-top: 15px;
     }
+
+    /* ━━━━━━━━━━━━━━━━━━━━ SCREEN: PLAYER RECORDS ━━━━━━━━━━━━━━━━━━━ */
+    #sc-records {
+      display: none;
+    }
+    #sc-records.on {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding: 40px 15px;
+      width: 100%;
+      height: 100%;
+    }
+    .records-panel {
+      width: 100%;
+      max-width: 960px;
+      margin: auto;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-gold);
+      padding: 30px;
+      backdrop-filter: blur(12px);
+    }
+    .records-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 1px solid rgba(196, 164, 101, 0.15);
+      padding-bottom: 15px;
+    }
+    .records-header h2 {
+      font-family: var(--ff-t);
+      color: var(--gold);
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+    }
+    .records-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .rec-stat-card {
+      background: rgba(5,5,8,0.5);
+      border: 1px solid rgba(196,164,101,0.12);
+      border-radius: 6px;
+      padding: 16px 12px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .rec-stat-card:hover {
+      border-color: rgba(196,164,101,0.4);
+      transform: translateY(-2px);
+    }
+    .rec-stat-label {
+      font-size: 0.68rem;
+      color: var(--text-d);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .rec-stat-value {
+      font-family: var(--ff-t);
+      font-size: 1.4rem;
+      color: var(--gold-l);
+      font-weight: 700;
+    }
+    .rec-table-wrap {
+      border: 1px solid rgba(196,164,101,0.15);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.25);
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .rec-table-header {
+      padding: 14px 20px;
+      background: rgba(196,164,101,0.05);
+      border-bottom: 1px solid rgba(196,164,101,0.15);
+      font-family: var(--ff-t);
+      color: var(--gold);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+    .rec-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .rec-table th {
+      padding: 12px 18px;
+      font-family: var(--ff-t);
+      font-size: 0.72rem;
+      color: var(--text-d);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid rgba(196,164,101,0.15);
+      background: rgba(5,5,8,0.3);
+    }
+    .rec-table td {
+      padding: 14px 18px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(196,164,101,0.08);
+      color: var(--text-p);
+    }
+    .rec-row-session {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .rec-row-session:hover {
+      background: rgba(196,164,101,0.04);
+    }
+    .rec-row-session.expanded {
+      background: rgba(196,164,101,0.03);
+    }
+    .rec-row-detail {
+      display: none;
+      background: rgba(5,5,8,0.4);
+    }
+    .rec-row-detail.visible {
+      display: table-row;
+    }
+    .rec-btn-expand {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      transition: transform 0.2s ease;
+    }
+    .rec-btn-expand.open {
+      transform: rotate(180deg);
+    }
+    
+    /* Expanded detail row metrics classes (mirrors admin.html visual structure) */
+    .rec-detail-cell {
+      padding: 0 !important;
+      background: rgba(5,5,8,0.7) !important;
+      border-bottom: 1px solid rgba(196,164,101,0.15) !important;
+    }
+    .rec-detail-inner {
+      padding: 24px;
+      border-top: 1px solid rgba(196,164,101,0.15);
+    }
+    .rec-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .rec-detail-section {
+      background: rgba(20,20,31,0.6);
+      border: 1px solid rgba(196,164,101,0.15);
+      border-radius: 8px;
+      padding: 18px;
+      backdrop-filter: blur(4px);
+    }
+    .rec-detail-section.full-width { grid-column: 1 / -1; }
+    .rec-section-title {
+      font-family: var(--ff-t);
+      font-size: 0.78rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(196,164,101,0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Module Scores list */
+    .rec-module-list { display: flex; flex-direction: column; gap: 7px; }
+    .rec-module-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+    .rec-module-name {
+      flex: 1;
+      color: var(--text-p);
+      font-family: var(--ff-b);
+      font-size: 0.88rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rec-module-score-bar {
+      width: 90px;
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .rec-module-score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--teal-d), var(--teal));
+    }
+    .rec-module-score-num {
+      font-family: var(--ff-m);
+      font-size: 0.75rem;
+      color: var(--gold);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Domain bar charts */
+    .rec-domain-list { display: flex; flex-direction: column; gap: 9px; }
+    .rec-domain-item { display: flex; align-items: center; gap: 10px; }
+    .rec-domain-name {
+      font-size: 0.78rem;
+      color: var(--text-d);
+      width: 130px;
+      flex-shrink: 0;
+      font-family: var(--ff-m);
+      letter-spacing: 0.02em;
+    }
+    .rec-domain-bar-outer {
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .rec-domain-bar-inner {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s ease;
+    }
+    .rec-domain-pct {
+      font-size: 0.72rem;
+      color: var(--gold);
+      font-family: var(--ff-m);
+      width: 38px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .rec-domain-bar-inner.bar-good   { background: linear-gradient(90deg, #1d6650, #3db87a); }
+    .rec-domain-bar-inner.bar-mid    { background: linear-gradient(90deg, #7a5a10, var(--gold)); }
+    .rec-domain-bar-inner.bar-low    { background: linear-gradient(90deg, #7a2010, var(--rust)); }
+
+    /* DASS breakdown */
+    .rec-dass-breakdown { display: flex; gap: 14px; flex-wrap: wrap; }
+    .rec-dass-block {
+      flex: 1;
+      min-width: 110px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+      border: 1px solid rgba(196,164,101,0.15);
+    }
+    .rec-dass-block-letter {
+      font-family: var(--ff-t);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .rec-dass-block-score {
+      font-family: var(--ff-t);
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .rec-dass-block-level {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 6px;
+      font-family: var(--ff-m);
+    }
+    .rec-dass-block-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .rec-dass-block-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .rec-db-depression { color: #7aa4d4; }
+    .rec-db-depression .rec-dass-block-bar-fill { background: #7aa4d4; }
+    .rec-db-anxiety    { color: #d4a07a; }
+    .rec-db-anxiety    .rec-dass-block-bar-fill { background: #d4a07a; }
+    .rec-db-stress     { color: #d47aa0; }
+    .rec-db-stress     .rec-dass-block-bar-fill { background: #d47aa0; }
+
+    /* Clinical Flags */
+    .rec-flags-list { display: flex; flex-direction: column; gap: 10px; }
+    .rec-flag-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left: 3px solid;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text-p);
+    }
+    .rec-flag-item.flag-warn  { background: rgba(192,71,31,0.10); border-color: var(--rust); }
+    .rec-flag-item.flag-note  { background: rgba(212,160,23,0.10); border-color: #d4a017; }
+    .rec-flag-item.flag-info  { background: rgba(46,154,120,0.10); border-color: var(--teal); }
+    .rec-flag-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .rec-no-flags {
+      font-style: italic;
+      color: var(--teal);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* RT Stats */
+    .rec-rt-stats { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+    .rec-rt-stat-card {
+      flex: 1;
+      min-width: 90px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(196,164,101,0.15);
+      border-radius: 6px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .rec-rt-stat-label { font-size: 0.65rem; color: var(--text-d); letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--ff-m); }
+    .rec-rt-stat-val { font-family: var(--ff-t); font-size: 1.2rem; color: var(--gold); margin-top: 4px; }
+    .rec-rt-dist-label { font-size: 0.75rem; color: var(--text-p); margin-bottom: 8px; font-family: var(--ff-m); letter-spacing: 0.06em; }
+    .rec-rt-dist-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+    .rec-rt-dist-bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; }
+    .rec-rt-dist-bar {
+      width: 100%;
+      border-radius: 2px 2px 0 0;
+      background: rgba(196,164,101,0.35);
+      transition: height 0.5s ease;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    .rec-rt-dist-tick { font-size: 0.58rem; color: var(--text-d); margin-top: 3px; }
+
+    /* Session Timeline */
+    .rec-timeline { display: flex; flex-direction: column; gap: 10px; }
+    .rec-timeline-item { display: flex; align-items: flex-start; gap: 12px; }
+    .rec-timeline-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 4px;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(196,164,101,0.4);
+    }
+    .rec-timeline-dot.dim { background: var(--text-d); box-shadow: none; }
+    .rec-timeline-content { flex: 1; }
+    .rec-timeline-ts { font-size: 0.7rem; color: var(--text-d); font-family: var(--ff-m); }
+    .rec-timeline-desc { font-size: 0.85rem; color: var(--text-p); line-height: 1.4; }
+
+    /* Chart Container for user progress */
+    .rec-chart-container {
+      background: rgba(5,5,8,0.4);
+      border: 1px solid rgba(196,164,101,0.1);
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -1519,7 +1892,7 @@
 
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <button class="btn-main" onclick="enterIsland()">Enter Island</button>
-        <button id="btn-home-progress" class="btn-secondary" onclick="window.location.href='admin.html'" style="display: none; background:rgba(196,164,101,0.08); border:1px solid rgba(196,164,101,0.25); color:var(--gold);">My Progress & Past Records</button>
+        <button id="btn-home-progress" class="btn-secondary" onclick="showPlayerRecords()" style="display: none; background:rgba(196,164,101,0.08); border:1px solid rgba(196,164,101,0.25); color:var(--gold);">My Progress & Past Records</button>
         <button class="btn-secondary" onclick="logout()">Logout</button>
       </div>
     </div>
@@ -1741,9 +2114,70 @@
       <div id="res-epilogue"></div>
 
       <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <button class="btn-main" onclick="window.location.href='admin.html'">My Progress & Past Records</button>
+        <button class="btn-main" onclick="showPlayerRecords()">My Progress & Past Records</button>
         <button class="btn-secondary" onclick="logout()">Log Out</button>
         <button class="btn-secondary" onclick="resetToHome()" style="background: transparent; border: 1px solid rgba(196,164,101,0.2); color: var(--gold-d);">Re-Board Vessel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: PLAYER RECORDS ━━━━━━━━━━━━━━━━━━━ -->
+  <div class="screen" id="sc-records">
+    <div class="records-panel">
+      <div class="records-header">
+        <h2>⚓ My Past Progress & Records</h2>
+        <button class="btn-secondary" onclick="closePlayerRecords()" style="padding: 8px 16px; font-size: 0.85rem;">← Back</button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="records-stats">
+        <div class="rec-stat-card">
+          <div class="rec-stat-label">Total Assessments</div>
+          <div class="rec-stat-value" id="rec-stat-total">—</div>
+        </div>
+        <div class="rec-stat-card">
+          <div class="rec-stat-label">Avg Cognitive Score</div>
+          <div class="rec-stat-value" id="rec-stat-avg">—</div>
+        </div>
+        <div class="rec-stat-card">
+          <div class="rec-stat-label">Completion Rate</div>
+          <div class="rec-stat-value" id="rec-stat-completed">—</div>
+        </div>
+        <div class="rec-stat-card">
+          <div class="rec-stat-label">Accusation Accuracy</div>
+          <div class="rec-stat-value" id="rec-stat-accuracy">—</div>
+        </div>
+        <div class="rec-stat-card">
+          <div class="rec-stat-label">My Avg DASS Stress</div>
+          <div class="rec-stat-value" id="rec-stat-stress">—</div>
+        </div>
+      </div>
+
+      <!-- Sessions Table -->
+      <div class="rec-table-wrap">
+        <div class="rec-table-header">Assessments History</div>
+        <div style="overflow-x:auto;">
+          <table class="rec-table">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Identity</th>
+                <th style="text-align: center;">Score</th>
+                <th style="text-align: center;">Progress</th>
+                <th style="text-align: center;">Accusation</th>
+                <th style="text-align: center;">DASS Markers</th>
+                <th style="text-align: left;">Date Played</th>
+                <th style="text-align: center;">Details</th>
+              </tr>
+            </thead>
+            <tbody id="rec-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-d);">
+                  Summoning records from the server...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -4144,6 +4578,681 @@ function finishBeach(t) {
         console.error('Error parsing user storage:', e);
         btn.style.display = 'none';
       }
+    }
+
+    /* ── 11. PLAYER PAST RECORDS PORTAL ────────────────────────── */
+    const MODULE_NAMES = [
+      'The Arrival',
+      'First Witnesses',
+      'The Study Room',
+      'Forensic Analysis',
+      'Memory Fragments',
+      'Alibi Checks',
+      'The Hidden Room',
+      'Digital Traces',
+      'The Confession',
+      'The Dock'
+    ];
+    const DOMAIN_NAMES = {
+      attention:             'Attention',
+      recognition:           'Memory',
+      workingMemory:         'Working Memory',
+      processingSpeed:       'Processing Speed',
+      errorMonitoring:       'Inhibition',
+      cognitiveFlexibility:  'Flexibility',
+      decisionMaking:        'Planning',
+      persistence:           'Reasoning',
+      multitasking:          'Multitasking',
+      distractionResistance: 'Visuospatial'
+    };
+
+    let playerSessions = [];
+    let expandedPlayerSessions = new Set();
+    let recordsBackScreen = 'sc-home';
+
+    async function showPlayerRecords() {
+      const activeScreen = document.querySelector('.screen.on');
+      if (activeScreen) {
+        recordsBackScreen = activeScreen.id;
+      }
+      
+      showScreen('sc-records');
+      expandedPlayerSessions.clear();
+      
+      const tbody = $('rec-tbody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 30px;">
+            <div class="spinner" style="margin: 0 auto 10px auto; width: 24px; height: 24px; border: 2px solid rgba(196,164,101,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            Summoning records from the server...
+          </td>
+        </tr>
+      `;
+
+      const userJson = localStorage.getItem('elaris_user');
+      if (!userJson) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--rust);">No logged-in user session found.</td></tr>`;
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userJson);
+        const uid = user.user_id || user.id;
+        if (!uid) throw new Error('No user ID found');
+
+        const res = await fetch('/api/sessions?user_id=' + encodeURIComponent(uid), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load past sessions');
+        
+        playerSessions = await res.json();
+        if (!Array.isArray(playerSessions)) playerSessions = [];
+
+        updatePlayerRecordsStats();
+        renderPlayerSessionsTable();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--rust);">${err.message}</td></tr>`;
+      }
+    }
+
+    function closePlayerRecords() {
+      showScreen(recordsBackScreen);
+    }
+
+    function updatePlayerRecordsStats() {
+      const n = playerSessions.length;
+      $('rec-stat-total').textContent = n;
+
+      if (n === 0) {
+        $('rec-stat-avg').textContent = '—';
+        $('rec-stat-completed').textContent = '—';
+        $('rec-stat-accuracy').textContent = '—';
+        $('rec-stat-stress').textContent = '—';
+        return;
+      }
+
+      const avgScore = Math.round(playerSessions.reduce((a, s) => a + (s.score || 0), 0) / n);
+      $('rec-stat-avg').textContent = avgScore;
+
+      const completed = playerSessions.filter(s => (s.module_idx || 0) >= 10).length;
+      $('rec-stat-completed').textContent = Math.round(completed / n * 100) + '%';
+
+      const correctGuess = playerSessions.filter(s => s.killer_guess && s.killer_guess === s.murderer).length;
+      $('rec-stat-accuracy').textContent = Math.round(correctGuess / n * 100) + '%';
+
+      const dassSum = playerSessions.reduce((acc, s) => {
+        const d = parsePlayerDASS(s);
+        acc.d += d.depression || 0;
+        acc.a += d.anxiety || 0;
+        acc.s += d.stress || 0;
+        return acc;
+      }, { d: 0, a: 0, s: 0 });
+
+      const avgDep = Math.round(dassSum.d / n);
+      const avgAnx = Math.round(dassSum.a / n);
+      const avgStr = Math.round(dassSum.s / n);
+      $('rec-stat-stress').textContent = `D:${avgDep} · A:${avgAnx} · S:${avgStr}`;
+    }
+
+    function renderPlayerSessionsTable() {
+      const tbody = $('rec-tbody');
+      if (playerSessions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-d);">
+              🏝️ No past assessment sessions found. Complete an assessment to see your progress!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = playerSessions.map(s => {
+        const sid = s.id;
+        const isExp = expandedPlayerSessions.has(sid);
+        const dass = parsePlayerDASS(s);
+        const pct = Math.min(100, Math.round((s.module_idx || 0) / 10 * 100));
+        const isCorrect = s.killer_guess && s.killer_guess === s.murderer;
+        const scoreCls = s.score >= 70 ? 'rec-score-green' : s.score >= 40 ? 'rec-score-gold' : 'rec-score-rust';
+        
+        let guessTag = '— No guess';
+        let guessCls = 'killer-none';
+        if (s.killer_guess) {
+          if (isCorrect) {
+            guessTag = '✓ ' + (s.murderer_name || s.killer_guess);
+            guessCls = 'killer-correct';
+          } else {
+            guessTag = '✗ ' + s.killer_guess;
+            guessCls = 'killer-wrong';
+          }
+        }
+
+        const dateStr = s.last_updated ? new Date(s.last_updated).toLocaleString() : 'Unknown';
+
+        return `
+          <tr class="rec-row-session ${isExp ? 'expanded' : ''}" id="rec-row-${sid}" onclick="togglePlayerSessionExpand('${sid}')">
+            <td style="text-align: left;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>${s.player_icon || '👤'}</span>
+                <div>
+                  <div style="font-weight:600; color:var(--gold-l);">${escapeHtmlStr(s.player_name || 'Investigator')}</div>
+                  <div style="font-size:0.75rem; color:var(--text-d);">${escapeHtmlStr(s.player_role || 'Guest')}</div>
+                </div>
+              </div>
+            </td>
+            <td style="text-align: center;"><span class="rec-score-badge ${scoreCls}">${s.score || 0}</span></td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
+                <div style="width:60px; height:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(196,164,101,0.15); border-radius:3px; overflow:hidden;">
+                  <div style="width:${pct}%; height:100%; background:var(--gold);"></div>
+                </div>
+                <span style="font-size:0.75rem;">${pct}%</span>
+              </div>
+            </td>
+            <td style="text-align: center;"><span class="killer-tag ${guessCls}">${guessTag}</span></td>
+            <td style="text-align: center;">
+              <div class="dass-mini">
+                <span class="dass-badge dass-norm">${dass.depression}D</span>
+                <span class="dass-badge dass-norm">${dass.anxiety}A</span>
+                <span class="dass-badge dass-norm">${dass.stress}S</span>
+              </div>
+            </td>
+            <td style="text-align: left; font-size:0.8rem; color:var(--text-d);">${dateStr}</td>
+            <td style="text-align: center;">
+              <button class="rec-btn-expand ${isExp ? 'open' : ''}">▾</button>
+            </td>
+          </tr>
+          <tr class="rec-row-detail ${isExp ? 'visible' : ''}" id="rec-detail-${sid}">
+            <td colspan="7" class="rec-detail-cell" onclick="event.stopPropagation()">
+              ${isExp ? buildPlayerDetailHTML(s) : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function togglePlayerSessionExpand(sid) {
+      const isExp = expandedPlayerSessions.has(sid);
+      if (isExp) {
+        expandedPlayerSessions.delete(sid);
+      } else {
+        expandedPlayerSessions.add(sid);
+      }
+      
+      const sessionRow = document.getElementById(`rec-row-${sid}`);
+      const detailRow  = document.getElementById(`rec-detail-${sid}`);
+      if (!sessionRow || !detailRow) { renderPlayerSessionsTable(); return; }
+
+      const nextExp = expandedPlayerSessions.has(sid);
+      sessionRow.classList.toggle('expanded', nextExp);
+      detailRow.classList.toggle('visible', nextExp);
+
+      const expandBtn = sessionRow.querySelector('.rec-btn-expand');
+      if (expandBtn) expandBtn.classList.toggle('open', nextExp);
+
+      const cell = detailRow.querySelector('.rec-detail-cell');
+      if (cell) {
+        const s = playerSessions.find(x => x.id === sid);
+        cell.innerHTML = nextExp && s ? buildPlayerDetailHTML(s) : '';
+      }
+    }
+
+    function buildPlayerDetailHTML(s) {
+      return `
+        <div class="rec-detail-inner">
+          <div class="rec-detail-grid">
+            ${buildPlayerProgressGraphHtml(s)}
+            ${buildPlayerModuleScoresHtml(s)}
+            ${buildPlayerDomainBars(s)}
+            ${buildPlayerDASSBreakdownHtml(s)}
+            ${buildPlayerClinicalFlagsHtml(s)}
+            ${buildPlayerRTSectionHtml(s)}
+            ${buildPlayerTimelineHtml(s)}
+          </div>
+        </div>
+      `;
+    }
+
+    function buildPlayerProgressGraphHtml(s) {
+      let scores = [];
+      try {
+        const raw = Array.isArray(s.module_scores) ? s.module_scores : JSON.parse(s.module_scores || '[]');
+        scores = raw;
+      } catch (_) {}
+
+      const parsedScores = [];
+      for (let i = 0; i < 10; i++) {
+        let sc = null;
+        if (Array.isArray(scores)) {
+          if (typeof scores[i] === 'number') {
+            sc = scores[i];
+          } else {
+            const entry = scores.find(e => (e.module === i || e.index === i)) || {};
+            if (typeof entry.score === 'number') {
+              sc = entry.score;
+            }
+          }
+        }
+        parsedScores.push(sc);
+      }
+
+      const points = [];
+      const W = 540;
+      const H = 140; 
+      const startX = 45;
+      const startY = 170; 
+      const dx = W / 9;   
+      const maxY = 20;
+
+      parsedScores.forEach((score, i) => {
+        if (score !== null) {
+          const x = startX + i * dx;
+          const y = startY - (score / maxY) * H;
+          points.push({ x, y, score, moduleIdx: i, name: MODULE_NAMES[i] });
+        }
+      });
+
+      let pathD = '';
+      let areaD = '';
+      if (points.length > 0) {
+        pathD = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+        areaD = `${pathD} L ${points[points.length - 1].x} ${startY} L ${points[0].x} ${startY} Z`;
+      }
+
+      let gridlines = '';
+      for (let sVal = 5; sVal <= 20; sVal += 5) {
+        const yVal = startY - (sVal / maxY) * H;
+        gridlines += `<line x1="${startX}" y1="${yVal}" x2="${startX + W}" y2="${yVal}" stroke="rgba(196,164,101,0.08)" stroke-dasharray="3,3" />`;
+        gridlines += `<text x="${startX - 8}" y="${yVal + 4}" fill="var(--text-d)" font-size="0.65rem" font-family="var(--ff-m)" text-anchor="end">${sVal}</text>`;
+      }
+
+      let xLabels = '';
+      for (let i = 0; i < 10; i++) {
+        const x = startX + i * dx;
+        const completed = parsedScores[i] !== null;
+        xLabels += `
+          <line x1="${x}" y1="${startY}" x2="${x}" y2="${startY + 4}" stroke="rgba(196,164,101,0.15)" />
+          <text x="${x}" y="${startY + 18}" fill="${completed ? 'var(--gold)' : 'var(--text-d)'}" font-size="0.65rem" font-family="var(--ff-m)" text-anchor="middle">M${i+1}</text>
+        `;
+      }
+
+      let dots = '';
+      points.forEach(p => {
+        dots += `
+          <g style="cursor: pointer;">
+            <title>Module ${p.moduleIdx+1} (${p.name}): ${p.score} pts</title>
+            <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--ink)" stroke="var(--gold)" stroke-width="2" />
+            <circle cx="${p.x}" cy="${p.y}" r="2" fill="var(--gold)" />
+          </g>
+        `;
+      });
+
+      const svgContent = `
+        <svg viewBox="0 0 620 200" width="100%" height="200" style="display: block; overflow: visible;">
+          <defs>
+            <linearGradient id="chartAreaGradPlayer" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.16" />
+              <stop offset="100%" stop-color="var(--gold)" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+          ${gridlines}
+          <line x1="${startX}" y1="${startY}" x2="${startX + W}" y2="${startY}" stroke="rgba(196,164,101,0.15)" stroke-width="1" />
+          <line x1="${startX}" y1="${startY}" x2="${startX}" y2="${startY - H - 10}" stroke="rgba(196,164,101,0.15)" stroke-width="1" />
+          ${areaD ? `<path d="${areaD}" fill="url(#chartAreaGradPlayer)" />` : ''}
+          ${pathD ? `<path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />` : ''}
+          ${xLabels}
+          ${dots}
+        </svg>
+      `;
+
+      return `
+        <div class="rec-detail-section full-width" style="margin-bottom: 10px;">
+          <div class="rec-section-title">📈 Assessment Progress Curve</div>
+          <div class="rec-chart-container">
+            ${svgContent}
+          </div>
+        </div>
+      `;
+    }
+
+    function buildPlayerModuleScoresHtml(s) {
+      let scores = [];
+      try {
+        const raw = Array.isArray(s.module_scores) ? s.module_scores : JSON.parse(s.module_scores || '[]');
+        scores = raw;
+      } catch (_) {}
+
+      const items = MODULE_NAMES.map((name, i) => {
+        let sc = null;
+        if (Array.isArray(scores)) {
+          if (typeof scores[i] === 'number') {
+            sc = scores[i];
+          } else {
+            const entry = scores.find(e => (e.module === i || e.index === i)) || {};
+            if (typeof entry.score === 'number') {
+              sc = entry.score;
+            }
+          }
+        }
+        const done  = i < (s.module_idx || 0);
+        const pct   = sc !== null ? Math.min(100, sc * 5) : (done ? 50 : 0);
+        const label = sc !== null ? sc : (done ? '?' : '—');
+        return `
+          <div class="rec-module-item">
+            <span style="color:var(--text-d);font-size:0.72rem;font-family:var(--ff-m);width:18px;text-align:right;flex-shrink:0">${i+1}</span>
+            <span class="rec-module-name" title="${escapeHtmlStr(name)}">${escapeHtmlStr(name)}</span>
+            <div class="rec-module-score-bar">
+              <div class="rec-module-score-bar-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="rec-module-score-num">${label}</span>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">📋 Module Scores</div>
+          <div class="rec-module-list">${items}</div>
+        </div>`;
+    }
+
+    function buildPlayerDomainBars(s) {
+      let domains = {};
+      try {
+        domains = typeof s.domains === 'object' && s.domains !== null ? s.domains : JSON.parse(s.domains || '{}');
+      } catch (_) {}
+
+      const items = Object.entries(DOMAIN_NAMES).map(([key, label]) => {
+        const val = typeof domains[key] === 'number' ? domains[key] : 0;
+        const pct = Math.min(100, Math.round(val));
+        const cls = pct >= 60 ? 'bar-good' : pct >= 35 ? 'bar-mid' : 'bar-low';
+        return `
+          <div class="rec-domain-item">
+            <span class="rec-domain-name">${escapeHtmlStr(label)}</span>
+            <div class="rec-domain-bar-outer">
+              <div class="rec-domain-bar-inner ${cls}" style="width:${pct}%"></div>
+            </div>
+            <span class="rec-domain-pct">${pct}%</span>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">🧬 Domain Profile</div>
+          <div class="rec-domain-list">${items}</div>
+        </div>`;
+    }
+
+    function buildPlayerDASSBreakdownHtml(s) {
+      const d = parsePlayerDASS(s);
+      const dep = d.depression || 0;
+      const anx = d.anxiety    || 0;
+      const str = d.stress     || 0;
+
+      const depLevel = dassPlayerLevel('depression', dep);
+      const anxLevel = dassPlayerLevel('anxiety',    anx);
+      const strLevel = dassPlayerLevel('stress',     str);
+
+      const depPct = Math.min(100, Math.round(dep / 42 * 100));
+      const anxPct = Math.min(100, Math.round(anx / 36 * 100));
+      const strPct = Math.min(100, Math.round(str / 42 * 100));
+
+      const block = (letter, score, level, pct, cls) => `
+        <div class="rec-dass-block ${cls}">
+          <div class="rec-dass-block-letter">${letter}</div>
+          <div class="rec-dass-block-score">${score}</div>
+          <div class="rec-dass-block-level">${level}</div>
+          <div class="rec-dass-block-bar">
+            <div class="rec-dass-block-bar-fill" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">🧪 DASS-21 Breakdown</div>
+          <div class="rec-dass-breakdown">
+            ${block('Depression', dep, depLevel, depPct, 'rec-db-depression')}
+            ${block('Anxiety',    anx, anxLevel, anxPct, 'rec-db-anxiety')}
+            ${block('Stress',     str, strLevel, strPct, 'rec-db-stress')}
+          </div>
+        </div>`;
+    }
+
+    function buildPlayerClinicalFlagsHtml(s) {
+      const d  = parsePlayerDASS(s);
+      let domains = {};
+      try {
+        domains = typeof s.domains === 'object' && s.domains !== null ? s.domains : JSON.parse(s.domains || '{}');
+      } catch (_) {}
+
+      const flags = [];
+      const dep = d.depression || 0;
+      const anx = d.anxiety    || 0;
+      const str = d.stress     || 0;
+
+      if (anx > 14) {
+        flags.push({
+          cls:  'flag-warn',
+          icon: '⚠️',
+          text: '<strong>Elevated Anxiety Indicators:</strong> User showed rapid click density and high distraction ratio in modules 2, 7. DASS Anxiety score ' + anx + ' exceeds moderate threshold.'
+        });
+      }
+      if (dep > 13) {
+        flags.push({
+          cls:  'flag-warn',
+          icon: '🔴',
+          text: '<strong>Possible Depressive Markers:</strong> Slow processing speed and low persistence scores detected. DASS Depression score ' + dep + ' in moderate-to-severe range.'
+        });
+      }
+      if (str > 18) {
+        flags.push({
+          cls:  'flag-note',
+          icon: '⚡',
+          text: '<strong>High Stress Response:</strong> Failed 60%+ of 2-attempt challenges. DASS Stress score ' + str + ' exceeds mild threshold.'
+        });
+      }
+      if ((domains.workingMemory || 0) < 30) {
+        flags.push({
+          cls:  'flag-info',
+          icon: '🧠',
+          text: '<strong>Cognitive Concern:</strong> Working memory score below 30% (' + (domains.workingMemory || 0) + '%). Consider further assessment.'
+        });
+      }
+
+      const html = flags.length === 0
+        ? `<div class="rec-no-flags">✓ &nbsp;No clinical flags — all DASS subscales within normal-to-mild range and cognitive domains above threshold.</div>`
+        : flags.map(f => `<div class="rec-flag-item ${f.cls}"><span class="rec-flag-icon">${f.icon}</span><div>${f.text}</div></div>`).join('');
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">🚩 Clinical Flags</div>
+          <div class="rec-flags-list">${html}</div>
+        </div>`;
+    }
+
+    function buildPlayerRTSectionHtml(s) {
+      let samples = [];
+      try {
+        samples = Array.isArray(s.rt_samples) ? s.rt_samples : JSON.parse(s.rt_samples || '[]');
+        samples = samples.map(Number).filter(x => !isNaN(x) && x > 0);
+      } catch (_) {}
+
+      if (samples.length === 0) {
+        return `
+          <div class="rec-detail-section">
+            <div class="rec-section-title">⏱ Response Times</div>
+            <p style="color:var(--text-d);font-style:italic;font-size:0.85rem">No response time data recorded.</p>
+          </div>`;
+      }
+
+      const avg     = Math.round(samples.reduce((a, b) => a + b, 0) / samples.length);
+      const fastest = Math.min(...samples);
+      const slowest = Math.max(...samples);
+
+      const buckets = 8;
+      const bucketSize = (slowest - fastest) / buckets || 1;
+      const counts = Array(buckets).fill(0);
+      samples.forEach(v => {
+        const idx = Math.min(buckets - 1, Math.floor((v - fastest) / bucketSize));
+        counts[idx]++;
+      });
+      const maxCount = Math.max(...counts);
+
+      const distBars = counts.map((c, i) => {
+        const h = maxCount > 0 ? Math.round(c / maxCount * 46) : 0;
+        const ms = Math.round(fastest + i * bucketSize);
+        return `
+          <div class="rec-rt-dist-bar-wrap">
+            <div class="rec-rt-dist-bar" style="height:${h}px"></div>
+            <div class="rec-rt-dist-tick">${ms < 1000 ? ms : (ms/1000).toFixed(1)+'s'}</div>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">⏱ Response Times</div>
+          <div class="rec-rt-stats">
+            <div class="rec-rt-stat-card">
+              <div class="rec-rt-stat-label">Average RT</div>
+              <div class="rec-rt-stat-val">${avg < 1000 ? avg + 'ms' : (avg/1000).toFixed(2) + 's'}</div>
+            </div>
+            <div class="rec-rt-stat-card">
+              <div class="rec-rt-stat-label">Fastest RT</div>
+              <div class="rec-rt-stat-val">${fastest < 1000 ? fastest + 'ms' : (fastest/1000).toFixed(2) + 's'}</div>
+            </div>
+            <div class="rec-rt-stat-card">
+              <div class="rec-rt-stat-label">Slowest RT</div>
+              <div class="rec-rt-stat-val">${slowest < 1000 ? slowest + 'ms' : (slowest/1000).toFixed(2) + 's'}</div>
+            </div>
+            <div class="rec-rt-stat-card">
+              <div class="rec-rt-stat-label">Samples</div>
+              <div class="rec-rt-stat-val">${samples.length}</div>
+            </div>
+          </div>
+          <div class="rec-rt-dist-label">RT DISTRIBUTION</div>
+          <div class="rec-rt-dist-bars">${distBars}</div>
+        </div>`;
+    }
+
+    function buildPlayerTimelineHtml(s) {
+      const startTs = s.session_start || 0;
+      const lastTs  = s.last_updated  || 0;
+      const modIdx  = s.module_idx    || 0;
+
+      const startDate = startTs ? new Date(startTs * 1000) : null;
+      const lastDate  = lastTs  ? new Date(lastTs  * 1000) : null;
+
+      const durationMs = startTs && lastTs ? (lastTs - startTs) * 1000 : null;
+      const durationStr = durationMs !== null ? formatPlayerDuration(durationMs) : 'Unknown';
+
+      const startStr   = startDate ? formatPlayerDateTime(startDate) : 'Unknown';
+      const lastStr    = lastDate  ? formatPlayerDateTime(lastDate)  : 'Unknown';
+
+      const modItems = [];
+      for (let i = 0; i < modIdx; i++) {
+        const frac = modIdx > 1 ? i / (modIdx - 1) : 0;
+        const modTs = startTs && lastTs ? startTs + Math.round(frac * (lastTs - startTs)) : 0;
+        modItems.push(`
+          <div class="rec-timeline-item">
+            <div class="rec-timeline-dot${i === modIdx - 1 ? '' : ' dim'}"></div>
+            <div class="rec-timeline-content">
+              <div class="rec-timeline-ts">${modTs ? formatPlayerDateTime(new Date(modTs * 1000)) : '—'}</div>
+              <div class="rec-timeline-desc">Module ${i + 1}: ${escapeHtmlStr(MODULE_NAMES[i] || `Module ${i+1}`)}</div>
+            </div>
+          </div>`);
+      }
+
+      return `
+        <div class="rec-detail-section">
+          <div class="rec-section-title">🕐 Session Timeline</div>
+          <div class="rec-timeline">
+            <div class="rec-timeline-item">
+              <div class="rec-timeline-dot"></div>
+              <div class="rec-timeline-content">
+                <div class="rec-timeline-ts">${startStr}</div>
+                <div class="rec-timeline-desc"><strong>Session Started</strong></div>
+              </div>
+            </div>
+            ${modItems.join('')}
+            ${modIdx >= 10 ? `
+            <div class="rec-timeline-item">
+              <div class="rec-timeline-dot"></div>
+              <div class="rec-timeline-content">
+                <div class="rec-timeline-ts">${lastStr}</div>
+                <div class="rec-timeline-desc"><strong>Assessment Completed</strong></div>
+                <div style="font-size:0.75rem; color:var(--text-d); margin-top:2px; font-style:italic;">Duration: ${durationStr}</div>
+              </div>
+            </div>` : ''}
+          </div>
+        </div>`;
+    }
+
+    function dassPlayerLevel(type, score) {
+      if (type === 'depression') {
+        if (score >= 28) return 'Extremely Severe';
+        if (score >= 21) return 'Severe';
+        if (score >= 14) return 'Moderate';
+        if (score >= 10) return 'Mild';
+        return 'Normal';
+      }
+      if (type === 'anxiety') {
+        if (score >= 20) return 'Extremely Severe';
+        if (score >= 15) return 'Severe';
+        if (score >= 10) return 'Moderate';
+        if (score >= 8)  return 'Mild';
+        return 'Normal';
+      }
+      if (type === 'stress') {
+        if (score >= 34) return 'Extremely Severe';
+        if (score >= 26) return 'Severe';
+        if (score >= 19) return 'Moderate';
+        if (score >= 15) return 'Mild';
+        return 'Normal';
+      }
+      return 'Unknown';
+    }
+
+    function formatPlayerDuration(ms) {
+      if (ms < 0) ms = 0;
+      const totalSecs = Math.floor(ms / 1000);
+      const h = Math.floor(totalSecs / 3600);
+      const m = Math.floor((totalSecs % 3600) / 60);
+      const s = totalSecs % 60;
+      if (h > 0) return `${h}h ${m}m ${s}s`;
+      if (m > 0) return `${m}m ${s}s`;
+      return `${s}s`;
+    }
+
+    function formatPlayerDateTime(d) {
+      const pad = n => String(n).padStart(2, '0');
+      const yr = d.getFullYear();
+      const mo = pad(d.getMonth() + 1);
+      const dy = pad(d.getDate());
+      const hr = pad(d.getHours());
+      const mn = pad(d.getMinutes());
+      return `${yr}-${mo}-${dy} ${hr}:${mn}`;
+    }
+
+    function parsePlayerDASS(s) {
+      try {
+        const raw = typeof s.dass === 'object' && s.dass !== null && !Array.isArray(s.dass)
+          ? s.dass
+          : JSON.parse(s.dass || '{}');
+        return {
+          depression: raw.depression || 0,
+          anxiety:    raw.anxiety || 0,
+          stress:     raw.stress || 0
+        };
+      } catch (_) {
+        return { depression: 0, anxiety: 0, stress: 0 };
+      }
+    }
+
+    function escapeHtmlStr(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     // ─ INIT ───────────────────────────────────────────────────────
