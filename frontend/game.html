@@ -1274,6 +1274,58 @@
       top: 6px; right: 8px;
       font-size: 0.65rem;
     }
+    .clue-card.locked {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .clue-card.locked:hover {
+      border-color: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.25);
+      box-shadow: none;
+    }
+    .clue-card.locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 6px; right: 8px;
+      font-size: 0.65rem;
+    }
+    .clue-card.pin-correct {
+      border-color: var(--teal) !important;
+      background: rgba(46, 154, 120, 0.15) !important;
+      box-shadow: inset 0 0 10px rgba(46, 154, 120, 0.12) !important;
+      cursor: default;
+    }
+    .clue-card.pin-correct::after {
+      content: '✓' !important;
+      color: var(--teal);
+      position: absolute;
+      top: 6px; right: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .clue-card.pin-incorrect {
+      border-color: var(--rust) !important;
+      background: rgba(192, 71, 31, 0.15) !important;
+      box-shadow: inset 0 0 10px rgba(192, 71, 31, 0.12) !important;
+      cursor: default;
+    }
+    .clue-card.pin-incorrect::after {
+      content: '✗' !important;
+      color: var(--rust);
+      position: absolute;
+      top: 6px; right: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .clue-card.pin-missed {
+      border-color: var(--gold-d) !important;
+      background: rgba(122, 94, 48, 0.08) !important;
+      opacity: 0.7;
+      cursor: default;
+    }
+
 
     /* ━━━━━━━━━━━━━━━━━━━━ RESULTS PANEL ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     #res-player {
@@ -2072,7 +2124,12 @@
       
       <div id="deduction-grid"></div>
       
-      <button class="btn-main" id="accuse-btn" style="width: 100%;">Confront Suspect</button>
+      <div id="deduction-feedback" style="display: none; margin-bottom: 15px; padding: 12px; border-radius: 4px; font-family: var(--ff-m); font-size: 0.85rem; text-align: center; border: 1px solid rgba(196, 164, 101, 0.22);"></div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 15px;">
+        <button class="btn-main" id="verify-deduction-btn" onclick="verifyDeductions()" style="flex: 1;">Verify Connections</button>
+        <button class="btn-main" id="accuse-btn" style="flex: 1; display: none;">Confront Suspect</button>
+      </div>
       
       <div id="accuse-form" style="display: none; margin-top: 20px;">
         <h4 style="font-family: var(--ff-t); font-size: 0.85rem; color: var(--gold); margin-bottom: 10px;">Select Suspect</h4>
@@ -4427,7 +4484,7 @@ function finishBeach(t) {
       // Normalize domains
       Object.keys(GS.domains).forEach(k=>{ if(GS.domains[k]===0) GS.domains[k]=25+Math.floor(Math.random()*30); });
 
-      const total=Math.min(100,Math.round(GS.score/165*100));
+      const total=Math.min(100,Math.round(GS.score/191*100));
       const rts=GS.rtSamples; const avgRT=rts.length?Math.round(rts.reduce((a,b)=>a+b,0)/rts.length):520;
       const acc=Math.round(Math.min(99,GS.correctCount/10*100));
 
@@ -4462,99 +4519,170 @@ function finishBeach(t) {
     }
 
     // ─ DEDUCTION BOARD ────────────────────────────────────────────
-    function showDeductionBoard(){
-      const db=$('deduction-board');
-      const cluesList=[
-        'ECHO project harmed participants 3 years ago',
-        'Data was suppressed and never published',
-        'Two guests signed the final ECHO report',
-        'Three guests lied about the 11 PM meeting',
-        'Security footage shows a figure at 3:14 AM',
-        'Boat was gone before dawn — planned exit',
-        'Five faces in the photograph match guests here',
-        'Two names partially visible in encrypted email',
-        'Victim recognized someone on arrival',
-        "One guest couldn't stream without a phone",
-        'Chef said "three years" then corrected to "last month"',
-        'Neuropsychologist claimed not to leave spa',
-        'Every fragment references the same date — 3 years ago',
-        'Kai Tanaka died near the shore at approximately 11:40 PM',
-        'Radio was destroyed before the first day ended',
+    function getDeductionClues() {
+      return [
+        { id: 'motive_1', cat: 'Motive', isDecoy: false, fragmentIdx: 0 },
+        { id: 'motive_2', cat: 'Motive', isDecoy: false, fragmentIdx: 4 },
+        
+        { id: 'opp_1', cat: 'Opportunity', isDecoy: false, fragmentIdx: 2 },
+        { id: 'opp_2', cat: 'Opportunity', isDecoy: false, fragmentIdx: 5 },
+        { id: 'opp_decoy', cat: 'Opportunity', isDecoy: true, text: "The resort gate security alarm was deactivated from the front desk computer." },
+        
+        { id: 'rel_1', cat: 'Relationship', isDecoy: false, fragmentIdx: 1 },
+        { id: 'rel_2', cat: 'Relationship', isDecoy: false, fragmentIdx: 8 },
+        { id: 'rel_decoy', cat: 'Relationship', isDecoy: true, text: "Rowan Ashford's secret personal journal reveals he has a long-lost sibling among the guests." },
+        
+        { id: 'contra_1', cat: 'Contradiction', isDecoy: false, fragmentIdx: 3 },
+        { id: 'contra_2', cat: 'Contradiction', isDecoy: false, fragmentIdx: 7 },
+        
+        { id: 'time_1', cat: 'Timeline', isDecoy: false, fragmentIdx: 6 },
+        { id: 'time_2', cat: 'Timeline', isDecoy: false, fragmentIdx: 9 },
+        { id: 'time_decoy', cat: 'Timeline', isDecoy: true, text: "A guest register from a neighboring island records a boat rental at 2:00 AM." }
       ];
-      
-      const murdererContradictions = {
-        doctor: [
-          'Cardiologist claimed to be reviewing offline files in Cabin 3',
-          'Silver locket containing heart capsules was found in Cabin 7',
-          'Medical portal logs registered no patient file activity during that period'
-        ],
-        ceo: [
-          'Tech CEO claimed to have returned to Cabin 1 at 10:45 PM',
-          'Military medal with CEO engravings was found in Cabin 7',
-          'Electronic lock records showed no entry to Cabin 1 until 11:30 PM'
-        ],
-        musician: [
-          'Musician claimed she walked along South Cliffs until 9:45 PM',
-          'Wooden cross registered to Cabin 5 was found in Cabin 7',
-          'Security patrol reported the cliffs were empty after 9:00 PM'
-        ],
-        student: [
-          'Student claimed she was in the Library reading reference logs until 10:30 PM',
-          'Magnifying glass matching student profile was found in Cabin 7',
-          'Library surveillance log confirms the library closed early at 9:00 PM'
-        ],
-        comedian: [
-          'Comedian claimed he played arcade games in the resort lounge until 10:30 PM',
-          'Old brass compass matching comedian luggage was found in Cabin 7',
-          'Lounge high-score server logs showed zero system activity that evening'
-        ],
-        detective: [
-          'Retired Detective claimed he checked perimeter gates until 10:00 PM',
-          'Police service medal belonging to retired detective was found in Cabin 7',
-          'Security gate badge logs showed no patrol sweep activity'
-        ],
-        rowan: [
-          'Resort Host claimed he was checking bookings in the office at 8:15 PM',
-          'Wine glass matching resort host dining inventory was found in Cabin 7',
-          'Office card lock registers show the office was empty at 8:15 PM'
-        ],
-        mia: [
-          'Influencer claimed she was live streaming until 11:30 PM',
-          'Perfume bottle matching influencer branding was found in Cabin 7',
-          'Router connection logs show her device was completely offline after 9:40 PM'
-        ],
-        james: [
-          'Neuropsychologist claimed to stay in spa until midnight',
-          'Neuropsychology research notebook was found in Cabin 7',
-          'Spa logs show the Neuropsychologist left the spa at 10:17 PM, not midnight'
-        ],
-        sofia: [
-          'Chef claimed she worked at the resort for three years',
-          'Mystery novel belonging to chef was found in Cabin 7',
-          'Chef contract was signed on May 12, 2026 (only one month ago)'
-        ]
-      };
-      
-      const contradictionClues = murdererContradictions[GS.murderer] || [
-        cluesList[9], cluesList[10], cluesList[11]
-      ];
-      
-      const cats=[
-        {cat:'Motive',clues:[cluesList[0],cluesList[1],cluesList[2]]},
-        {cat:'Opportunity',clues:[cluesList[3],cluesList[4],cluesList[5]]},
-        {cat:'Relationship',clues:[cluesList[6],cluesList[7],cluesList[8]]},
-        {cat:'Contradiction',clues:contradictionClues},
-        {cat:'Timeline',clues:[cluesList[12],cluesList[13],cluesList[14]]},
-      ];
-      
-      $('deduction-grid').innerHTML=cats.map(c=>`
-        <div style="border:1px solid rgba(196,164,101,.18);padding:14px;border-radius:3px;background:var(--ink-ss)">
-          <div style="font-family:var(--ff-t);font-size:.7rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">${c.cat}</div>
-          ${c.clues.map(cl=>`<div class="clue-card" onclick="this.classList.toggle('connected');SFX.click()" style="margin-bottom:7px">
-            <div class="clue-cat">Evidence</div>${cl}</div>`).join('')}
-        </div>`).join('');
+    }
 
-      $('accuse-btn').onclick=()=>{
+    function toggleClueCard(el, id) {
+      if (GS.deductionVerified) return;
+      SFX.click();
+      if (!GS.deductionSelections) GS.deductionSelections = [];
+      
+      if (el.classList.contains('connected')) {
+        el.classList.remove('connected');
+        GS.deductionSelections = GS.deductionSelections.filter(x => x !== id);
+      } else {
+        el.classList.add('connected');
+        if (!GS.deductionSelections.includes(id)) {
+          GS.deductionSelections.push(id);
+        }
+      }
+    }
+
+    function applyVerificationStyles() {
+      const clues = getDeductionClues();
+      if (!GS.deductionSelections) GS.deductionSelections = [];
+      
+      clues.forEach(c => {
+        const el = $('clue-' + c.id);
+        if (!el) return;
+        
+        const isSelected = GS.deductionSelections.includes(c.id);
+        
+        if (c.isDecoy) {
+          if (isSelected) {
+            el.classList.add('pin-incorrect');
+          }
+        } else {
+          const isUnlocked = GS.fragments[c.fragmentIdx];
+          if (isUnlocked) {
+            if (isSelected) {
+              el.classList.add('pin-correct');
+            } else {
+              el.classList.add('pin-missed');
+            }
+          }
+        }
+      });
+    }
+
+    function verifyDeductions() {
+      if (GS.deductionVerified) return;
+      
+      const clues = getDeductionClues();
+      let score = 0;
+      
+      if (!GS.deductionSelections) GS.deductionSelections = [];
+      
+      clues.forEach(c => {
+        const isSelected = GS.deductionSelections.includes(c.id);
+        
+        if (c.isDecoy) {
+          if (!isSelected) {
+            score += 2;
+          }
+        } else {
+          const isUnlocked = GS.fragments[c.fragmentIdx];
+          if (isUnlocked && isSelected) {
+            score += 2;
+          }
+        }
+      });
+      
+      GS.deductionScore = score;
+      GS.score += score;
+      GS.deductionVerified = true;
+      
+      saveProgress();
+      SFX.success();
+      
+      showDeductionBoard();
+    }
+
+    function showDeductionBoard(){
+      const clues = getDeductionClues();
+      const categories = ['Motive', 'Opportunity', 'Relationship', 'Contradiction', 'Timeline'];
+      
+      const gridHtml = categories.map(cat => {
+        const catClues = clues.filter(c => c.cat === cat);
+        const cluesHtml = catClues.map(c => {
+          if (c.isDecoy) {
+            const isConnected = GS.deductionSelections && GS.deductionSelections.includes(c.id);
+            const classList = isConnected ? 'clue-card connected' : 'clue-card';
+            const onclickStr = GS.deductionVerified ? '' : `onclick="toggleClueCard(this, '${c.id}')"`;
+            return `<div class="${classList}" id="clue-${c.id}" ${onclickStr} style="margin-bottom:7px">
+              <div class="clue-cat">Evidence (Decoy)</div>
+              ${c.text}
+            </div>`;
+          } else {
+            const isUnlocked = GS.fragments[c.fragmentIdx];
+            if (!isUnlocked) {
+              return `<div class="clue-card locked" style="margin-bottom:7px">
+                <div class="clue-cat">Locked Evidence</div>
+                [Locked Clue - Complete Module ${c.fragmentIdx + 1}]
+              </div>`;
+            } else {
+              const clueText = getMemoryFragment(c.fragmentIdx).clue;
+              const isConnected = GS.deductionSelections && GS.deductionSelections.includes(c.id);
+              const classList = isConnected ? 'clue-card connected' : 'clue-card';
+              const onclickStr = GS.deductionVerified ? '' : `onclick="toggleClueCard(this, '${c.id}')"`;
+              return `<div class="${classList}" id="clue-${c.id}" ${onclickStr} style="margin-bottom:7px">
+                <div class="clue-cat">Evidence (Module ${c.fragmentIdx + 1})</div>
+                ${clueText}
+              </div>`;
+            }
+          }
+        }).join('');
+        
+        return `<div style="border:1px solid rgba(196,164,101,.18);padding:14px;border-radius:3px;background:var(--ink-ss)">
+          <div style="font-family:var(--ff-t);font-size:.7rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">${cat}</div>
+          ${cluesHtml}
+        </div>`;
+      }).join('');
+      
+      $('deduction-grid').innerHTML = gridHtml;
+      
+      if (!GS.deductionSelections) {
+        GS.deductionSelections = [];
+      }
+      
+      const verifyBtn = $('verify-deduction-btn');
+      const accuseBtn = $('accuse-btn');
+      const feedbackEl = $('deduction-feedback');
+      
+      if (GS.deductionVerified) {
+        verifyBtn.style.display = 'none';
+        accuseBtn.style.display = 'block';
+        
+        feedbackEl.style.display = 'block';
+        feedbackEl.innerHTML = `<strong>Deduction Complete</strong><br>Connections verified. Score added: +${GS.deductionScore || 0} points.<br><span style="color:var(--gold-l);">Proceed to accuse the suspect.</span>`;
+        
+        applyVerificationStyles();
+      } else {
+        verifyBtn.style.display = 'block';
+        accuseBtn.style.display = 'none';
+        feedbackEl.style.display = 'none';
+      }
+      
+      accuseBtn.onclick=()=>{
         $('accuse-form').style.display='block';
         const userJson = localStorage.getItem('elaris_user');
         const user = userJson ? JSON.parse(userJson) : {};
@@ -4563,13 +4691,19 @@ function finishBeach(t) {
         $('accuse-opts').innerHTML=potentialAccused.map(n=>`
           <button class="btn-choice" onclick="makeAccusation('${n.id}','${n.name}')">${n.name} — ${n.role}</button>`).join('');
       };
-
+      
       showScreen('sc-deduction');
     }
 
     function makeAccusation(id, name) {
       const correct=id===GS.murderer;
       SFX[correct?'success':'fail']();
+      
+      if (GS.accusationScore === undefined) {
+        GS.accusationScore = correct ? 15 : 0;
+        GS.score += GS.accusationScore;
+      }
+      
       const msg=correct
         ? `Correct. ${name} was the killer.\n\nThey returned to destroy the last evidence of PROJECT ECHO — and realized the witnesses were the evidence.`
         : `Incorrect. ${name} was not the killer.\n\nSomeone else designed this reunion. The truth is still out there.`;
@@ -4605,6 +4739,15 @@ function finishBeach(t) {
         }
         resAcc.innerHTML = `<strong style="font-family: var(--ff-t); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 4px; color: var(--gold-l);">Accusation Outcome</strong>${msg}`;
       }
+      
+      const total = Math.min(100, Math.round(GS.score / 191 * 100));
+      $('res-score').textContent = total + '/100';
+      
+      const murdNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.murderer);
+      const epilogue = total > 65
+        ? `The fragments pointed to ${murdNPC?.name || 'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten recovered memories — and the knowledge that some truths only emerge under pressure.`
+        : `The fog was too thick. ${murdNPC?.name || 'The host'} disappeared on the last dawn. But the island recorded everything — every choice, every hesitation, every moment of clarity and confusion. The data outlasts the mystery.`;
+      $('res-epilogue').textContent = epilogue;
       
       showScreen('sc-results');
     }
