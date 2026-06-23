@@ -48,6 +48,7 @@ type Session struct {
 	KillerGuess  string          `json:"killer_guess"`
 	SessionStart int64           `json:"session_start"`
 	LastUpdated  int64           `json:"last_updated"`
+	UserEmail    string          `json:"user_email"`
 }
 
 // ─── Global DB handle ─────────────────────────────────────────────────────────
@@ -106,7 +107,8 @@ func initDB() {
 			password TEXT NOT NULL,
 			age      INTEGER,
 			identity TEXT,
-			progress TEXT DEFAULT '{}'
+			progress TEXT DEFAULT '{}',
+			email    TEXT DEFAULT ''
 		)`,
 		`CREATE TABLE IF NOT EXISTS sessions (
 			id             TEXT    PRIMARY KEY,
@@ -144,6 +146,7 @@ func initDB() {
 	// Safe ALTER TABLE – add click_density column if it does not yet exist.
 	// Ignore the error if the column is already present.
 	_, _ = db.Exec(`ALTER TABLE sessions ADD COLUMN click_density TEXT NOT NULL DEFAULT '[]'`)
+	_, _ = db.Exec(`ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''`)
 
 	log.Println("✔  Database initialised:", DBPath)
 }
@@ -211,6 +214,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		Age          int    `json:"age"`
 		Identity     string `json:"identity"`
 		IdentityName string `json:"identityName"`
+		Email        string `json:"email"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
@@ -233,8 +237,8 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	userID := fmt.Sprintf("u_%d", time.Now().UnixNano())
 	_, err := db.Exec(
-		`INSERT INTO users (id, username, password, age, identity) VALUES (?, ?, ?, ?, ?)`,
-		userID, username, password, body.Age, body.Identity,
+		`INSERT INTO users (id, username, password, age, identity, email) VALUES (?, ?, ?, ?, ?, ?)`,
+		userID, username, password, body.Age, body.Identity, body.Email,
 	)
 	if err != nil {
 		writeJSON(w, http.StatusConflict, map[string]string{"error": "username already taken"})
@@ -254,6 +258,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		"age":          body.Age,
 		"identity":     body.Identity,
 		"identityName": identityName,
+		"email":        body.Email,
 		"status":       "registered",
 	})
 }
@@ -554,13 +559,16 @@ func handleGetSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	row := db.QueryRow(`SELECT
-		id, user_id, player_name, player_role, player_icon,
-		score, module_idx, module_scores, domains, fragments,
-		dass, dass_raw, rt_samples, click_density,
-		correct_count, attempt_count,
-		murderer, murderer_name, killer_guess,
-		session_start, last_updated
-		FROM sessions WHERE id = ?`, id)
+		s.id, s.user_id, s.player_name, s.player_role, s.player_icon,
+		s.score, s.module_idx, s.module_scores, s.domains, s.fragments,
+		s.dass, s.dass_raw, s.rt_samples, s.click_density,
+		s.correct_count, s.attempt_count,
+		s.murderer, s.murderer_name, s.killer_guess,
+		s.session_start, s.last_updated,
+		COALESCE(u.email, '') AS user_email
+		FROM sessions s
+		LEFT JOIN users u ON s.user_id = u.id
+		WHERE s.id = ?`, id)
 
 	s, err := scanSession(row)
 	if err == sql.ErrNoRows {
@@ -616,22 +624,28 @@ func handleListSessions(w http.ResponseWriter, r *http.Request) {
 	)
 	if userID != "" {
 		rows, err = db.Query(`SELECT
-			id, user_id, player_name, player_role, player_icon,
-			score, module_idx, module_scores, domains, fragments,
-			dass, dass_raw, rt_samples, click_density,
-			correct_count, attempt_count,
-			murderer, murderer_name, killer_guess,
-			session_start, last_updated
-			FROM sessions WHERE user_id = ? ORDER BY last_updated DESC`, userID)
+			s.id, s.user_id, s.player_name, s.player_role, s.player_icon,
+			s.score, s.module_idx, s.module_scores, s.domains, s.fragments,
+			s.dass, s.dass_raw, s.rt_samples, s.click_density,
+			s.correct_count, s.attempt_count,
+			s.murderer, s.murderer_name, s.killer_guess,
+			s.session_start, s.last_updated,
+			COALESCE(u.email, '') AS user_email
+			FROM sessions s
+			LEFT JOIN users u ON s.user_id = u.id
+			WHERE s.user_id = ? ORDER BY s.last_updated DESC`, userID)
 	} else {
 		rows, err = db.Query(`SELECT
-			id, user_id, player_name, player_role, player_icon,
-			score, module_idx, module_scores, domains, fragments,
-			dass, dass_raw, rt_samples, click_density,
-			correct_count, attempt_count,
-			murderer, murderer_name, killer_guess,
-			session_start, last_updated
-			FROM sessions ORDER BY last_updated DESC`)
+			s.id, s.user_id, s.player_name, s.player_role, s.player_icon,
+			s.score, s.module_idx, s.module_scores, s.domains, s.fragments,
+			s.dass, s.dass_raw, s.rt_samples, s.click_density,
+			s.correct_count, s.attempt_count,
+			s.murderer, s.murderer_name, s.killer_guess,
+			s.session_start, s.last_updated,
+			COALESCE(u.email, '') AS user_email
+			FROM sessions s
+			LEFT JOIN users u ON s.user_id = u.id
+			ORDER BY s.last_updated DESC`)
 	}
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
@@ -671,6 +685,7 @@ func scanSession(row rowScanner) (Session, error) {
 		&s.CorrectCount, &s.AttemptCount,
 		&s.Murderer, &s.MurdererName, &s.KillerGuess,
 		&s.SessionStart, &s.LastUpdated,
+		&s.UserEmail,
 	)
 	if err != nil {
 		return s, err
@@ -699,6 +714,7 @@ func scanSessionRow(rows *sql.Rows) (Session, error) {
 		&s.CorrectCount, &s.AttemptCount,
 		&s.Murderer, &s.MurdererName, &s.KillerGuess,
 		&s.SessionStart, &s.LastUpdated,
+		&s.UserEmail,
 	)
 	if err != nil {
 		return s, err
@@ -953,6 +969,40 @@ func handleLogError(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "logged"})
 }
 
+func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
+		return
+	}
+	var body struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	if body.Username == "" || body.Email == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "username and email required"})
+		return
+	}
+
+	row := db.QueryRow(
+		`SELECT password FROM users WHERE username = ? AND email = ?`,
+		body.Username, body.Email,
+	)
+	var password string
+	if err := row.Scan(&password); err != nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "matching user manifest not found"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{
+		"status":     "verified",
+		"passphrase": password,
+	})
+}
+
 // ─── main ─────────────────────────────────────────────────────────────────────
 
 func main() {
@@ -964,6 +1014,7 @@ func main() {
 	mux.HandleFunc("/api/health", handleHealth)
 	mux.HandleFunc("/api/register", handleRegister)
 	mux.HandleFunc("/api/login", handleLogin)
+	mux.HandleFunc("/api/forgot-password", handleForgotPassword)
 	mux.HandleFunc("/api/update-identity", handleUpdateIdentity)
 	mux.HandleFunc("/api/user/progress", handleUserProgress)
 	mux.HandleFunc("/api/session", handleSession)

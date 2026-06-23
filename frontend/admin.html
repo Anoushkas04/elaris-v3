@@ -870,6 +870,7 @@ td.td-center { text-align: center; }
         <thead>
           <tr>
             <th>Player</th>
+            <th>Email</th>
             <th class="th-center">Score</th>
             <th>Progress</th>
             <th class="th-center">Modules</th>
@@ -882,7 +883,7 @@ td.td-center { text-align: center; }
         </thead>
         <tbody id="sessions-tbody">
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <div class="loading-state">
                 <div class="spinner"></div>
                 <p>Summoning session data from the island…</p>
@@ -1422,7 +1423,7 @@ function renderTable() {
 
   if (filteredSessions.length === 0) {
     tbody.innerHTML = `
-      <tr><td colspan="9">
+      <tr><td colspan="10">
         <div class="empty-state">
           <div class="es-icon">🏝️</div>
           <p>No sessions match your current filters.</p>
@@ -1476,6 +1477,11 @@ function renderSessionRow(s) {
           </div>
         </div>
       </td>
+      <td>
+        <div style="font-family:var(--ff-b); font-size:0.9rem; color:var(--gold-l); opacity:0.85; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(s.user_email || '—')}">
+          ${escHtml(s.user_email || '—')}
+        </div>
+      </td>
       <td class="td-center"><span class="score-badge ${scoreCls}">${score}</span></td>
       <td>
         <div class="prog-wrap">
@@ -1495,7 +1501,7 @@ function renderSessionRow(s) {
       </td>
     </tr>
     <tr class="detail-row${isExp ? ' visible' : ''}" id="detail-${sid}">
-      <td colspan="9" class="detail-cell">
+      <td colspan="10" class="detail-cell">
         ${isExp ? buildDetailHTML(s) : ''}
       </td>
     </tr>`;

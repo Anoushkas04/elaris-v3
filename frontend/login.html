@@ -739,7 +739,7 @@
               />
             </div>
 
-            <div class="field">
+            <div class="field" style="margin-bottom: 25px; position: relative;">
               <label for="login-pass">Passphrase</label>
               <input
                 id="login-pass"
@@ -749,6 +749,7 @@
                 autocomplete="current-password"
                 required
               />
+              <span class="forgot-link" onclick="openForgotModal()" style="position: absolute; right: 0; bottom: -20px; font-size: 0.75rem; color: var(--gold); cursor: pointer; text-decoration: underline; opacity: 0.85; transition: opacity var(--transition);">Forgot Passphrase?</span>
             </div>
 
             <button type="submit" class="btn-submit" id="login-btn">
@@ -774,6 +775,18 @@
                 type="text"
                 name="name"
                 placeholder="Full name on the manifest…"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="reg-email">Email Address</label>
+              <input
+                id="reg-email"
+                type="email"
+                name="email"
+                placeholder="Your contact email…"
                 autocomplete="off"
                 required
               />
@@ -843,6 +856,37 @@
         <div style="display:flex; gap:10px;">
           <button type="button" id="admin-login-cancel" style="width:50%; padding:14px; background:transparent; border:1px solid rgba(212,175,55,0.3); color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Cancel</button>
           <button type="submit" style="width:50%; padding:14px; background:var(--gold-dim); border:1px solid var(--gold); color:#050508; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s;">Verify</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Passphrase Overlay -->
+  <div id="forgot-passphrase-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(5,5,8,0.95); backdrop-filter:blur(10px); z-index:99999; align-items:center; justify-content:center;">
+    <div style="width:100%; max-width:400px; padding:40px; background:rgba(15, 20, 25, 0.95); border:1px solid rgba(196, 164, 101, 0.3); border-radius:8px; box-shadow:0 10px 40px rgba(0,0,0,0.8); text-align:center;">
+      <span style="font-size:3rem; display:block; margin-bottom:15px;">🔍</span>
+      <h2 style="font-family:var(--ff-t); color:var(--gold); font-size:1.8rem; margin-bottom:10px; letter-spacing:0.05em;">Passphrase Recovery</h2>
+      <p style="color:var(--gold-l); opacity:0.75; font-size:0.9rem; margin-bottom:30px; font-family:var(--ff-b);">Enter your username and email to recover your passphrase</p>
+      <form id="forgot-passphrase-form">
+        <div style="margin-bottom:15px; text-align:left;">
+          <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:var(--ff-m);">Username / Name</label>
+          <input type="text" id="forgot-username" placeholder="Enter your full name / username" required style="width:100%; padding:14px; background:rgba(196, 164, 101, 0.03); border:1px solid rgba(196, 164, 101, 0.25); color:#d8cbb5; border-radius:4px; font-family:var(--ff-m); outline:none;" />
+        </div>
+        <div style="margin-bottom:20px; text-align:left;">
+          <label style="display:block; font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-family:var(--ff-m);">Email Address</label>
+          <input type="email" id="forgot-email" placeholder="Enter your contact email" required style="width:100%; padding:14px; background:rgba(196, 164, 101, 0.03); border:1px solid rgba(196, 164, 101, 0.25); color:#d8cbb5; border-radius:4px; font-family:var(--ff-m); outline:none;" />
+        </div>
+        <div id="forgot-passphrase-error" style="color:var(--rust); font-size:0.85rem; margin-bottom:20px; display:none; font-family:var(--ff-b);"></div>
+        
+        <!-- Recovery Result Area -->
+        <div id="forgot-passphrase-result" style="display:none; padding:15px; background:rgba(46,154,120,0.1); border:1px solid rgba(46,154,120,0.3); border-radius:4px; margin-bottom:20px; text-align:left;">
+          <label style="display:block; font-size:0.75rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:5px; font-family:var(--ff-m);">Your Recovered Passphrase:</label>
+          <div id="recovered-passphrase-val" style="font-family:var(--ff-m); color:var(--gold-l); font-size:1.1rem; word-break:break-all; font-weight:bold; letter-spacing:1px; background:rgba(0,0,0,0.2); padding:10px; border-radius:4px; border:1px dashed rgba(196,164,101,0.4);"></div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" id="forgot-passphrase-cancel" style="width:50%; padding:14px; background:transparent; border:1px solid rgba(196, 164, 101, 0.3); color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s; font-family:var(--ff-m);">Close</button>
+          <button type="submit" id="forgot-passphrase-submit" style="width:50%; padding:14px; background:var(--gold); border:1px solid var(--gold-l); color:var(--ink); font-weight:600; text-transform:uppercase; letter-spacing:0.1em; border-radius:4px; cursor:pointer; transition:all 0.3s; font-family:var(--ff-m);">Recover</button>
         </div>
       </form>
     </div>
@@ -1130,10 +1174,12 @@
       clearError('register');
 
       const name       = document.getElementById('reg-name').value.trim();
+      const email      = document.getElementById('reg-email').value.trim();
       const age        = parseInt(document.getElementById('reg-age').value, 10);
       const passphrase = document.getElementById('reg-pass').value;
 
       if (!name)              { showError('register', 'Please enter your name.');             return; }
+      if (!email)             { showError('register', 'Please enter your email.');            return; }
       if (!age || age < 18)   { showError('register', 'You must be 18 or older to board.');  return; }
       if (!passphrase)        { showError('register', 'Please choose a passphrase.');         return; }
 
@@ -1145,6 +1191,7 @@
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
             name,
+            email,
             age,
             passphrase,
             identity:     '',
@@ -1249,6 +1296,77 @@
           if (adminError) {
             adminError.textContent = err.message;
             adminError.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    /* ── 11. FORGOT PASSPHRASE MODAL ────────────────── */
+    const forgotOverlay = document.getElementById('forgot-passphrase-overlay');
+    const forgotCancel  = document.getElementById('forgot-passphrase-cancel');
+    const forgotForm    = document.getElementById('forgot-passphrase-form');
+    const forgotError   = document.getElementById('forgot-passphrase-error');
+    const forgotResult  = document.getElementById('forgot-passphrase-result');
+    const recoveredVal  = document.getElementById('recovered-passphrase-val');
+
+    window.openForgotModal = function() {
+      if (forgotOverlay) {
+        forgotOverlay.style.display = 'flex';
+        document.getElementById('forgot-username').focus();
+      }
+    };
+
+    if (forgotCancel && forgotOverlay) {
+      forgotCancel.addEventListener('click', () => {
+        forgotOverlay.style.display = 'none';
+        if (forgotError) {
+          forgotError.style.display = 'none';
+          forgotError.textContent = '';
+        }
+        if (forgotResult) {
+          forgotResult.style.display = 'none';
+        }
+        forgotForm.reset();
+      });
+    }
+
+    if (forgotForm) {
+      forgotForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('forgot-username').value.trim();
+        const email = document.getElementById('forgot-email').value.trim();
+
+        if (forgotError) {
+          forgotError.style.display = 'none';
+          forgotError.textContent = '';
+        }
+        if (forgotResult) {
+          forgotResult.style.display = 'none';
+        }
+
+        try {
+          const res = await fetch('/api/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email })
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Recovery failed - check your username/email');
+          }
+
+          if (data.passphrase) {
+            recoveredVal.textContent = data.passphrase;
+            forgotResult.style.display = 'block';
+          } else {
+            throw new Error('No passphrase returned from server');
+          }
+        } catch (err) {
+          if (forgotError) {
+            forgotError.textContent = err.message;
+            forgotError.style.display = 'block';
           }
         }
       });
