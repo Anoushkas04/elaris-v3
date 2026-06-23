@@ -492,6 +492,134 @@
       position: relative;
     }
 
+    /* ✉️ INTERACTIVE ENVELOPE STYLING */
+    .envelope-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      height: 500px;
+      margin: auto;
+      perspective: 1200px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 290px;
+      background: #3e3225;
+      border-radius: 4px;
+      border: 1px solid #6e552d;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      transform-style: preserve-3d;
+      z-index: 10;
+      transition: all 0.4s ease;
+    }
+    .envelope-front {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #4e3f30 0%, #2b2118 100%);
+      border-radius: 4px;
+      z-index: 3;
+      box-shadow: inset 0 2px 6px rgba(255,255,255,0.06), 0 -2px 10px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 30px;
+      border-top: 1px solid #735b37;
+    }
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: -1px;
+      right: -1px;
+      height: 130px;
+      background: #524233;
+      border: 1px solid #6e552d;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+      z-index: 4;
+      transform-origin: top center;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .envelope.open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+    .wax-seal {
+      position: absolute;
+      top: 105px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 52px;
+      background: radial-gradient(circle, #aa2c2c 0%, #6e1c1c 100%);
+      border-radius: 50%;
+      z-index: 5;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 0 6px rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.2rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid #5a1212;
+    }
+    .wax-seal::after {
+      content: '✉';
+      font-family: Arial, sans-serif;
+    }
+    .envelope.open .wax-seal {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.4) rotate(45deg);
+      pointer-events: none;
+    }
+    .envelope-paper {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      bottom: 8px;
+      height: 270px;
+      background: radial-gradient(circle, #fcfcf3 0%, #f3ebdb 100%);
+      border: 1.5px solid #b5a78c;
+      border-radius: 2px;
+      padding: 24px 28px;
+      z-index: 2;
+      transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1), height 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 0 35px rgba(90,75,60,0.1);
+      overflow-y: auto;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #2b241a;
+      opacity: 0.8;
+    }
+    .envelope-paper::-webkit-scrollbar { display: none; }
+    .envelope.open .envelope-paper {
+      transform: translateY(-200px);
+      height: 380px;
+      z-index: 12;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.6), inset 0 0 35px rgba(90,75,60,0.12);
+      opacity: 1;
+    }
+    .envelope-label-txt {
+      font-family: var(--ff-m);
+      font-size: 0.88rem;
+      color: var(--text-d);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
     /* ━━━━━━━━━━━━━━━━━━━━ MODALS SYSTEM ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     .modal {
       position: fixed;
@@ -1819,7 +1947,7 @@
   <div id="hud">
     <div class="hud-left">
       <button class="hud-btn" id="evidence-btn" title="Evidence Log" onclick="showEvidenceModal()">🔍</button>
-      <div id="hud-frags" style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--text-d);">Fragments: 0 / 10</div>
+      <div id="hud-frags" style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--text-d);">Envelopes: 0 / 10</div>
     </div>
     <div class="hud-center">
       <div id="hud-module">MODULE 1 / 10</div>
@@ -1862,13 +1990,29 @@
 
   <!-- Fragment Details Overlay popup -->
   <div id="frag-overlay">
-    <div class="frag-card">
-      <h3 style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--text-dm); letter-spacing: 0.15em;">MEMORY FRAGMENT <span id="frag-num">#1</span></h3>
-      <div class="divider"></div>
-      <p id="frag-body" style="font-size: 1rem; margin: 16px 0; white-space: pre-wrap; font-style: italic; color: var(--text-p);"></p>
-      <p id="frag-clue" style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--gold); margin-bottom: 24px; text-transform: uppercase;"></p>
-      <p id="frag-reveal" style="font-family: var(--ff-m); font-size: 0.8rem; color: #ff6b6b; margin-bottom: 24px; display: none; border-top: 1px dashed rgba(255,107,107,0.3); padding-top: 12px;"></p>
-      <button class="btn-main" onclick="closeFrag()">Store Memory</button>
+    <div class="envelope-wrapper">
+      <div class="envelope" id="envelope-elem">
+        <!-- Flap of the envelope -->
+        <div class="envelope-flap"></div>
+        <!-- Wax Seal that cracks/fades on open -->
+        <div class="wax-seal" id="wax-seal-elem" onclick="unsealEnvelope()"></div>
+        <!-- Pocket on the front of the envelope -->
+        <div class="envelope-front">
+          <div class="envelope-label-txt">Evidence Envelope</div>
+          <h3 id="frag-num-header" style="font-family: var(--ff-m); font-size: 1.05rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 5px;">ENVELOPE <span id="frag-num">#1</span></h3>
+        </div>
+        <!-- Paper sheet that slides out containing the clue -->
+        <div class="envelope-paper">
+          <h4 style="font-family: var(--ff-t); font-size: 1.12rem; color: #8e5b15; letter-spacing: 0.08em; border-bottom: 1px dashed rgba(90,75,60,0.25); padding-bottom: 4px; width: 100%; text-align: center; margin-bottom: 12px; text-transform: uppercase;">CLASSIFIED LOG SHEET</h4>
+          <p id="frag-body" style="font-size: 1.22rem; line-height: 1.5; white-space: pre-wrap; font-style: italic; color: #2b241a; text-align: left; width: 100%; margin-bottom: 12px;"></p>
+          <p id="frag-clue" style="font-family: var(--ff-m); font-size: 1.05rem; color: #a82e2e; text-transform: uppercase; text-align: left; width: 100%; margin-bottom: 12px; font-weight: bold;"></p>
+          <p id="frag-reveal" style="font-family: var(--ff-m); font-size: 1.05rem; color: #c0471f; border-top: 1px dotted rgba(192,71,31,0.3); padding-top: 8px; width: 100%; text-align: left; display: none;"></p>
+        </div>
+      </div>
+    </div>
+    <!-- Interactive Button at the bottom -->
+    <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 30;">
+      <button class="btn-main" id="frag-action-btn" onclick="handleFragAction()" style="box-shadow: 0 4px 20px rgba(0,0,0,0.5);">Unseal Envelope</button>
     </div>
   </div>
 
@@ -2318,7 +2462,7 @@
   <div class="modal" id="modal-evidence">
     <div class="modal-content">
       <span class="modal-close" onclick="closeModal('modal-evidence')">×</span>
-      <h3>Evidence Bag</h3>
+      <h3>Evidence Envelopes</h3>
       <div class="divider"></div>
       <div id="evidence-list">
         <!-- Evidence populated here dynamically -->
@@ -2984,7 +3128,7 @@
       GS.fragments[idx] = true;
       const dot = $('frag-dot-'+idx);
       if (dot) { dot.classList.add('lit'); }
-      $('hud-frags').textContent = `Fragments: ${GS.fragments.filter(Boolean).length} / 10`;
+      $('hud-frags').textContent = `Envelopes: ${GS.fragments.filter(Boolean).length} / 10`;
       const f = getMemoryFragment(idx);
       $('frag-num').textContent = '#' + (idx+1);
       $('frag-body').textContent = f.text;
@@ -3026,15 +3170,53 @@
         }
       }
 
+      // Reset interactive envelope state
+      const envelope = $('envelope-elem');
+      if (envelope) envelope.classList.remove('open');
+      
+      const actionBtn = $('frag-action-btn');
+      if (actionBtn) actionBtn.textContent = "Unseal Envelope";
+      
+      window._envelopeOpened = false;
+
       $('frag-overlay').classList.add('on');
-      TTS.say('Memory fragment recovered. ' + f.clue, 0.85, 0.8);
+      TTS.say('Evidence envelope recovered. ' + f.clue, 0.85, 0.8);
       window._fragCb = cb;
     }
+
+    window.unsealEnvelope = () => {
+      if (window._envelopeOpened) return;
+      window._envelopeOpened = true;
+      
+      SFX.drag();
+      
+      const envelope = $('envelope-elem');
+      if (envelope) envelope.classList.add('open');
+      
+      const actionBtn = $('frag-action-btn');
+      if (actionBtn) actionBtn.textContent = "Archive Evidence";
+      
+      const idx = GS.moduleIdx;
+      const f = getMemoryFragment(idx);
+      TTS.say(f.clue, 0.88, 0.85);
+    };
+
+    window.handleFragAction = () => {
+      if (!window._envelopeOpened) {
+        unsealEnvelope();
+      } else {
+        closeFrag();
+      }
+    };
 
     window.closeFrag = () => {
       $('frag-overlay').classList.remove('on');
       const hud = $('hud');
       if (hud) hud.style.pointerEvents = 'auto';
+      
+      const envelope = $('envelope-elem');
+      if (envelope) envelope.classList.remove('open');
+      
       if (window._fragCb) { const cb=window._fragCb; window._fragCb=null; cb(); }
     };
 
@@ -3216,7 +3398,7 @@
         { npc:'mia',   text:'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.' },
         { npc:null,    text:'That night — the lights cut out.\n\nA projector ignited. Text burned across the wall:', projector:true, projtext:'ONE OF YOU CAME HERE TO DISAPPEAR FOREVER.' },
         { npc:'rowan', text:'A scream from the pool. Kai Tanaka — dead.\nThe storm has destroyed the radio. The only boat is gone.\n\nNobody leaves this island.' },
-        { npc:'rowan', text:'Truth is stored in memory.\nMemory is fragmented.\nRecover all ten fragments.' },
+        { npc:'rowan', text:'Truth is sealed in records.\nEach step yields a hidden envelope.\nUncover all ten evidence envelopes.' },
       ];
       let i=0;
       function nextLine() {
@@ -3370,7 +3552,7 @@
       showScreen('sc-narrative');
       const rowan = GS.npcs.find(n=>n.id==='rowan');
       showDialog('Rowan Ashford',
-        'Every fragment so far contains the same date.\nThree years ago. Exactly.\nThis isn\'t a random crime.\nSomething happened on this island three years ago.\nAnd every person here was part of it.',
+        'Every envelope so far contains the same date.\nThree years ago. Exactly.\nThis isn\'t a random crime.\nSomething happened on this island three years ago.\nAnd every person here was part of it.',
         null, cb, 'rowan'
       );
     }
@@ -4510,7 +4692,7 @@ function finishBeach(t) {
 
       const murdNPC=[...IDENTITIES, ...NPCS_BASE].find(c=>c.id===GS.murderer);
       const epilogue = total>65
-        ? `The fragments pointed to ${murdNPC?.name||'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten recovered memories — and the knowledge that some truths only emerge under pressure.`
+        ? `The envelopes pointed to ${murdNPC?.name||'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten unsealed envelopes — and the knowledge that some truths only emerge under pressure.`
         : `The fog was too thick. ${murdNPC?.name||'The host'} disappeared on the last dawn. But the island recorded everything — every choice, every hesitation, every moment of clarity and confusion. The data outlasts the mystery.`;
       $('res-epilogue').textContent=epilogue;
 
@@ -4637,7 +4819,7 @@ function finishBeach(t) {
             if (!isUnlocked) {
               return `<div class="clue-card locked" style="margin-bottom:7px">
                 <div class="clue-cat">Locked Evidence</div>
-                [Locked Clue - Complete Module ${c.fragmentIdx + 1}]
+                [Locked Clue - Recover Envelope ${c.fragmentIdx + 1}]
               </div>`;
             } else {
               const clueText = getMemoryFragment(c.fragmentIdx).clue;
@@ -4645,7 +4827,7 @@ function finishBeach(t) {
               const classList = isConnected ? 'clue-card connected' : 'clue-card';
               const onclickStr = GS.deductionVerified ? '' : `onclick="toggleClueCard(this, '${c.id}')"`;
               return `<div class="${classList}" id="clue-${c.id}" ${onclickStr} style="margin-bottom:7px">
-                <div class="clue-cat">Evidence (Module ${c.fragmentIdx + 1})</div>
+                <div class="clue-cat">Evidence (Envelope ${c.fragmentIdx + 1})</div>
                 ${clueText}
               </div>`;
             }
@@ -4745,7 +4927,7 @@ function finishBeach(t) {
       
       const murdNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.murderer);
       const epilogue = total > 65
-        ? `The fragments pointed to ${murdNPC?.name || 'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten recovered memories — and the knowledge that some truths only emerge under pressure.`
+        ? `The envelopes pointed to ${murdNPC?.name || 'the host'}. The coast guard arrived as the sun came up. You walked off Elaris Island carrying ten unsealed envelopes — and the knowledge that some truths only emerge under pressure.`
         : `The fog was too thick. ${murdNPC?.name || 'The host'} disappeared on the last dawn. But the island recorded everything — every choice, every hesitation, every moment of clarity and confusion. The data outlasts the mystery.`;
       $('res-epilogue').textContent = epilogue;
       
@@ -4803,7 +4985,7 @@ function finishBeach(t) {
           const fd = getMemoryFragment(idx);
           list.innerHTML += `
             <div class="evidence-item" style="grid-column: 1 / -1; margin-bottom: 8px;">
-              <h4>Fragment #${idx+1}</h4>
+              <h4>Envelope #${idx+1}</h4>
               <p style="font-style:italic; font-size:0.72rem; white-space: pre-wrap; line-height: 1.4; color: var(--text-d); margin-top: 4px;">${fd.text}</p>
             </div>
           `;
@@ -5026,7 +5208,7 @@ function finishBeach(t) {
       'First Witnesses',
       'The Study Room',
       'Forensic Analysis',
-      'Memory Fragments',
+      'Evidence Envelopes',
       'Alibi Checks',
       'The Hidden Room',
       'Digital Traces',
