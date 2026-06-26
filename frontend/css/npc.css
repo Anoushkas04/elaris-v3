@@ -1,0 +1,76 @@
+/* ━━━━━━━━━━━━━━━━━━━━ CHARACTERS STAGE ━━━━━━━━━━━━━━━━━━━━━━━ */
+#char-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: none;
+}
+#char-stage.on { display: block; }
+
+.char-wrap {
+  position: absolute;
+  bottom: -2px; /* Anchor feet to bottom edge */
+  width: fit-content; /* Hug the image's natural width */
+  height: 72vh; /* Large visual-novel style character */
+  left: 13%;
+  transform: translate(-50%, 80px);
+  opacity: 0;
+  transition: transform 0.65s cubic-bezier(.175, .885, .32, 1.15), opacity 0.65s;
+}
+.char-wrap.enter {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.char-svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  /* Full character visible including pedestal — no fade mask */
+  filter: drop-shadow(0 16px 40px rgba(0,0,0,0.75));
+}
+
+.char-bubble {
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink-ss);
+  border: 1px solid var(--gold-d);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  width: 190px;
+  font-size: 0.8rem;
+  color: var(--text-p);
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  pointer-events: auto;
+}
+.char-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--gold-d);
+}
+.char-name {
+  display: block;
+  font-family: var(--ff-t);
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-bottom: 3px;
+  letter-spacing: 0.04em;
+}
+
+
+
+/* Lift the 130px cap for NPC portraits; use natural aspect-ratio width */
+#char-stage .char-svg {
+  max-height: none;
+  width: auto; /* Break circular dependency with .char-wrap fit-content */
+}
