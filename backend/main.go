@@ -448,11 +448,17 @@ func handleUserProgress(w http.ResponseWriter, r *http.Request) {
 		murdererName := ""
 		if cp.Murderer != "" {
 			mNames := map[string]string{
-				"rowan": "Rowan Ashford",
-				"mia":   "Mia Lacroix",
-				"james": "Dr. James Okoro",
-				"kai":   "Kai Tanaka",
-				"sofia": "Sofia Reyes",
+				"doctor":     "Dr. Avery Ross",
+				"ceo":        "Marcus Hale",
+				"musician":   "Lena Brooks",
+				"student":    "Noah Mercer",
+				"comedian":   "Ethan Cross",
+				"detective":  "Oliver Grant",
+				"therapist":  "Maya Singh",
+				"gamer":      "Daniel Price",
+				"influencer": "Sarah Bennett",
+				"rachel":     "Rachel Quinn",
+				"rowan":      "Rowan Ashford",
 			}
 			murdererName = mNames[cp.Murderer]
 		}

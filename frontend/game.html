@@ -285,7 +285,10 @@
     /* ━━━━━━━━━━━━━━━━━━━━ CHARACTERS STAGE ━━━━━━━━━━━━━━━━━━━━━━━ */
     #char-stage {
       position: fixed;
-      inset: 60px 0 160px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 10;
       pointer-events: none;
       display: none;
@@ -294,21 +297,25 @@
 
     .char-wrap {
       position: absolute;
-      bottom: 0;
-      width: 140px;
-      height: 210px;
-      transition: transform 0.55s cubic-bezier(.175, .885, .32, 1.15), opacity 0.55s;
-      transform: translateY(180px);
+      bottom: -2px; /* Anchor feet to bottom edge */
+      width: fit-content; /* Hug the image's natural width */
+      height: 72vh; /* Large visual-novel style character */
+      left: 13%;
+      transform: translate(-50%, 80px);
       opacity: 0;
+      transition: transform 0.65s cubic-bezier(.175, .885, .32, 1.15), opacity 0.65s;
     }
     .char-wrap.enter {
-      transform: translateY(0);
+      transform: translate(-50%, 0);
       opacity: 1;
     }
 
     .char-svg {
-      width: 100%;
+      display: block;
       height: 100%;
+      width: auto;
+      /* Full character visible including pedestal — no fade mask */
+      filter: drop-shadow(0 16px 40px rgba(0,0,0,0.75));
     }
 
     .char-bubble {
@@ -865,6 +872,97 @@
     .book-nav-btn:hover {
       background: rgba(196, 164, 101, 0.12);
       border-color: var(--gold);
+    }
+
+    /* Custom Styles for Case File Modal Dashboard */
+    .cf-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(196, 164, 101, 0.18);
+      padding-bottom: 6px;
+      overflow-x: auto;
+    }
+    .cf-tab-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(196, 164, 101, 0.2);
+      color: var(--text-d);
+      font-family: var(--ff-t);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .cf-tab-btn:hover {
+      background: rgba(196, 164, 101, 0.08);
+      color: var(--gold-l);
+      border-color: rgba(196, 164, 101, 0.4);
+    }
+    .cf-tab-btn.active {
+      background: rgba(196, 164, 101, 0.15);
+      color: var(--gold-l);
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(196, 164, 101, 0.2);
+    }
+    .dossier-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--ff-b);
+      font-size: 0.74rem;
+      color: var(--text-p);
+      background: rgba(10, 10, 20, 0.5);
+    }
+    .dossier-table th, .dossier-table td {
+      border: 1px solid rgba(196, 164, 101, 0.15);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .dossier-table th {
+      font-family: var(--ff-t);
+      color: var(--gold);
+      background: rgba(196, 164, 101, 0.08);
+      font-weight: normal;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .dossier-table tr:hover {
+      background: rgba(196, 164, 101, 0.04);
+    }
+    .redacted-clue {
+      background: rgba(0, 0, 0, 0.85);
+      color: rgba(255, 94, 77, 0.35);
+      font-family: monospace;
+      font-size: 0.68rem;
+      padding: 3px 6px;
+      border-radius: 2px;
+      border: 1px dashed rgba(192, 71, 31, 0.45);
+      letter-spacing: 0.05em;
+      user-select: none;
+      display: inline-block;
+      max-width: 100%;
+      word-break: break-all;
+    }
+    .unredacted-clue {
+      color: #dfcea6;
+      font-family: var(--ff-m);
+      font-size: 0.72rem;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .char-svg {
+      width: 100%;
+      height: 100%;
+      max-height: 130px;
+    }
+    /* Lift the 130px cap for NPC portraits; use natural aspect-ratio width */
+    #char-stage .char-svg {
+      max-height: none;
+      width: auto; /* Break circular dependency with .char-wrap fit-content */
     }
 
     /* Field Manual Sidebar Design */
@@ -2288,7 +2386,7 @@
       <h3>Psychological Clearance Report</h3>
       <div class="divider"></div>
       
-      <div id="res-player">Dr. Priya Sharma</div>
+      <div id="res-player">Assessment Subject</div>
       
       <div class="stats-row">
         <div class="stat-box">
@@ -2437,21 +2535,70 @@
 
   <!-- ━━━━━━━━━━━━━━━━━━━━ MODAL: FILES DOSSIER ━━━━━━━━━━━━━━━━━━ -->
   <div class="modal" id="modal-cf">
-    <div class="modal-content" style="max-width: 580px;">
+    <div class="modal-content" id="cf-modal-content" style="max-width: 800px; width: 90%;">
       <span class="modal-close" onclick="closeModal('modal-cf')">×</span>
       <h3>Case File Dossier</h3>
       <div class="divider"></div>
-      
-      <div class="book-container">
-        <div class="book-card" id="cf-book-card">
-          <!-- Dynamically populated via JS page-flipping -->
+
+      <!-- Tabbed Menu Dashboard -->
+      <div class="cf-tabs">
+        <button class="cf-tab-btn active" onclick="switchDossierTab('dossiers')">Dossiers</button>
+        <button class="cf-tab-btn" onclick="switchDossierTab('manifest')">Suspect Manifest</button>
+        <button class="cf-tab-btn" onclick="switchDossierTab('victims')">Victims Record</button>
+      </div>
+
+      <!-- Dossier book page flipping view -->
+      <div class="cf-panel" id="cf-panel-dossiers" style="display: block;">
+        <div class="book-container">
+          <div class="book-card" id="cf-book-card">
+            <!-- Dynamically populated via JS page-flipping -->
+          </div>
+        </div>
+        
+        <div class="book-nav" style="margin-top: 15px;">
+          <button class="book-nav-btn" onclick="prevDossierPage()">← Previous Profile</button>
+          <div style="font-family: var(--ff-m); font-size: 0.7rem; color: var(--text-d);"><span id="cf-page-num">1</span> / <span id="cf-page-total">10</span></div>
+          <button class="book-nav-btn" onclick="nextDossierPage()">Next Profile →</button>
         </div>
       </div>
-      
-      <div class="book-nav">
-        <button class="book-nav-btn" onclick="prevDossierPage()">← Previous Profile</button>
-        <div style="font-family: var(--ff-m); font-size: 0.7rem; color: var(--text-d);"><span id="cf-page-num">1</span> / <span id="cf-page-total">10</span></div>
-        <button class="book-nav-btn" onclick="nextDossierPage()">Next Profile →</button>
+
+      <!-- Suspect Manifest Tab Panel -->
+      <div class="cf-panel" id="cf-panel-manifest" style="display: none;">
+        <div class="table-container" style="overflow-x: auto; max-height: 400px; margin-top: 10px;">
+          <table class="dossier-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Suspect</th>
+                <th>Role</th>
+                <th>Public Persona</th>
+                <th>Secret (Unlocked by Envelopes)</th>
+              </tr>
+            </thead>
+            <tbody id="manifest-table-body">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Victims Record Tab Panel -->
+      <div class="cf-panel" id="cf-panel-victims" style="display: none;">
+        <div class="table-container" style="overflow-x: auto; max-height: 400px; margin-top: 10px;">
+          <table class="dossier-table">
+            <thead>
+              <tr>
+                <th>Victim</th>
+                <th>Role</th>
+                <th>Time of Death</th>
+                <th>Hidden Truth (Unlocked Progressive)</th>
+              </tr>
+            </thead>
+            <tbody id="victims-table-body">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -2568,159 +2715,344 @@
 
     // ─ DATA ───────────────────────────────────────────────────────
     const IDENTITIES = [
-      {id:'doctor',  icon:'🩺', name:'Dr. Priya Sharma',   role:'Burned-out Cardiologist', trait:'Methodical · Overworked', pitch:1.1, rate:.86, details:'Dr. Priya Sharma, cardiologist. Hired to consult on pilot health studies. Overworked, methodical, carrying deep-seated anxiety about a past clinical failure.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Attended welcome dinner.<br>• <strong>8:45 PM - 10:15 PM:</strong> Logged into medical portal from Cabin 3 (Verified by router connection log).<br>• <strong>10:30 PM - Midnight:</strong> Reviewing offline patient case records in Cabin 3 (Confirmed by local file-open timestamp).</div>', image:'assets/portrait_emily_1780832277768.png'},
-      {id:'ceo',     icon:'💼', name:'Marcus Chen',        role:'Workaholic Tech CEO',     trait:'Decisive · Under Pressure', pitch:.95, rate:.92, details:'Marcus Chen, tech company executive. Decisive, aggressive under investor pressure. Hired resort for private research trials.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Welcome dinner in Main Dining Hall.<br>• <strong>8:45 PM - 10:30 PM:</strong> Sent 14 emails from the lobby lounge (Verified by corporate mail server timestamp).<br>• <strong>10:45 PM:</strong> Returned to Cabin 1 (Verified by electronic door lock).</div>', image:'assets/portrait_philip_1780832251248.png'},
-      {id:'musician',icon:'🎵', name:'Elena Voss',         role:'Grieving Musician',       trait:'Perceptive · Emotional', pitch:1.15, rate:.84, details:'Elena Voss, classical violinist. Perceptive and highly emotional. Investigating the circumstances surrounding her sister\'s sudden withdrawal from an island project.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Left welcome dinner early.<br>• <strong>8:30 PM - 9:45 PM:</strong> Walked along South Cliffs (Witnessed by security patrol officer).<br>• <strong>10:00 PM:</strong> Returned to Cabin 5 (Verified by entrance lock registry).</div>', image:'assets/portrait_vera_1780832238588.png'},
-      {id:'student', icon:'📚', name:'Zara Okonkwo',       role:'Perfectionist Student',   trait:'Detail-Oriented · Anxious', pitch:1.2, rate:.9, details:'Zara Okonkwo, postgraduate research student. Highly anxious, obsessive attention to detail. Searching for unpublished papers from a previous study.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Welcome dinner (Left dining hall at 8:15 PM).<br>• <strong>8:30 PM - 10:30 PM:</strong> In resort Library room reading reference logs (Verified by library surveillance check).<br>• <strong>10:45 PM:</strong> Returned to Cabin 6.</div>', image:'assets/portrait_zara_1781502098030.png'},
-      {id:'comedian',icon:'🎤', name:'Rory Walsh',         role:'Nervous Comedian',        trait:'Quick Wit · Distracted', pitch:1.05, rate:.95, details:'Rory Walsh, stand-up comedian. Anxious and easily startled. Uses comedy to mask panic. Admits to seeing someone near the server room.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Main welcome dinner.<br>• <strong>8:45 PM - 10:30 PM:</strong> Played arcade games in the resort lounge (Verified by high-score server logs).<br>• <strong>10:45 PM:</strong> Returned to Cabin 8.</div>', image:'assets/portrait_rory_1781502120015.png'},
-      {id:'detective',icon:'🔍',name:'Ret. Det. Frank Silva',role:'Retired Detective',     trait:'Sharp · Methodical', pitch:.9, rate:.85, details:'Ret. Det. Frank Silva, investigator. Cynical and extremely observant. Noted suspicious digital server activities prior to the power outage.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:00 PM:</strong> Briefly attended welcome dinner.<br>• <strong>8:15 PM - 10:00 PM:</strong> Checked security perimeter gates (Confirmed by staff radio log).<br>• <strong>10:15 PM:</strong> Returned to Cabin 9 (Verified by security cabin badge logs).</div>', image:'assets/portrait_william_1780832265198.png'}
+  {
+    id: 'narrator',
+    icon: '🔊',
+    name: 'Narrator',
+    role: 'System Broadcaster',
+    trait: 'Omniscient · Guiding',
+    pitch: 1,
+    rate: .9,
+    details: 'The Narrator guides the player through the island, delivering system broadcasts and DASS prompts.',
+    alibi: '',
+    image: 'assets/NARRATOR.png'
+  },
+      {
+        id: 'doctor',
+        icon: '🩺',
+        name: 'Dr. Avery Ross',
+        role: 'Psychologist',
+        trait: 'Intelligent · Empathetic',
+        pitch: 1.1,
+        rate: .86,
+        details: 'Dr. Avery Ross, psychologist. Intelligent, empathetic, she monitored participant profiles. Behind her caring demeanor lies the knowledge that participants were developing severe psychological issues, yet she approved the project\'s continuation to protect her career.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Conducted final participant profile check.<br>• <strong>8:45 PM - Midnight:</strong> Reviewing patient logs in Cabin 3 (Verified by offline log timestamps).</div>',
+        image: 'assets/portrait_emily_1780832277768.png'
+      },
+      {
+        id: 'ceo',
+        icon: '💼',
+        name: 'Marcus Hale',
+        role: 'Security Consultant',
+        trait: 'Calm · Disciplined · Logical',
+        pitch: .95,
+        rate: .92,
+        details: 'Marcus Hale, security consultant. Calm, disciplined, and logical. He was hired to oversee resort safety, but his main role was deleting participant incident reports and complaints before external regulators could investigate Project Echo.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:30 PM:</strong> Patrolling the resort perimeter gates (Claimed, but gate sensors recorded no scans).<br>• <strong>10:45 PM:</strong> Returned to Cabin 1.</div>',
+        image: 'assets/portrait_philip_1780832251248.png'
+      },
+      {
+        id: 'musician',
+        icon: '🎵',
+        name: 'Lena Brooks',
+        role: 'Marine Biologist',
+        trait: 'Friendly · Optimistic',
+        pitch: 1.15,
+        rate: .84,
+        details: 'Lena Brooks, marine biologist. Friendly and optimistic. She secretly stole confidential Echo files intending to expose the project, but later sold a portion of the raw data to a private buyer for financial gain.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Left welcome dinner early.<br>• <strong>8:30 PM - 9:45 PM:</strong> Collecting water samples near South Cliffs (Sector reported completely vacant by patrol logs).<br>• <strong>10:00 PM:</strong> Returned to Cabin 5.</div>',
+        image: 'assets/portrait_vera_1780832238588.png'
+      },
+      {
+        id: 'student',
+        icon: '📚',
+        name: 'Noah Mercer',
+        role: 'Data Analyst',
+        trait: 'Quiet · Withdrawn',
+        pitch: 1.2,
+        rate: .9,
+        details: 'Noah Mercer, data analyst. Quiet and withdrawn. He was originally a participant in the Project Echo trials who suffered severe side effects, and was subsequently hired by the organization to buy his silence.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:30 PM:</strong> Reading system logs in the resort Library (Library was locked early at 9:00 PM).<br>• <strong>10:45 PM:</strong> Returned to Cabin 6.</div>',
+        image: 'assets/portrait_zara_1781502098030.png'
+      },
+      {
+        id: 'comedian',
+        icon: '🎤',
+        name: 'Ethan Cross',
+        role: 'Journalist',
+        trait: 'Charismatic · Competitive',
+        pitch: 1.05,
+        rate: .95,
+        details: 'Ethan Cross, journalist. Charismatic, competitive, and desperate for a scoop. He repeatedly sabotaged Kai\'s previous investigations because Kai always beat him to major stories.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:30 PM:</strong> Interviewing guests in the resort lounge (Security footage shows the lounge was completely empty).<br>• <strong>10:45 PM:</strong> Returned to Cabin 8.</div>',
+        image: 'assets/portrait_rory_1781502120015.png'
+      },
+      {
+        id: 'detective',
+        icon: '🔍',
+        name: 'Oliver Grant',
+        role: 'Software Engineer',
+        trait: 'Introverted · Analytical',
+        pitch: .9,
+        rate: .85,
+        details: 'Oliver Grant, software engineer. Introverted and analytical. He was hired to build the hidden digital surveillance networks that monitored Project Echo participants without their knowledge or consent.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:15 PM - 10:00 PM:</strong> Monitoring server grids in the main office (Office card log showed no entry).<br>• <strong>10:15 PM:</strong> Returned to Cabin 9.</div>',
+        image: 'assets/portrait_william_1780832265198.png'
+      },
+      {
+        id: 'therapist',
+        icon: '🧠',
+        name: 'Maya Singh',
+        role: 'Nurse',
+        trait: 'Caring · Compassionate',
+        pitch: 1.0,
+        rate: .86,
+        details: 'Maya Singh, nurse. Caring and compassionate. Under pressure from project leaders, she falsified clinical participant medical records to hide the severe physiological harm caused by the trials.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:00 PM:</strong> Managing first aid inventory in the Spa (RFID badge logs show exit at 10:17 PM).<br>• <strong>10:30 PM:</strong> Returned to Cabin 4.</div>',
+        image: 'assets/portrait_james_1780832187054.png'
+      },
+      {
+        id: 'gamer',
+        icon: '🎮',
+        name: 'Daniel Price',
+        role: 'Research Assistant',
+        trait: 'Nervous · Obedient',
+        pitch: 1.05,
+        rate: .93,
+        details: 'Daniel Price, research assistant. Nervous and obedient. He manipulated and falsified raw research data logs under orders to make the Project Echo outcomes appear highly successful to investors.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - 10:15 PM:</strong> Auditing registries at the escape vessel dock (Dock log contains no badge scans after 8:30 PM).<br>• <strong>10:30 PM:</strong> Returned to Cabin 10.</div>',
+        image: 'assets/portrait_kai_1780832200618.png'
+      },
+      {
+        id: 'influencer',
+        icon: '📱',
+        name: 'Sarah Bennett',
+        role: 'Investor',
+        trait: 'Confident · Influential',
+        pitch: 1.2,
+        rate: .95,
+        details: 'Sarah Bennett, investor. Confident and highly influential. She put immense pressure on research coordinators to expand the trials and collect more data despite severe safety concerns to protect her capital.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - 9:30 PM:</strong> VIP beach photoshoot (Beach security log shows beach lights were shut off at 9:30 PM).<br>• <strong>9:45 PM:</strong> Returned to Cabin 7.</div>',
+        image: 'assets/portrait_mia_1780832174257.png'
+      }
     ];
 
     const NPCS_BASE = [
-      {id:'rowan', icon:'🛎️', name:'Rowan Ashford', role:'Resort Host · Ex-Researcher', color:'#c4a465', x:'12%', alive:true, speak_pitch:.9, speak_rate:.82, details:'Rowan Ashford, resort host. Ex-Researcher who left the mainland three years ago after a confidential experiment was shut down.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>6:30 PM - 8:00 PM:</strong> Hosted dinner service.<br>• <strong>8:15 PM - 9:30 PM:</strong> Conducted inventory audit in main pantry (Verified by kitchen assistant sign-off sheet).<br>• <strong>10:00 PM:</strong> Closed main office (Verified by office card lock).</div>', image:'assets/portrait_rowan_1780832160368.png'},
-      {id:'mia',   icon:'📱', name:'Mia Lacroix',  role:'Social Media Influencer',     color:'#c0471f', x:'72%', alive:true, speak_pitch:1.2, speak_rate:.95, details:'Mia Lacroix, social media influencer. Perceptive but self-centered, constantly filming. Verified device logs show her phone battery depleted completely at 9:30 PM; no charger was found in her belongings.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM - 8:30 PM:</strong> Took photos at the beach dock.<br>• <strong>9:00 PM - 9:30 PM:</strong> Started livestream from room (Verified by bandwidth spike).<br>• <strong>9:30 PM:</strong> Phone battery died (Zero connection logs or data packets after 9:40 PM).</div>', image:'assets/portrait_mia_1780832174257.png'},
-      {id:'james', icon:'🧠', name:'Dr. James Okoro', role:'Neuropsychologist',        color:'#3a6fbf', x:'22%', alive:true, speak_pitch:1.0, speak_rate:.86, details:'Dr. James Okoro, neuropsychologist. Methodical, strict, researching cognitive degradation under stress. Signed a confidentiality agreement with Rowan Ashford before arriving.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:00 PM:</strong> Spa room meditation session (Verified by Spa electronic lock log).<br>• <strong>10:17 PM:</strong> Returned to Cabin 4 (RFID badge reader recorded entry tap).<br>• <strong>10:20 PM - Midnight:</strong> Offline inside Cabin 4 (No local network traffic).</div>', image:'assets/portrait_james_1780832187054.png'},
-      {id:'kai',   icon:'🎮', name:'Kai Tanaka',   role:'Game Streamer',               color:'#2e9a78', x:'78%', alive:true, speak_pitch:1.05, speak_rate:.93, details:'Kai Tanaka, game streamer. High energy, loves puzzles, mystery games, and exploring off-limit zones.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:45 PM - 8:45 PM:</strong> Explored the beach perimeter.<br>• <strong>9:00 PM - 10:15 PM:</strong> Inventory audit at the escape vessel dock (Verified by digital dock logs).<br>• <strong>10:30 PM:</strong> Returned to Cabin 2 (Verified by cabin access log).</div>', image:'assets/portrait_kai_1780832200618.png'},
-      {id:'sofia', icon:'🍳', name:'Sofia Reyes',  role:'Resort Chef',                 color:'#6a3a9a', x:'50%', alive:true, speak_pitch:1.1, speak_rate:.88, details:'Sofia Reyes, resort chef. Quiet, works long hours in the kitchen. Staff contract shows hire date: May 12, 2026 (1 month ago). Verified kitchen logs show she cleaned stoves until 9:00 PM.', alibi:'<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>May 12, 2026:</strong> Signed 6-month contract.<br>• <strong>7:00 PM - 8:00 PM:</strong> Supervised kitchen dinner service cleanup.<br>• <strong>8:00 PM - 9:00 PM:</strong> Cleaning kitchen stoves (Verified by shift manager log).<br>• <strong>9:15 PM:</strong> Retired to Staff Quarters (Verified by badge reader tap).</div>', image:'assets/portrait_sofia_1780832213248.png'},
+      {
+        id: 'rowan',
+        icon: '🛎️',
+        name: 'Rowan Ashford',
+        role: 'Resort Host & Project Director',
+        color: '#c4a465',
+        x: '12%',
+        alive: true,
+        speak_pitch: .9,
+        speak_rate: .82,
+        details: 'Rowan Ashford, resort host and former Director of Project Echo. He coordinated the trials and shuttered the island facilities three years ago, turning them into a luxury resort to monitor the remaining witnesses.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>6:30 PM - 8:00 PM:</strong> Hosted dinner service.<br>• <strong>8:15 PM - 9:30 PM:</strong> Pantry inventory audit.<br>• <strong>10:00 PM:</strong> Closed main office.</div>',
+        image: 'assets/portrait_rowan_1780832160368.png'
+      },
+      {
+        id: 'rachel',
+        icon: '⚖️',
+        name: 'Rachel Quinn',
+        role: 'Corporate Lawyer',
+        color: '#c0471f',
+        x: '72%',
+        alive: true,
+        speak_pitch: 1.1,
+        speak_rate: .88,
+        details: 'Rachel Quinn, corporate lawyer. Composed and professional. She drafted the legal agreements and strict non-disclosure contracts that prevented the victims of Project Echo from suing the organization.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:15 PM:</strong> Drafting legal files in the resort lobby (Lobby router logs show laptop disconnected after 9:00 PM).<br>• <strong>10:30 PM:</strong> Retired to Cabin 2.</div>',
+        image: 'assets/portrait_sofia_1780832213248.png'
+      },
+      {
+        id: 'keeper',
+        icon: '🔦',
+        name: 'Lighthouse Keeper',
+        role: 'Former Caretaker',
+        color: '#3a6fbf',
+        x: '32%',
+        alive: true,
+        speak_pitch: 0.8,
+        speak_rate: 0.75,
+        details: 'The resort\'s Lighthouse Keeper and former facilities caretaker. He secretly archived Project Echo documents after the facility shut down, storing them in a chest inside the lighthouse.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM:</strong> Welcome dinner brief.<br>• <strong>8:30 PM - 9:30 PM:</strong> Maintenance check at the lighthouse tower.</div>',
+        image: 'assets/portrait_general_1780832290626.png'
+      },
+      {
+        id: 'kai',
+        icon: '✍️',
+        name: 'Kai Nakamura',
+        role: 'Investigative Journalist',
+        color: '#2e9a78',
+        x: '85%',
+        alive: false,
+        speak_pitch: 1.0,
+        speak_rate: 0.9,
+        details: 'Kai Nakamura, investigative journalist (Victim 1). He illegally accessed Project Echo files to expose the trial operators. He was murdered near the shoreline perimeter shortly after arriving.',
+        alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">Deceased. Found on the shoreline at 10:30 PM.</div>',
+        image: 'assets/portrait_general_1780832290626.png'
+      }
     ];
 
     const CHARACTER_META = {
-      doctor: {
-        id: 'doctor',
-        name: 'Dr. Priya Sharma',
-        role: 'Cardiologist',
-        cabin: 'Cabin 3',
-        item: 'Silver Locket',
-        itemClue: 'A silver locket containing customized medical capsules',
-        bonfireClaim: 'reviewing offline patient case records in Cabin 3',
-        bonfireContradiction: 'local file-open timestamp showed no activity during that period',
-        alibiContradiction: 'Cardiologist claimed to be reviewing case records in Cabin 3, but local network files indicate no patient records were accessed.',
-        dossierAlibiSummary: 'Logged into medical portal from Cabin 3 (8:45 PM - 10:15 PM), reviewed case files (10:30 PM - Midnight).'
-      },
       ceo: {
         id: 'ceo',
-        name: 'Marcus Chen',
-        role: 'Tech CEO',
+        name: 'Marcus Hale',
+        role: 'Security Consultant',
         cabin: 'Cabin 1',
-        item: 'Military Medal',
-        itemClue: 'A corporate leadership medal with tech CEO credentials',
-        bonfireClaim: 'returned to Cabin 1 at 10:45 PM',
-        bonfireContradiction: 'electronic door lock registered no entry until 11:30 PM',
-        alibiContradiction: 'Tech CEO claimed to have returned to Cabin 1 at 10:45 PM, but electronic lock records show no door entry until 11:30 PM.',
-        dossierAlibiSummary: 'Sent 14 emails from lobby lounge (8:45 PM - 10:30 PM), returned to Cabin 1 at 10:45 PM.'
+        item: 'Tactical Flashlight',
+        itemClue: 'A professional tactical flashlight matching the Security Consultant\'s gear',
+        bonfireClaim: 'patrolling the resort perimeter gates until 10:30 PM',
+        bonfireContradiction: 'perimeter gate electronic sensor recorded no badge scans that night',
+        alibiContradiction: 'Security Consultant claimed to have patrolled the gates, but the gate sensors recorded no scans.',
+        dossierAlibiSummary: 'Patrolled perimeter (8:30 PM - 10:30 PM), returned to Cabin 1 (10:45 PM).',
+        secret: 'Deleted participant complaints and incident reports before regulators could investigate Project Echo.',
+        motive: 'Kai discovered evidence linking him to the cover-up.'
       },
-      musician: {
-        id: 'musician',
-        name: 'Elena Voss',
-        role: 'Musician',
-        cabin: 'Cabin 5',
-        item: 'Wooden Cross',
-        itemClue: 'A wooden cross necklace registered to Cabin 5',
-        bonfireClaim: 'walked along South Cliffs until 9:45 PM',
-        bonfireContradiction: 'security patrol log reported South Cliffs were empty after 9:00 PM',
-        alibiContradiction: 'Musician claimed she walked along the South Cliffs, but security patrols saw no one in the sector after 9:00 PM.',
-        dossierAlibiSummary: 'Walked along South Cliffs (8:30 PM - 9:45 PM), returned to Cabin 5 at 10:00 PM.'
+      doctor: {
+        id: 'doctor',
+        name: 'Dr. Avery Ross',
+        role: 'Psychologist',
+        cabin: 'Cabin 3',
+        item: 'Clinical Notepad',
+        itemClue: 'A clinical notepad with psychologist handwriting',
+        bonfireClaim: 'reviewing patient psychological logs in Cabin 3 until midnight',
+        bonfireContradiction: 'local network file-open timestamps showed no patient data was accessed',
+        alibiContradiction: 'Psychologist claimed to be reviewing case files in Cabin 3, but local network files indicate no patient records were accessed.',
+        dossierAlibiSummary: 'Conducted sessions (8:00 PM), reviewed patient logs in Cabin 3 (8:45 PM - Midnight).',
+        secret: 'Knew participants were developing severe psychological issues but approved continuation of the project.',
+        motive: 'Kai possessed documents proving her negligence.'
       },
       student: {
         id: 'student',
-        name: 'Zara Okonkwo',
-        role: 'Student',
+        name: 'Noah Mercer',
+        role: 'Data Analyst',
         cabin: 'Cabin 6',
-        item: 'Magnifying Glass',
-        itemClue: 'A student\'s magnifying glass left in Cabin 7',
-        bonfireClaim: 'in resort Library reading reference logs until 10:30 PM',
-        bonfireContradiction: 'library surveillance log confirms the library closed at 9:00 PM',
-        alibiContradiction: 'Student claimed she was in the Library reading reference logs, but surveillance checks show the library was locked early at 9:00 PM.',
-        dossierAlibiSummary: 'In resort Library reading reference logs (8:30 PM - 10:30 PM), returned to Cabin 6 at 10:45 PM.'
+        item: 'Encrypted USB Drive',
+        itemClue: 'An encrypted USB drive containing raw data archives',
+        bonfireClaim: 'analyzing server activity logs in the Library until 10:30 PM',
+        bonfireContradiction: 'library surveillance log confirms the room closed early at 9:00 PM',
+        alibiContradiction: 'Data Analyst claimed he was in the Library reading logs, but surveillance shows the room closed early at 9:00 PM.',
+        dossierAlibiSummary: 'In Library reading server logs (8:30 PM - 10:30 PM), returned to Cabin 6 at 10:45 PM.',
+        secret: 'Was originally a Project Echo participant and later hired to keep him from speaking publicly.',
+        motive: 'Kai knew Noah\'s entire history with the project.'
+      },
+      musician: {
+        id: 'musician',
+        name: 'Lena Brooks',
+        role: 'Marine Biologist',
+        cabin: 'Cabin 5',
+        item: 'Water Sampler',
+        itemClue: 'A water sampling vial registered to Cabin 5',
+        bonfireClaim: 'taking tide pool samples at South Cliffs until 9:45 PM',
+        bonfireContradiction: 'coastal patrol logs reported the South Cliffs sector was completely vacant',
+        alibiContradiction: 'Marine Biologist claimed she was collecting tide samples, but patrol logs confirm South Cliffs were vacant after 9:00 PM.',
+        dossierAlibiSummary: 'Left welcome dinner early (8:00 PM), South Cliffs (8:30 PM - 9:45 PM), Cabin 5 (10:00 PM).',
+        secret: 'Stole confidential Echo files intending to expose the project, but secretly sold part of the data.',
+        motive: 'Kai uncovered the illegal sale.'
+      },
+      rachel: {
+        id: 'rachel',
+        name: 'Rachel Quinn',
+        role: 'Corporate Lawyer',
+        cabin: 'Cabin 2',
+        item: 'Legal Briefcase',
+        itemClue: 'A locked leather briefcase with corporate legal branding',
+        bonfireClaim: 'drafting settlement agreements in the resort lobby until 10:15 PM',
+        bonfireContradiction: 'lobby router records show her laptop was disconnected after 9:00 PM',
+        alibiContradiction: 'Corporate Lawyer claimed she was drafting agreements in the lobby, but router logs show her device went offline at 9:00 PM.',
+        dossierAlibiSummary: 'Attended welcome dinner (7:30 PM), worked in lobby (8:45 PM - 10:15 PM), retired to Cabin 2 (10:30 PM).',
+        secret: 'Drafted legal agreements that prevented victims from suing Project Echo.',
+        motive: 'Kai was preparing to expose her role in protecting the organization.'
       },
       comedian: {
         id: 'comedian',
-        name: 'Rory Walsh',
-        role: 'Comedian',
+        name: 'Ethan Cross',
+        role: 'Journalist',
         cabin: 'Cabin 8',
-        item: 'Old Compass',
-        itemClue: 'An old brass compass matching Cabin 8\'s inventory',
-        bonfireClaim: 'played arcade games in the resort lounge until 10:30 PM',
-        bonfireContradiction: 'high-score server logs recorded no game activity that evening',
-        alibiContradiction: 'Comedian claimed he played arcade games in the lounge, but lounge high-score logs showed zero system activity.',
-        dossierAlibiSummary: 'Played arcade games in resort lounge (8:45 PM - 10:30 PM), returned to Cabin 8 at 10:45 PM.'
+        item: 'Voice Recorder',
+        itemClue: 'A digital voice recorder containing audio notes',
+        bonfireClaim: 'interviewing guests in the resort lounge until 10:30 PM',
+        bonfireContradiction: 'resort security cameras recorded the lounge as empty after 9:30 PM',
+        alibiContradiction: 'Journalist claimed he was interviewing guests in the lounge, but security footage shows the lounge was completely empty after 9:30 PM.',
+        dossierAlibiSummary: 'Dinner (7:30 PM), guest interviews in resort lounge (8:45 PM - 10:30 PM), Cabin 8 (10:45 PM).',
+        secret: 'Sabotaged Kai\'s previous investigations because Kai repeatedly got major stories first.',
+        motive: 'Kai\'s final exposé would permanently damage Ethan\'s career.'
+      },
+      therapist: {
+        id: 'therapist',
+        name: 'Maya Singh',
+        role: 'Nurse',
+        cabin: 'Cabin 4',
+        item: 'First Aid Kit',
+        itemClue: 'A medical first aid kit containing falsified records',
+        bonfireClaim: 'organizing medical inventory in the Spa until midnight',
+        bonfireContradiction: 'Spa RFID badge reader registered an exit tap at 10:17 PM',
+        alibiContradiction: 'Nurse claimed she was managing medical inventory in the Spa, but badge logs show she exited at 10:17 PM.',
+        dossierAlibiSummary: 'Spa inventory management (8:30 PM - 10:00 PM), exited Spa (10:17 PM), Cabin 4 (10:30 PM).',
+        secret: 'Falsified participant medical records after being pressured by project leaders.',
+        motive: 'Kai obtained copies of the original records.'
       },
       detective: {
         id: 'detective',
-        name: 'Ret. Det. Frank Silva',
-        role: 'Retired Detective',
+        name: 'Oliver Grant',
+        role: 'Software Engineer',
         cabin: 'Cabin 9',
-        item: 'Military Medal',
-        itemClue: 'A police service medal belonging to the occupant of Cabin 9',
-        bonfireClaim: 'checked security perimeter gates until 10:00 PM',
-        bonfireContradiction: 'staff radio log showed no communications or movement at the gates',
-        alibiContradiction: 'Retired Detective claimed he was checking perimeter gates at 9:00 PM, but security gate badge records show no patrol activity.',
-        dossierAlibiSummary: 'Checked security perimeter gates (8:15 PM - 10:00 PM), returned to Cabin 9 at 10:15 PM.'
+        item: 'Network Sniffer',
+        itemClue: 'A compact network sniffer device matching Cabin 9',
+        bonfireClaim: 'monitoring server power grids from the main office until 10:00 PM',
+        bonfireContradiction: 'office lock logs recorded no badge entries between 8:00 PM and 10:30 PM',
+        alibiContradiction: 'Software Engineer claimed he was monitoring grids in the office, but card logs show the room was empty.',
+        dossierAlibiSummary: 'Checked server rooms (8:15 PM), monitored power grids (8:30 PM - 10:00 PM), Cabin 9 (10:15 PM).',
+        secret: 'Built hidden monitoring systems that tracked participants without their consent.',
+        motive: 'Kai traced the surveillance system back to Oliver.'
       },
-      rowan: {
-        id: 'rowan',
-        name: 'Rowan Ashford',
-        role: 'Resort Host',
-        cabin: 'Office',
-        item: 'Wine Glass',
-        itemClue: 'A dirty wine glass matching the resort host\'s dining inventory',
-        bonfireClaim: 'checking room bookings from 8:15 PM',
-        bonfireContradiction: 'office card lock log was completely inactive during that hour',
-        alibiContradiction: 'Resort Host claimed he was checking room bookings in the office at 8:15 PM, but office card lock registers show the room was empty.',
-        dossierAlibiSummary: 'Hosted dinner service (6:30 PM - 8:00 PM), audited pantry inventory (8:15 PM - 9:30 PM), closed office at 10:00 PM.'
+      gamer: {
+        id: 'gamer',
+        name: 'Daniel Price',
+        role: 'Research Assistant',
+        cabin: 'Cabin 10',
+        item: 'Lab Logbook',
+        itemClue: 'A research lab logbook with edited data tables',
+        bonfireClaim: 'auditing the escape vessel dock logs until 10:15 PM',
+        bonfireContradiction: 'digital dock access registries recorded no logins after 8:30 PM',
+        alibiContradiction: 'Research Assistant claimed he audited the dock logs, but access registries show no logins after 8:30 PM.',
+        dossierAlibiSummary: 'Resort perimeter walk (7:45 PM), dock audit (9:00 PM - 10:15 PM), Cabin 10 (10:30 PM).',
+        secret: 'Manipulated research data to make Project Echo appear successful.',
+        motive: 'Kai discovered the original data archives.'
       },
-      mia: {
-        id: 'mia',
-        name: 'Mia Lacroix',
-        role: 'Influencer',
-        cabin: 'Cabin 2',
-        item: 'Perfume Bottle',
-        itemClue: 'A custom perfume bottle registered to the social media influencer',
-        bonfireClaim: 'live streaming the whole night until 11:30 PM',
-        bonfireContradiction: 'device analytics show her phone battery died at 9:30 PM',
-        alibiContradiction: 'Influencer claimed she was live streaming until 11:30 PM, but router logs show her phone battery died at 9:30 PM.',
-        dossierAlibiSummary: 'Took photos at beach (7:30 PM - 8:30 PM), started livestream (9:00 PM - 9:30 PM), phone died at 9:30 PM.'
-      },
-      james: {
-        id: 'james',
-        name: 'Dr. James Okoro',
-        role: 'Neuropsychologist',
-        cabin: 'Cabin 4',
-        item: 'Hidden Notebook',
-        itemClue: 'A clinical research notebook matching the Neuropsychologist\'s signature',
-        bonfireClaim: 'stayed there straight until midnight',
-        bonfireContradiction: 'spa electronic RFID lock recorded exit at 10:17 PM',
-        alibiContradiction: 'Neuropsychologist claimed he stayed in the spa room meditating until midnight, but electronic locks show he left at 10:17 PM.',
-        dossierAlibiSummary: 'Spa room meditation (8:30 PM - 10:00 PM), returned to Cabin 4 at 10:17 PM (RFID tap).'
-      },
-      sofia: {
-        id: 'sofia',
-        name: 'Sofia Reyes',
-        role: 'Resort Chef',
-        cabin: 'Staff Quarters',
-        item: 'Mystery Novel',
-        itemClue: 'A mystery novel belonging to the resort chef',
-        bonfireClaim: 'working at this resort three years ago',
-        bonfireContradiction: 'personnel files show her contract was signed only one month ago',
-        alibiContradiction: 'Resort Chef claimed she worked at the resort for three years, but payroll records show she signed her contract last month.',
-        dossierAlibiSummary: 'Signed 6-month contract on May 12, 2026. Cleaned stoves until 9:00 PM, retired to Staff Quarters at 9:15 PM.'
+      influencer: {
+        id: 'influencer',
+        name: 'Sarah Bennett',
+        role: 'Investor',
+        cabin: 'Cabin 7',
+        item: 'Diamond Ring',
+        itemClue: 'A high-value diamond ring registered to the resort investor',
+        bonfireClaim: 'attending the VIP beach photoshoot until 11:30 PM',
+        bonfireContradiction: 'beach security logs confirm the photography lights were shut off at 9:30 PM',
+        alibiContradiction: 'Investor claimed she was at the beach photoshoot, but security logs show the beach was closed at 9:30 PM.',
+        dossierAlibiSummary: 'Took photos at beach (7:30 PM - 8:30 PM), VIP photoshoot (9:00 PM - 9:30 PM), Cabin 7 (9:45 PM).',
+        secret: 'Pressured researchers to collect more data despite safety concerns to protect her investment.',
+        motive: 'Kai planned to expose her financial involvement.'
       }
     };
 
     function getMemoryFragment(idx) {
-      const murdererId = GS.murderer || 'rowan';
-      const meta = CHARACTER_META[murdererId] || CHARACTER_META.rowan;
+      const murdererId = GS.murderer || 'ceo';
+      const meta = CHARACTER_META[murdererId] || CHARACTER_META.ceo;
       
       const list = [
         // Module 1 (The Shoreline)
         {
-          text: `"This wasn't supposed to happen.\nWe only agreed to collect data. ${meta.name} was never supposed to find out."\n\n[Voice recording. Speaker unknown. Dated: 3 years ago.]`,
-          clue: `The murder is connected to a past experiment. ${meta.name} is connected to the project.`
+          text: `"This wasn't supposed to happen.\nWe only agreed to collect data. ${meta.name} was never supposed to find out."\n\n[Beach audio recorder log. Speaker unknown. Dated: 3 years ago.]`,
+          clue: `The victim, Kai Nakamura, discovered that ${meta.name} was connected to the Project Echo cover-up.`
         },
         // Module 2 (The Lighthouse)
         {
-          text: `"Meeting moved to private channel.\nNobody else can know.\n—Dr. Okoro / R. Ashford"\n\n[Encrypted email fragment. Surnames decrypted.]`,
-          clue: `Dr. James Okoro and Rowan Ashford were secretly communicating before arriving on Elaris.`
+          text: `"The archives are hidden safe in the lighthouse. The Caretaker is keeping them secure. Nobody else must know."\n\n[Decrypted journal entry. Dated: 1 year ago.]`,
+          clue: `The Lighthouse Keeper secretly maintained a hidden archive of Project Echo documents, linking to ${meta.name}'s past.`
         },
         // Module 3 (Cabin 7)
         {
@@ -2734,33 +3066,33 @@
         },
         // Module 5 (Lost Baggage)
         {
-          text: `"[Baggage search report]\n\nA folder of historical documents was found hidden in the luggage of ${meta.name}. It contains clinical trial blueprints from 3 years ago and a layout of the island's server room."`,
-          clue: `${meta.name} is carrying blueprints and documentation of Project Echo.`
+          text: `"[Baggage search report]\n\nA folder of historical documents was found hidden in the luggage of ${meta.name}. It contains clinical trial blueprints and a detailed layout of the island's server room."`,
+          clue: `${meta.name} was carrying server blueprints and suppressed clinical trial records.`
         },
         // Module 6 (The Forest Trail)
         {
-          text: `"[Security footage: 3:14 AM. A figure matching the build of ${meta.name} is seen deleting files from the data server. The monitor displays: PROJECT ECHO — PARTICIPANT DATA.]"`,
+          text: `"[Security footage: 3:14 AM. A user logged in as ${meta.name} is seen deleting files from the data server. The monitor displays: PROJECT ECHO — ARCHIVE CLEAR.]"`,
           clue: `${meta.name} was seen deleting Project Echo files from the server room at 3:14 AM.`
         },
         // Module 7 (Evidence Challenge)
         {
-          text: `"If the ECHO data gets out, we're finished. Ashford, Okoro, all of us. Not just the ones who ran the tests."\n\n[Decrypted audio log belonging to ${window._testEvidenceName || 'Dr. Priya Sharma'} from the server room database.]`,
-          clue: `The decrypted timeline log belonging to ${window._testEvidenceName || 'Dr. Priya Sharma'} is connected to Project Echo.`
+          text: `"If the truth about the secret gets out, we're finished. Marcus, Avery, all of us. Not just the ones who ran the tests."\n\n[Decrypted control room audio log belonging to ${meta.name}.]`,
+          clue: `Surveillance logs decrypt to expose ${meta.name}'s secret: ${meta.secret}`
         },
         // Module 8 (CCTV Reconstruction)
         {
-          text: `"[Boardroom CCTV Reconstruction]\n\nAt 11:00 PM, a meeting took place in the boardroom. The footage clearly shows ${meta.name} present, despite their alibi claiming they were alone in their quarters."`,
+          text: `"[Boardroom CCTV Reconstruction]\n\nAt 11:00 PM, a meeting took place in the boardroom. The footage clearly shows ${meta.name} present, contradicting their alibi."`,
           clue: `CCTV footage places ${meta.name} in the boardroom at 11:00 PM, contradicting their alibi.`
         },
         // Module 9 (The Storm Shelter)
         {
-          text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed. Study was never published.'\n\n[Signed: Rowan Ashford (Director), Dr. James Okoro (Lead Neuropsychologist), and ${window._testStormName || 'Sofia Reyes'} (Consultant)]"`,
-          clue: `${window._testStormName || 'Sofia Reyes'} is documented in the Project Echo report.`
+          text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed.'\n\n[Suppress-Signatures: Rowan Ashford (Director), Dr. Avery Ross, and ${meta.name} (Consultant)]"`,
+          clue: `${meta.name} is documented as an operator in the suppressed Project Echo report.`
         },
         // Module 10 (The Dock / Pathfinder)
         {
           text: `'"I came back to destroy the evidence. But when I saw who else was here — I realized the evidence is them."\n\n[Final voice recording recovered from the victim\'s recorder. Voice analysis indicates the speaker matches: ${meta.name}.]'`,
-          clue: `${meta.name} returned to silence the witnesses of Project Echo.`
+          clue: `${meta.name} killed Kai Nakamura because: ${meta.motive}`
         }
       ];
       return list[idx];
@@ -2821,84 +3153,409 @@
 
     // ─ CHARACTER RENDERING ────────────────────────────────────────
     function makeSVGChar(npc, speaking=false) {
+      if (npc.id === 'narrator') {
+        return `<img class="char-svg" src="assets/NARRATOR.png" style="filter: drop-shadow(0 0 32px rgba(100,160,255,0.75)) drop-shadow(0 8px 16px rgba(0,0,0,0.5));" />`;
+      }
+      if (npc.id === 'ceo') {
+        return `<img class="char-svg" src="assets/MARCUS-HALE-FIGURINE.png" />`;
+      }
+      if (npc.id === 'doctor') {
+        return `<img class="char-svg" src="assets/AVERY-ROSS-FIGURINE.png" />`;
+      }
+      if (npc.id === 'musician') {
+        return `<img class="char-svg" src="assets/LENA-BROOKS-FIGURINE.png" />`;
+      }
+      if (npc.id === 'rachel') {
+        return `<img class="char-svg" src="assets/RACHEL-FIGURINE.png" />`;
+      }
+      if (npc.id === 'comedian') {
+        return `<img class="char-svg" src="assets/ETHAN-FIGURINE.png" />`;
+      }
+      if (npc.id === 'therapist') {
+        return `<img class="char-svg" src="assets/MAYA-SINGH-FIGURINE.png" />`;
+      }
+      if (npc.id === 'detective') {
+        return `<img class="char-svg" src="assets/OLIVER-GRANT-FIGURINE.png" />`;
+      }
+      if (npc.id === 'gamer') {
+        return `<img class="char-svg" src="assets/DANIEL-PRICE-FIGURINE.png" />`;
+      }
+      if (npc.id === 'influencer') {
+        return `<img class="char-svg" src="assets/SARAH-BENNETT-FIGURINE.png" />`;
+      }
+      if (npc.id === 'kai') {
+        return `<img class="char-svg" src="assets/KAI-NAKAMURA-FIGURINE.png" />`;
+      }
+      if (npc.id === 'student') {
+        return `<img class="char-svg" src="assets/NOAH-MERCER-FIGURINE.png" />`;
+      }
+
       const c = npc.color || '#c4a465';
       const lipAnim = speaking ? 'class="lip-anim"' : '';
+      const stroke = '#2c221a';
+
+      // Default values
+      let hairColor1 = '#4a3520', hairColor2 = '#2a1e12';
+      let clothColor1 = c, clothColor2 = '#2a1a0f';
+      let legColor = '#2a2622', shoeColor = '#1a1816';
       
       let hair = '';
       let clothes = '';
-      let skin = '#ffe0cc'; // Nostalgic, warmer skin
-      let stroke = '#4a3b32'; // Soft warm outline
-      
+      let extra = '';
+
+      // Skin tone defaults
+      const skinTones = {
+        doctor:     { light: '#fbe3d6', dark: '#d59b80' },
+        ceo:        { light: '#f5d0b9', dark: '#c38b6c' },
+        musician:   { light: '#ecd2c1', dark: '#b5836a' },
+        student:    { light: '#f3d0bc', dark: '#be886b' },
+        rachel:     { light: '#fadcce', dark: '#c78f77' },
+        comedian:   { light: '#f5d5be', dark: '#c08b6a' },
+        therapist:  { light: '#e0a98c', dark: '#9e6b4e' },
+        detective:  { light: '#eed2be', dark: '#ba886a' },
+        gamer:      { light: '#fae6d9', dark: '#cca283' },
+        influencer: { light: '#f9dfd0', dark: '#c59278' },
+        rowan:      { light: '#fbe0d1', dark: '#cda087' },
+        keeper:     { light: '#f5cbac', dark: '#c28e67' },
+        kai:        { light: '#fcd6c0', dark: '#cfa183' }
+      };
+      const tone = skinTones[npc.id] || { light: '#fcd5b8', dark: '#e09f7a' };
+      const skinLight = tone.light;
+      const skinDark = tone.dark;
+
       if (npc.id === 'rowan') {
-        hair = `<path d="M 25 50 Q 25 25 50 25 Q 75 25 75 50 Z" fill="#e6d5c3" stroke="${stroke}" stroke-width="2"/><path d="M 30 35 Q 50 25 70 35" fill="none" stroke="#d4c0ab" stroke-width="2"/>`;
-        clothes = `<path d="M 30 85 L 35 120 L 65 120 L 70 85 Z" fill="#4a5d4e" stroke="${stroke}" stroke-width="2"/><path d="M 25 120 L 75 120 L 75 130 L 25 130 Z" fill="#e0dac8" stroke="${stroke}" stroke-width="2"/>`;
-      } else if (npc.id === 'mia') {
-        hair = `<path d="M 20 60 Q 20 20 50 20 Q 80 20 80 60 Q 80 80 70 80 Q 75 60 50 30 Q 25 60 30 80 Q 20 80 20 60 Z" fill="#4a2522" stroke="${stroke}" stroke-width="2"/>`;
-        clothes = `<path d="M 35 85 L 30 130 L 70 130 L 65 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 40 85 L 50 110 L 60 85 Z" fill="#fff" stroke="${stroke}" stroke-width="1.5"/>`;
-      } else if (npc.id === 'james') {
-        hair = `<path d="M 25 45 Q 25 25 50 25 Q 75 25 75 45 Q 70 35 50 35 Q 30 35 25 45 Z" fill="#3a3a3a" stroke="${stroke}" stroke-width="2"/>`;
-        clothes = `<path d="M 32 85 L 35 130 L 65 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><circle cx="42" cy="55" r="7" fill="none" stroke="${stroke}" stroke-width="1.5"/><circle cx="58" cy="55" r="7" fill="none" stroke="${stroke}" stroke-width="1.5"/><line x1="49" y1="55" x2="51" y2="55" stroke="${stroke}" stroke-width="1.5"/>`;
+        hairColor1 = '#fcfcfc'; hairColor2 = '#a0a3ad';
+        clothColor1 = '#285e3a'; clothColor2 = '#103019';
+        legColor = '#3a3a40'; shoeColor = '#222120';
+        hair = `<path d="M 24 50 Q 24 22 50 20 Q 76 22 76 50 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <path d="M 32 35 Q 50 25 68 35" fill="none" stroke="#cfd2d6" stroke-width="1.5"/>`;
+        clothes = `<!-- White shirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#ffffff" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Green Vest side panels -->
+          <path d="M 30 81 L 43 81 L 46 122 L 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 70 81 L 57 81 L 54 122 L 72 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
+        extra = `<!-- Golden bowtie -->
+          <path d="M 44 82 L 56 86 L 56 82 L 44 86 Z" fill="#d4af37" stroke="${stroke}" stroke-width="1"/>
+          <circle cx="50" cy="84" r="2" fill="#b59020"/>`;
+      } else if (npc.id === 'doctor') {
+        hairColor1 = '#fae093'; hairColor2 = '#a88632';
+        clothColor1 = '#9b1c31'; clothColor2 = '#490714';
+        legColor = '#2a2023'; shoeColor = '#181013';
+        hair = `<path d="M 20 54 Q 18 20 50 18 Q 82 20 80 54 Q 80 65 72 65 Q 65 32 50 32 Q 35 32 28 65 Q 20 65 20 54 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <path d="M 35 32 Q 50 24 65 32" fill="none" stroke="#eed182" stroke-width="2"/>`;
+        clothes = `<!-- White shirt -->
+          <path d="M 40 80 L 50 95 L 60 80 Z" fill="#ffffff" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Blazer body -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Lapels -->
+          <path d="M 30 80 L 45 105 L 50 122 M 70 80 L 55 105 L 50 122" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 30 80 L 40 92 M 70 80 L 60 92" fill="none" stroke="${stroke}" stroke-width="1.5"/>`;
+        extra = `<ellipse cx="36" cy="56" rx="9" ry="8" fill="none" stroke="url(#metalSilverGrad_${npc.id})" stroke-width="1.5"/>
+                 <ellipse cx="64" cy="56" rx="9" ry="8" fill="none" stroke="url(#metalSilverGrad_${npc.id})" stroke-width="1.5"/>
+                 <line x1="45" y1="56" x2="55" y2="56" stroke="url(#metalSilverGrad_${npc.id})" stroke-width="1.5"/>`;
+      } else if (npc.id === 'ceo') {
+        hairColor1 = '#8a909a'; hairColor2 = '#4a505a';
+        clothColor1 = '#2d3748'; clothColor2 = '#131924';
+        legColor = '#1a1a1a'; shoeColor = '#111111';
+        hair = `<path d="M 26 44 Q 30 22 50 20 Q 70 22 74 44 Q 50 36 26 44 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
+        clothes = `<!-- Grey shirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#4a5568" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Tactical vest -->
+          <path d="M 32 84 L 68 84 L 70 120 L 30 120 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Straps -->
+          <rect x="35" y="80" width="7" height="15" fill="#1a202c" stroke="${stroke}" stroke-width="1.2"/>
+          <rect x="58" y="80" width="7" height="15" fill="#1a202c" stroke="${stroke}" stroke-width="1.2"/>
+          <!-- Pocket details -->
+          <rect x="36" y="98" width="9" height="10" rx="1" fill="#1a202c" stroke="${stroke}" stroke-width="1"/>
+          <rect x="55" y="98" width="9" height="10" rx="1" fill="#1a202c" stroke="${stroke}" stroke-width="1"/>`;
+        extra = `<path d="M 37 87 L 42 85 L 47 87 L 45 93 L 42 96 L 39 93 Z" fill="url(#metalSilverGrad_${npc.id})" stroke="#1a202c" stroke-width="1"/>`;
+      } else if (npc.id === 'musician') {
+        hairColor1 = '#4a2c1b'; hairColor2 = '#23120a';
+        clothColor1 = '#1e6865'; clothColor2 = '#0d3b39';
+        legColor = '#70583b'; shoeColor = '#3a2b16';
+        hair = `<path d="M 22 50 Q 18 15 50 15 Q 82 15 78 50 Q 84 75 75 92 Q 70 58 50 32 Q 30 58 25 92 Q 16 75 22 50 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <path d="M 28 50 C 24 60 26 75 28 85 M 72 50 C 76 60 74 75 72 85" fill="none" stroke="${stroke}" stroke-width="1"/>`;
+        clothes = `<!-- Yellow undershirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#ebaa42" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Teal field vest -->
+          <path d="M 33 86 L 45 86 L 45 120 L 31 120 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 67 86 L 55 86 L 55 120 L 69 120 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Pockets -->
+          <rect x="34" y="98" width="8" height="8" rx="1" fill="#0f3d38" stroke="${stroke}" stroke-width="1"/>
+          <rect x="58" y="98" width="8" height="8" rx="1" fill="#0f3d38" stroke="${stroke}" stroke-width="1"/>`;
+      } else if (npc.id === 'student') {
+        hairColor1 = '#3d2516'; hairColor2 = '#1f1008';
+        clothColor1 = '#4a4a4a'; clothColor2 = '#232323';
+        legColor = '#2b446a'; shoeColor = '#1f2e46';
+        hair = `<path d="M 24 48 Q 20 22 50 20 Q 80 22 76 48 Q 70 36 50 36 Q 30 36 24 48 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <path d="M 36 34 L 40 45 L 45 35 M 64 34 L 60 45 L 55 35" fill="none" stroke="${stroke}" stroke-width="1.2"/>`;
+        clothes = `<!-- Hoodie body -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Hoodie pocket pouch -->
+          <path d="M 36 104 L 64 104 L 67 121 L 33 121 Z" fill="#2d2d2d" stroke="${stroke}" stroke-width="1.2"/>
+          <!-- Drawstrings -->
+          <path d="M 46 88 L 46 104 M 54 88 L 54 104" stroke="#d6d6d6" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Hoodie collar wrap -->
+          <path d="M 34 80 Q 50 92 66 80 Q 50 74 34 80" fill="#2d2d2d" stroke="${stroke}" stroke-width="1.5"/>`;
+      } else if (npc.id === 'rachel') {
+        hairColor1 = '#222222'; hairColor2 = '#0d0d0d';
+        clothColor1 = '#262626'; clothColor2 = '#121212';
+        legColor = '#1f1f1f'; shoeColor = '#111111';
+        hair = `<!-- Bun on top -->
+          <circle cx="50" cy="20" r="10" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 23 52 Q 22 25 50 25 Q 78 25 77 52 Q 72 40 50 40 Q 28 40 23 52 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
+        clothes = `<!-- White collared shirt -->
+          <path d="M 38 80 L 50 98 L 62 80 Z" fill="#ffffff" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Red Tie -->
+          <path d="M 48 85 L 52 85 L 53 105 L 50 112 L 47 105 Z" fill="#8c1c1c" stroke="${stroke}" stroke-width="1"/>
+          <!-- Suit Jacket -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Lapels -->
+          <path d="M 30 80 L 44 102 L 50 122 L 56 102 L 70 80" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 30 80 L 40 92 L 38 80 M 70 80 L 60 92 L 62 80" fill="none" stroke="${stroke}" stroke-width="1.2"/>`;
+      } else if (npc.id === 'comedian') {
+        hairColor1 = '#e9c277'; hairColor2 = '#a27e3d';
+        clothColor1 = '#315a80'; clothColor2 = '#19324c';
+        legColor = '#3a3e47'; shoeColor = '#1e2025';
+        hair = `<path d="M 24 46 Q 20 20 50 18 Q 80 20 76 46 Q 68 36 50 36 Q 32 36 24 46 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <!-- Spiky pieces -->
+                <path d="M 28 26 L 24 16 L 34 22 L 42 12 L 48 20 L 58 10 L 62 20 L 72 14 L 70 26" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.2"/>`;
+        clothes = `<!-- Light shirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#e2e8f0" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Denim jacket open -->
+          <path d="M 30 80 L 44 80 L 42 122 L 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 70 80 L 56 80 L 58 122 L 72 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Collar folds -->
+          <path d="M 30 80 L 38 90 L 44 80" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.2"/>
+          <path d="M 70 80 L 62 90 L 56 80" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.2"/>`;
+      } else if (npc.id === 'therapist') {
+        hairColor1 = '#3a271c'; hairColor2 = '#1a100a';
+        clothColor1 = '#207e7b'; clothColor2 = '#0e4947';
+        legColor = '#4a928e'; shoeColor = '#ffffff';
+        hair = `<!-- Bun on top -->
+          <circle cx="50" cy="22" r="9" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 24 50 Q 22 25 50 25 Q 78 25 76 50 Q 68 38 50 38 Q 32 38 24 50 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
+        clothes = `<!-- Scrubs base -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- V-neck skin showing -->
+          <path d="M 38 80 L 50 93 L 62 80 Z" fill="url(#skinGrad_${npc.id})" stroke="none"/>
+          <!-- V-neck lines -->
+          <path d="M 36 80 L 50 95 L 64 80" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Pocket with red cross -->
+          <rect x="34" y="96" width="10" height="10" rx="1" fill="#155553" stroke="${stroke}" stroke-width="1"/>
+          <line x1="39" y1="99" x2="39" y2="103" stroke="#e53e3e" stroke-width="1.2"/>
+          <line x1="37" y1="101" x2="41" y2="101" stroke="#e53e3e" stroke-width="1.2"/>`;
+      } else if (npc.id === 'detective') {
+        hairColor1 = '#5c6068'; hairColor2 = '#303339';
+        clothColor1 = '#4c2e68'; clothColor2 = '#231233';
+        legColor = '#2c2b33'; shoeColor = '#18171c';
+        hair = `<path d="M 24 46 Q 20 22 50 20 Q 80 22 76 46 Q 68 36 50 36 Q 32 36 24 46 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
+        clothes = `<path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 44 80 Q 50 86 56 80" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+          <line x1="50" y1="82" x2="50" y2="120" stroke="${stroke}" stroke-width="1" stroke-dasharray="3,3"/>`;
+        extra = `<!-- Headphone band around neck -->
+          <path d="M 38 74 Q 50 82 62 74" fill="none" stroke="#1a202c" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- Ear cups resting on shoulders -->
+          <rect x="34" y="68" width="6" height="12" rx="2" fill="#1a202c" stroke="${stroke}" stroke-width="1"/>
+          <rect x="60" y="68" width="6" height="12" rx="2" fill="#1a202c" stroke="${stroke}" stroke-width="1"/>`;
+      } else if (npc.id === 'gamer') {
+        hairColor1 = '#4a3020'; hairColor2 = '#21130a';
+        clothColor1 = '#f7f5f0'; clothColor2 = '#cbd5e0';
+        legColor = '#25354e'; shoeColor = '#18202b';
+        hair = `<path d="M 23 48 Q 20 24 50 22 Q 80 24 77 48 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <path d="M 26 38 Q 40 32 50 36 M 50 36 Q 60 32 74 38" fill="none" stroke="${stroke}" stroke-width="1.2"/>`;
+        clothes = `<!-- Grey shirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#4a5568" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Lab coat open -->
+          <path d="M 30 80 L 44 80 L 40 122 L 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 70 80 L 56 80 L 60 122 L 72 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Flaps -->
+          <rect x="31" y="102" width="7" height="9" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>
+          <rect x="62" y="102" width="7" height="9" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>`;
+        extra = `<path d="M 44 80 L 50 102 L 56 80" fill="none" stroke="#e53e3e" stroke-width="1.2"/>
+          <rect x="47" y="102" width="6" height="8" rx="0.5" fill="#fcfcfc" stroke="${stroke}" stroke-width="0.5"/>
+          <rect x="48" y="103" width="4" height="2" fill="#e53e3e"/>`;
+      } else if (npc.id === 'influencer') {
+        hairColor1 = '#ffd269'; hairColor2 = '#bc8b20';
+        clothColor1 = '#e0537f'; clothColor2 = '#871a3d';
+        legColor = '#e0537f'; shoeColor = '#ffd700';
+        hair = `<path d="M 22 52 Q 18 15 50 15 Q 82 15 78 52 Q 84 75 75 88 Q 72 55 50 30 Q 28 55 25 88 Q 16 75 22 52 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <circle cx="21" cy="45" r="4.5" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>
+                <circle cx="23" cy="62" r="5" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>
+                <circle cx="79" cy="45" r="4.5" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>
+                <circle cx="77" cy="62" r="5" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1"/>`;
+        clothes = `<!-- Rose pink dress base -->
+          <path d="M 32 80 L 68 80 L 74 122 L 26 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Sweetheart neckline -->
+          <path d="M 32 80 Q 40 88 50 85 Q 60 88 68 80" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Dress inner skin area -->
+          <path d="M 32 80 Q 40 88 50 85 Q 60 88 68 80 L 68 80 L 32 80 Z" fill="url(#skinGrad_${npc.id})" stroke="none"/>`;
+        extra = `<!-- Gold necklace -->
+          <path d="M 40 76 Q 50 86 60 76" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+          <circle cx="50" cy="86" r="2.5" fill="#e53e3e" stroke="#d4af37" stroke-width="0.5"/>`;
+      } else if (npc.id === 'keeper') {
+        hairColor1 = '#f7f7f7'; hairColor2 = '#b8bac2';
+        clothColor1 = '#f7c325'; clothColor2 = '#a37905';
+        legColor = '#3d2d23'; shoeColor = '#1d1510';
+        hair = `<path d="M 28 42 Q 50 14 72 42 Z" fill="#cca421" stroke="${stroke}" stroke-width="1.5"/>
+                <ellipse cx="50" cy="20" r="3.5" fill="#b0881b"/>`;
+        clothes = `<!-- Yellow Rain Slicker -->
+          <path d="M 28 80 Q 50 78 72 80 L 74 122 Q 50 125 26 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <line x1="50" y1="80" x2="50" y2="122" stroke="#5a460b" stroke-width="2"/>
+          <rect x="46" y="90" width="8" height="2.5" rx="1" fill="#3d2c00" stroke="${stroke}" stroke-width="0.5"/>
+          <rect x="46" y="102" width="8" height="2.5" rx="1" fill="#3d2c00" stroke="${stroke}" stroke-width="0.5"/>`;
+        extra = `<!-- Beard -->
+          <path d="M 28 62 Q 50 92 72 62 Q 50 75 28 62 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>`;
       } else if (npc.id === 'kai') {
-        hair = `<path d="M 25 55 Q 20 20 50 20 Q 80 20 75 55 Q 65 35 50 35 Q 35 35 25 55 Z" fill="#2a2c33" stroke="${stroke}" stroke-width="2"/><path d="M 18 45 A 8 15 0 0 0 28 45 Z" fill="#e84545" stroke="${stroke}" stroke-width="2"/><path d="M 72 45 A 8 15 0 0 1 82 45 Z" fill="#e84545" stroke="${stroke}" stroke-width="2"/><path d="M 23 35 Q 50 10 77 35" fill="none" stroke="#444" stroke-width="4"/>`;
-        clothes = `<path d="M 30 80 Q 25 100 30 130 L 70 130 Q 75 100 70 80 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 40 95 L 60 95 L 50 110 Z" fill="rgba(255,255,255,0.2)"/>`;
-      } else if (npc.id === 'sofia') {
-        hair = `<circle cx="50" cy="25" r="12" fill="#6a4a3a" stroke="${stroke}" stroke-width="2"/><path d="M 25 50 Q 25 20 50 20 Q 75 20 75 50 Z" fill="#6a4a3a" stroke="${stroke}" stroke-width="2"/>`;
-        clothes = `<path d="M 32 85 L 32 130 L 68 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/><path d="M 35 100 L 35 130 L 65 130 L 65 100 Z" fill="#fff" stroke="${stroke}" stroke-width="2"/>`;
-      } else {
-        hair = `<path d="M 25 50 Q 25 25 50 25 Q 75 25 75 50 Z" fill="#4a3520" stroke="${stroke}" stroke-width="2"/>`;
-        clothes = `<path d="M 32 85 L 35 130 L 65 130 L 68 85 Z" fill="${c}" stroke="${stroke}" stroke-width="2"/>`;
+        hairColor1 = '#3a2b22'; hairColor2 = '#1c130e';
+        clothColor1 = '#e53e3e'; clothColor2 = '#741b1b';
+        legColor = '#2a2622'; shoeColor = '#1a1816';
+        hair = `<path d="M 24 50 Q 24 22 50 20 Q 76 22 76 50 Z" fill="url(#hairGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+                <!-- Headband -->
+                <path d="M 22 38 Q 50 35 78 38 L 77 43 Q 50 40 23 43 Z" fill="#c53030" stroke="${stroke}" stroke-width="1"/>`;
+        clothes = `<!-- Black undershirt -->
+          <path d="M 30 80 Q 50 78 70 80 L 72 122 Q 50 125 28 122 Z" fill="#1a202c" stroke="${stroke}" stroke-width="1.5"/>
+          <!-- Red jacket open -->
+          <path d="M 30 80 L 44 80 L 42 122 L 28 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <path d="M 70 80 L 56 80 L 58 122 L 72 122 Z" fill="url(#clothGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+          <line x1="50" y1="84" x2="50" y2="122" stroke="#d6d6d6" stroke-width="1.5"/>`;
+        extra = `<!-- Camera Strap -->
+          <path d="M 30 80 L 72 122" fill="none" stroke="#2d3748" stroke-width="3" stroke-linecap="round"/>
+          <rect x="60" y="108" width="10" height="7" rx="1" fill="#1a202c" stroke="${stroke}" stroke-width="1" transform="rotate(15, 65, 111)"/>
+          <circle cx="65" cy="111" r="2" fill="url(#metalSilverGrad_${npc.id})"/>`;
+      }
+
+      let mouth = `<path d="M 46 68 Q 50 71 54 68" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round"/>`;
+      if (speaking) {
+        mouth = `<ellipse cx="50" cy="69" rx="3.5" ry="2" fill="#802010" stroke="${stroke}" stroke-width="1"/>`;
       }
 
       return `<svg class="char-svg" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-        <defs><radialGradient id="bg${npc.id}" cx="50%" cy="50%"><stop offset="0%" stop-color="${c}" stop-opacity=".4"/><stop offset="100%" stop-color="${c}" stop-opacity="0"/></radialGradient></defs>
+        <defs>
+          <style>
+            .lip-anim {
+              animation: talk 0.22s infinite alternate ease-in-out;
+              transform-origin: 50px 69px;
+            }
+            @keyframes talk {
+              0% { transform: scaleY(0.4); }
+              100% { transform: scaleY(1.4); }
+            }
+          </style>
+          <!-- Background shadow glow radial gradient -->
+          <radialGradient id="bg${npc.id}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${c}" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="${c}" stop-opacity="0"/>
+          </radialGradient>
+          
+          <!-- Skin gradient -->
+          <linearGradient id="skinGrad_${npc.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${skinLight}"/>
+            <stop offset="100%" stop-color="${skinDark}"/>
+          </linearGradient>
+          
+          <!-- Hair gradient -->
+          <linearGradient id="hairGrad_${npc.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${hairColor1}"/>
+            <stop offset="100%" stop-color="${hairColor2}"/>
+          </linearGradient>
+          
+          <!-- Cloth gradient -->
+          <linearGradient id="clothGrad_${npc.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${clothColor1}"/>
+            <stop offset="100%" stop-color="${clothColor2}"/>
+          </linearGradient>
+          
+          <!-- Pedestal Gold gradients -->
+          <linearGradient id="pedestalBaseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4a361a"/>
+            <stop offset="25%" stop-color="#d4af37"/>
+            <stop offset="50%" stop-color="#fff6cc"/>
+            <stop offset="75%" stop-color="#aa8010"/>
+            <stop offset="100%" stop-color="#4a361a"/>
+          </linearGradient>
+          
+          <linearGradient id="pedestalTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffe875"/>
+            <stop offset="100%" stop-color="#9a7200"/>
+          </linearGradient>
+          
+          <radialGradient id="pedestalInnerGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#403010"/>
+            <stop offset="100%" stop-color="#1c1404"/>
+          </radialGradient>
+
+          <!-- Metal Silver -->
+          <linearGradient id="metalSilverGrad_${npc.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="50%" stop-color="#a0a5ad"/>
+            <stop offset="100%" stop-color="#404348"/>
+          </linearGradient>
+        </defs>
         
-        <!-- Floor Shadow -->
-        <ellipse cx="50" cy="145" rx="35" ry="10" fill="url(#bg${npc.id})"/>
-        <ellipse cx="50" cy="145" rx="20" ry="6" fill="rgba(0,0,0,0.3)"/>
+        <!-- Floor Shadow under base -->
+        <ellipse cx="50" cy="151" rx="36" ry="8" fill="rgba(0,0,0,0.4)" />
+
+        <!-- Pedestal Base (metallic/gold board game piece style) -->
+        <path d="M 12 142 L 12 147 C 12 153, 88 153, 88 147 L 88 142 Z" fill="url(#pedestalBaseGrad)" stroke="#1a120a" stroke-width="1.5"/>
+        <ellipse cx="50" cy="142" rx="38" ry="9" fill="url(#pedestalTopGrad)" stroke="#4a361a" stroke-width="1.2"/>
+        <ellipse cx="50" cy="142" rx="34" ry="7" fill="url(#pedestalInnerGrad)"/>
 
         <!-- Legs -->
-        <rect x="38" y="125" width="8" height="20" rx="3" fill="#3a2b22" stroke="${stroke}" stroke-width="2"/>
-        <rect x="54" y="125" width="8" height="20" rx="3" fill="#3a2b22" stroke="${stroke}" stroke-width="2"/>
+        <rect x="38" y="121" width="9" height="22" rx="2" fill="${legColor}" stroke="${stroke}" stroke-width="1.5"/>
+        <rect x="53" y="121" width="9" height="22" rx="2" fill="${legColor}" stroke="${stroke}" stroke-width="1.5"/>
         <!-- Shoes -->
-        <ellipse cx="42" cy="145" rx="8" ry="6" fill="#221a15" stroke="${stroke}" stroke-width="2"/>
-        <ellipse cx="58" cy="145" rx="8" ry="6" fill="#221a15" stroke="${stroke}" stroke-width="2"/>
+        <ellipse cx="42" cy="141" rx="7" ry="4" fill="${shoeColor}" stroke="${stroke}" stroke-width="1.5"/>
+        <ellipse cx="58" cy="141" rx="7" ry="4" fill="${shoeColor}" stroke="${stroke}" stroke-width="1.5"/>
 
-        <!-- Body Base (Clothes) -->
+        <!-- Torso / Clothes base -->
         ${clothes}
 
         <!-- Arms Outline -->
         <path d="M 32 85 Q 18 100 24 120" fill="none" stroke="${stroke}" stroke-width="14" stroke-linecap="round"/>
         <path d="M 68 85 Q 82 100 76 120" fill="none" stroke="${stroke}" stroke-width="14" stroke-linecap="round"/>
-        <!-- Arms Fill -->
-        <path d="M 32 85 Q 18 100 24 120" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-        <path d="M 68 85 Q 82 100 76 120" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+        <!-- Arms Fill (styled with clothing gradient) -->
+        <path d="M 32 85 Q 18 100 24 120" fill="none" stroke="url(#clothGrad_${npc.id})" stroke-width="10" stroke-linecap="round"/>
+        <path d="M 68 85 Q 82 100 76 120" fill="none" stroke="url(#clothGrad_${npc.id})" stroke-width="10" stroke-linecap="round"/>
 
         <!-- Hands -->
-        <circle cx="24" cy="120" r="7" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
-        <circle cx="76" cy="120" r="7" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+        <circle cx="24" cy="120" r="7" fill="url(#skinGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+        <circle cx="76" cy="120" r="7" fill="url(#skinGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
 
         <!-- Neck -->
-        <rect x="44" y="75" width="12" height="15" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+        <rect x="44" y="72" width="12" height="15" fill="url(#skinGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
+        <!-- Neck Shadow -->
+        <rect x="44" y="72" width="12" height="6" fill="rgba(0,0,0,0.18)"/>
 
         <!-- Head Base -->
-        <ellipse cx="50" cy="55" rx="32" ry="28" fill="${skin}" stroke="${stroke}" stroke-width="2"/>
+        <ellipse cx="50" cy="55" rx="30" ry="26" fill="url(#skinGrad_${npc.id})" stroke="${stroke}" stroke-width="1.5"/>
         
         <!-- Blush -->
-        <ellipse cx="28" cy="62" rx="5" ry="3" fill="#ff8a8a" opacity="0.45"/>
-        <ellipse cx="72" cy="62" rx="5" ry="3" fill="#ff8a8a" opacity="0.45"/>
+        <ellipse cx="30" cy="62" rx="4.5" ry="2.5" fill="#ff7a7a" opacity="0.35"/>
+        <ellipse cx="70" cy="62" rx="4.5" ry="2.5" fill="#ff7a7a" opacity="0.35"/>
 
-        <!-- Eyes (Big Chibi Eyes) -->
-        <ellipse cx="33" cy="55" rx="4.5" ry="6" fill="#1a1510"/>
-        <ellipse cx="67" cy="55" rx="4.5" ry="6" fill="#1a1510"/>
-        <circle cx="34" cy="53" r="1.5" fill="#fff"/>
-        <circle cx="68" cy="53" r="1.5" fill="#fff"/>
+        <!-- Eyes (Expressive Chibi Eyes) -->
+        <ellipse cx="35" cy="56" rx="4.5" ry="6" fill="#1b1510"/>
+        <ellipse cx="65" cy="56" rx="4.5" ry="6" fill="#1b1510"/>
+        <circle cx="36" cy="54" r="1.5" fill="#ffffff"/>
+        <circle cx="66" cy="54" r="1.5" fill="#ffffff"/>
 
         <!-- Mouth & Lip Sync Anim -->
-        <path d="M 46 68 Q 50 71 54 68" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round"/>
-        <g ${lipAnim}><rect x="46" y="69" width="8" height="3" rx="1.5" fill="${speaking?'#c0471f':'transparent'}"/></g>
+        <g ${lipAnim}>
+          ${mouth}
+        </g>
+        
+        <!-- Extra decorations (badges, glasses, beards) -->
+        ${extra}
 
         <!-- Hair Overlay -->
         ${hair}
+
+        <!-- Plastic figurine glossy highlight highlights (Toy finish) -->
+        <!-- Head shine -->
+        <path d="M 28 42 A 20 20 0 0 1 50 32" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.15"/>
+        <!-- Torso shine -->
+        <path d="M 33 88 L 33 115" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.12"/>
       </svg>`;
     }
 
@@ -2925,8 +3582,7 @@
       });
 
       const bubble = message ? `<div class="char-bubble"><span class="char-name">${npc.name}</span>${message}</div>` : '';
-      const portraitImg = npc.image || 'assets/portrait_general_1780832290626.png';
-      const innerContent = bubble + `<img class="char-sketch-img" src="${portraitImg}" style="width: 140px; height: 160px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));" onerror="this.src='assets/portrait_general_1780832290626.png'">`;
+      const innerContent = bubble + makeSVGChar(npc, speak);
 
       if (wrap) {
         // Cancel any pending removal timeout
@@ -2937,26 +3593,16 @@
         // Update content (like dialogue bubble)
         wrap.innerHTML = innerContent;
         wrap.classList.add('enter');
-        if (!npc.x) {
-          wrap.style.transform = 'translate(-50%, 0)';
-        }
         activeChars[npcId] = wrap;
       } else {
         // Create new
         wrap = document.createElement('div');
         wrap.className = `char-wrap char-wrap-${npcId}`;
-        wrap.style.left = npc.x || '50%';
-        if (!npc.x) {
-          wrap.style.transform = 'translate(-50%, 180px)';
-        }
         wrap.innerHTML = innerContent;
         stage.appendChild(wrap);
         activeChars[npcId] = wrap;
         
         requestAnimationFrame(() => {
-          if (!npc.x) {
-            wrap.style.transform = 'translate(-50%, 0)';
-          }
           wrap.classList.add('enter');
         });
       }
@@ -3282,16 +3928,17 @@
             let hintText = m.hint;
             if (id === 'sc-room') {
               const killerHints = {
-                doctor: "Clue: The intruder item was likely left by someone with clinical medical access. Check for customized medical capsules.",
-                ceo: "Clue: The intruder item belongs to a high-ranking corporate leader. Check for elite awards or decorations.",
-                musician: "Clue: The intruder item is a spiritual or personal keepsake from Cabin 5.",
-                student: "Clue: The intruder item is a tool used for inspecting close details, belonging to a student.",
-                comedian: "Clue: The intruder item is an old brass direction finder, potentially dropped by someone easily startled.",
-                detective: "Clue: The intruder item is a service award belonging to a retired investigator.",
-                rowan: "Clue: The intruder item was likely dropped by someone managing the resort's guest hosting or dining inventory. Check for glassware.",
-                mia: "Clue: The intruder item belongs to a high-profile influencer obsessed with luxury cosmetics and accessories. Check for a beauty item.",
-                james: "Clue: The intruder item belongs to a researcher who keeps methodical logs. Check for personal records.",
-                sofia: "Clue: The intruder item belongs to someone who reads fictional case logs or recipes in their spare kitchen hours."
+                doctor: "Clue: The intruder item is a silver locket, possibly dropped by the psychologist.",
+                ceo: "Clue: The intruder item is an elite service medal belonging to the security consultant.",
+                musician: "Clue: The intruder item is a wooden cross keepsake, potentially dropped by the marine biologist.",
+                student: "Clue: The intruder item is a magnifying glass used for inspecting fine details, belonging to the data analyst.",
+                comedian: "Clue: The intruder item is an old brass compass direction finder, potentially dropped by the journalist.",
+                detective: "Clue: The intruder item is a service medal, potentially dropped by the software engineer.",
+                rowan: "Clue: The intruder item is a wine glass, likely dropped by the resort host.",
+                influencer: "Clue: The intruder item is a perfume bottle, belonging to the investor.",
+                therapist: "Clue: The intruder item is a notebook with research logs, belonging to the nurse.",
+                rachel: "Clue: The intruder item is a mystery novel, belonging to the corporate lawyer.",
+                gamer: "Clue: The intruder item is a notebook with research logs, belonging to the research assistant."
               };
               hintText = killerHints[GS.murderer] || m.hint;
             }
@@ -3323,7 +3970,11 @@
       }
       
       const user = JSON.parse(userJson);
-      const matchedIdentity = IDENTITIES.find(i => i.id === user.identity);
+      // Support matching 'academic' from phq9.html to 'student' in game.html
+      const userIdentityId = user.identity === 'academic' ? 'student' : user.identity;
+      GS.playerIdentity = userIdentityId;
+      
+      const matchedIdentity = IDENTITIES.find(i => i.id === userIdentityId);
       if (matchedIdentity) {
         GS.playerName = user.name || user.username || matchedIdentity.name;
         GS.playerRole = matchedIdentity.role;
@@ -3335,20 +3986,43 @@
       }
       
       GS.npcs = JSON.parse(JSON.stringify(NPCS_BASE));
-      const potentialMurderers = [...IDENTITIES, ...NPCS_BASE].filter(c => c.id !== 'kai' && c.id !== user.identity);
+      
+      // Select randomized killer (excluding player, rowan, keeper, kai)
+      const potentialMurderers = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+        c.id !== 'kai' && 
+        c.id !== 'keeper' && 
+        c.id !== 'rowan' && 
+        c.id !== userIdentityId
+      );
       GS.murderer = potentialMurderers[Math.floor(Math.random()*potentialMurderers.length)].id;
+      
+      // Select randomized bonfire victim (excluding player, killer, rowan, keeper, kai)
+      const potentialBonfireVictims = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+        c.id !== 'kai' && 
+        c.id !== 'keeper' && 
+        c.id !== 'rowan' && 
+        c.id !== userIdentityId && 
+        c.id !== GS.murderer
+      );
+      GS.bonfireVictim = potentialBonfireVictims[Math.floor(Math.random()*potentialBonfireVictims.length)].id;
       GS.victim = 'kai';
       
-      // Let Rowan Ashford greet the player
+      // Ensure keeper is alive and kai is dead at start
+      const keeper = GS.npcs.find(n => n.id === 'keeper');
+      if (keeper) keeper.alive = true;
+      const kai = GS.npcs.find(n => n.id === 'kai');
+      if (kai) kai.alive = false;
+      
+      // Narrator greets the player
       showScreen('sc-narrative');
-      showDialog('Rowan Ashford',
-        `Welcome to Elaris Island, ${GS.playerName}. The weekend is designed to help you relax. Tell me... are you ready to board?`,
+      showDialog('Narrator',
+        `Welcome to Elaris Island, ${GS.playerName}. Every detail of this weekend has been arranged. The island holds secrets older than its guests.\n\nAre you ready to step ashore?`,
         [
           { text: "Yes, I am ready", cb: startGame },
           { text: "No, I need a moment", cb: resetToHome }
         ],
         null,
-        'rowan'
+        'narrator'
       );
     }
 
@@ -3392,13 +4066,13 @@
     function playNarrativeIntro() {
       showScreen('sc-narrative');
       const lines = [
-        { npc:'rowan', text:'Welcome to Elaris. I designed every detail of this weekend myself.\nYou deserve to escape the weight you\'ve been carrying.' },
-        { npc:'sofia', text:'The kitchen is open all hours. Please — eat, rest. Whatever you need.\nThe island has a way of… revealing things about a person.' },
-        { npc:'james', text:'Forgive me if I seem distracted.\nI keep feeling as if I\'ve been here before.' },
-        { npc:'mia',   text:'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.' },
+        { npc:'narrator', text:'Welcome to Elaris. Every detail of this weekend has been arranged.\nThe island holds secrets older than its guests.' },
+        { npc:'rachel', text:'The kitchen is open all hours. Please — eat, rest. Whatever you need.\nThe island has a way of… revealing things about a person.' },
+        { npc:'therapist', text:'Forgive me if I seem distracted.\nI keep feeling as if I\'ve been here before.' },
+        { npc:'influencer',   text:'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.' },
         { npc:null,    text:'That night — the lights cut out.\n\nA projector ignited. Text burned across the wall:', projector:true, projtext:'ONE OF YOU CAME HERE TO DISAPPEAR FOREVER.' },
-        { npc:'rowan', text:'A scream from the pool. Kai Tanaka — dead.\nThe storm has destroyed the radio. The only boat is gone.\n\nNobody leaves this island.' },
-        { npc:'rowan', text:'Truth is sealed in records.\nEach step yields a hidden envelope.\nUncover all ten evidence envelopes.' },
+        { npc:'narrator', text:'A scream from the pool. Kai Nakamura — dead.\nThe storm has destroyed the radio. The only boat is gone.\n\nNobody leaves this island.' },
+        { npc:'narrator', text:'Truth is sealed in records.\nEach step yields a hidden envelope.\nUncover all ten evidence envelopes.' },
       ];
       let i=0;
       function nextLine() {
@@ -3473,8 +4147,16 @@
       // Clean transition: return to the narrative scene backdrop for the briefing dialog
       showScreen('sc-narrative');
 
-      // Pre-game NPC briefing
-      const briefNPC = NPCS_BASE[idx % NPCS_BASE.length];
+      // Pre-game NPC briefing: select an alive NPC/suspect (excluding player and dead victims)
+      const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+      const userIdentityId = user.identity === 'academic' ? 'student' : user.identity;
+      const aliveNPCs = [...IDENTITIES, ...GS.npcs].filter(c => 
+        c.id !== userIdentityId && 
+        c.id !== 'kai' && 
+        c.alive !== false
+      );
+      // Select Rowan or another alive suspect
+      const briefNPC = aliveNPCs[idx % aliveNPCs.length] || NPCS_BASE.find(n => n.id === 'rowan');
 
       showDialog(briefNPC.name,
         `${m.intro}\n\nYou need to go to the ${m.loc}. Stay sharp.`,
@@ -3520,6 +4202,18 @@
       if(games[id]) games[id]();
     }
 
+    // Helper to mark a character deceased in all state models
+    function markDeceased(npcId) {
+      const npcInGS = GS.npcs.find(n => n.id === npcId);
+      if (npcInGS) npcInGS.alive = false;
+      const npcInBase = NPCS_BASE.find(n => n.id === npcId);
+      if (npcInBase) npcInBase.alive = false;
+      const npcInIdentities = IDENTITIES.find(i => i.id === npcId);
+      if (npcInIdentities) npcInIdentities.alive = false;
+      const npcInDossier = dossierList.find(c => c.id === npcId);
+      if (npcInDossier) npcInDossier.alive = false;
+    }
+
     function onModuleComplete(score, rt, correct) {
       GS.gameActive = false;
       // Instantly freeze pointer events on the active screen to prevent extra clicks during transition
@@ -3537,23 +4231,48 @@
       SFX.success();
       saveProgress();
 
-      // Reveal fragment
-      revealFragment(GS.moduleIdx, correct, ()=>{
-        // Mid-game twist after fragment 5
-        if(GS.moduleIdx===4){
-          showMidgameTwist(()=>runModule(GS.moduleIdx+1));
-        } else {
-          runModule(GS.moduleIdx+1);
-        }
-      });
+      const proceed = () => {
+        revealFragment(GS.moduleIdx, correct, () => {
+          // Mid-game twist after fragment 5 (index 4)
+          if(GS.moduleIdx===4){
+            showMidgameTwist(()=>runModule(GS.moduleIdx+1));
+          } else {
+            runModule(GS.moduleIdx+1);
+          }
+        });
+      };
+
+      // Deceased Progression Triggers
+      if (GS.moduleIdx === 1) { // Module 2 (Lighthouse) completes
+        markDeceased('keeper');
+        showScreen('sc-narrative');
+        showDialog('Narrator',
+          'ALERT: A sudden radio broadcast cuts through the wind. A search party has found the Lighthouse Keeper lifeless at the bottom of the spiral stairs. The secret archive has been compromised.',
+          null,
+          proceed,
+          'narrator'
+        );
+      } else if (GS.moduleIdx === 3) { // Module 4 (Bonfire) completes
+        markDeceased(GS.bonfireVictim);
+        const victimNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.bonfireVictim);
+        const victimName = victimNPC ? victimNPC.name : 'one of the suspects';
+        showScreen('sc-narrative');
+        showDialog('Narrator',
+          `ALERT: The bonfire dies down to cold embers. Suddenly, a cry of terror rings out. ${victimName} lies dead on the beach, poisoned. The liar who knew the truth has been silenced.`,
+          null,
+          proceed,
+          'narrator'
+        );
+      } else {
+        proceed();
+      }
     }
 
     function showMidgameTwist(cb) {
       showScreen('sc-narrative');
-      const rowan = GS.npcs.find(n=>n.id==='rowan');
-      showDialog('Rowan Ashford',
+      showDialog('Narrator',
         'Every envelope so far contains the same date.\nThree years ago. Exactly.\nThis isn\'t a random crime.\nSomething happened on this island three years ago.\nAnd every person here was part of it.',
-        null, cb, 'rowan'
+        null, cb, 'narrator'
       );
     }
 
@@ -3874,9 +4593,10 @@ function finishBeach(t) {
     comedian: 'compass',
     detective: 'medal',
     rowan: 'wine',
-    mia: 'perfume',
-    james: 'notebook',
-    sofia: 'novel'
+    influencer: 'perfume',
+    therapist: 'notebook',
+    rachel: 'novel',
+    gamer: 'notebook'
   };
   const targetId = killerIntruderMap[GS.murderer] || 'wine';
   const intruderIdx = items.findIndex(item => item.id === targetId);
@@ -3990,118 +4710,118 @@ function finishBeach(t) {
 // ─ GAME 4: BONFIRE ────────────────────────────────────────────
     function startBonfire(){
       const scenes = {
-        doctor: {
-          npc: 'Dr. Priya Sharma',
-          dialogue: '"I briefly attended the welcome dinner. After that, I returned to my room and was reviewing offline patient case records in Cabin 3 from 10:30 PM straight through until midnight."',
-          correct: 'reviewing offline patient case records in Cabin 3',
-          opts: [
-            'briefly attended the welcome dinner',
-            'reviewing offline patient case records in Cabin 3',
-            'returned to my room',
-            'straight through until midnight'
-          ]
-        },
         ceo: {
-          npc: 'Marcus Chen',
-          dialogue: '"I spent the evening emailing and returned to Cabin 1 at 10:45 PM. I stayed inside my cabin for the rest of the night."',
-          correct: 'returned to Cabin 1 at 10:45 PM',
+          npc: 'Marcus Hale',
+          dialogue: '"I kept watch over the island. I was patrolling the resort perimeter gates until 10:30 PM. I returned to my cabin straight after that."',
+          correct: 'patrolling the resort perimeter gates until 10:30 PM',
           opts: [
-            'spent the evening emailing',
-            'returned to Cabin 1 at 10:45 PM',
-            'stayed inside my cabin',
-            'rest of the night'
+            'kept watch over the island',
+            'patrolling the resort perimeter gates until 10:30 PM',
+            'returned to my cabin',
+            'straight after that'
           ]
         },
-        musician: {
-          npc: 'Elena Voss',
-          dialogue: '"I left the dinner early and walked along South Cliffs until 9:45 PM. I saw the security officer while walking near the cliffs."',
-          correct: 'walked along South Cliffs until 9:45 PM',
+        doctor: {
+          npc: 'Dr. Avery Ross',
+          dialogue: '"I stayed inside my room reviewing patient psychological logs in Cabin 3 until midnight. I wanted to complete my trial reviews before the storm hit."',
+          correct: 'reviewing patient psychological logs in Cabin 3 until midnight',
           opts: [
-            'left the dinner early',
-            'walked along South Cliffs until 9:45 PM',
-            'security officer while walking',
-            'near the cliffs'
+            'stayed inside my room',
+            'reviewing patient psychological logs in Cabin 3 until midnight',
+            'complete my trial reviews',
+            'before the storm hit'
           ]
         },
         student: {
-          npc: 'Zara Okonkwo',
-          dialogue: '"I left the welcome dinner at 8:15 PM and was in the resort Library reading reference logs until 10:30 PM. Then I walked straight back to my cabin."',
-          correct: 'in the resort Library reading reference logs until 10:30 PM',
+          npc: 'Noah Mercer',
+          dialogue: '"I needed quiet, so I was analyzing server activity logs in the Library until 10:30 PM. Then I walked back to Cabin 6 under the heavy rain."',
+          correct: 'analyzing server activity logs in the Library until 10:30 PM',
           opts: [
-            'left the welcome dinner',
-            'in the resort Library reading reference logs until 10:30 PM',
-            'walked straight back',
-            'to my cabin'
+            'needed quiet',
+            'analyzing server activity logs in the Library until 10:30 PM',
+            'walked back to Cabin 6',
+            'under the heavy rain'
+          ]
+        },
+        musician: {
+          npc: 'Lena Brooks',
+          dialogue: '"I was taking tide pool samples at South Cliffs until 9:45 PM. I wanted to record the baseline readings before the tidal surge ruined the data."',
+          correct: 'taking tide pool samples at South Cliffs until 9:45 PM',
+          opts: [
+            'wanted to record baseline',
+            'taking tide pool samples at South Cliffs until 9:45 PM',
+            'before tidal surge ruined',
+            'ruined the data'
+          ]
+        },
+        rachel: {
+          npc: 'Rachel Quinn',
+          dialogue: '"I stayed busy drafting settlement agreements in the resort lobby until 10:15 PM. I needed a stable internet link to fetch the templates."',
+          correct: 'drafting settlement agreements in the resort lobby until 10:15 PM',
+          opts: [
+            'stayed busy',
+            'drafting settlement agreements in the resort lobby until 10:15 PM',
+            'stable internet link',
+            'fetch the templates'
           ]
         },
         comedian: {
-          npc: 'Rory Walsh',
-          dialogue: '"I left the dinner and played arcade games in the resort lounge until 10:30 PM. I got the high score on the machine."',
-          correct: 'played arcade games in the resort lounge until 10:30 PM',
+          npc: 'Ethan Cross',
+          dialogue: '"I spent the evening interviewing guests in the resort lounge until 10:30 PM. I gathered some good quotes about the pilot project background."',
+          correct: 'interviewing guests in the resort lounge until 10:30 PM',
           opts: [
-            'left the dinner',
-            'played arcade games in the resort lounge until 10:30 PM',
-            'high score on the machine',
-            'in the resort lounge'
+            'spent the evening',
+            'interviewing guests in the resort lounge until 10:30 PM',
+            'good quotes',
+            'pilot project background'
+          ]
+        },
+        therapist: {
+          npc: 'Maya Singh',
+          dialogue: '"I was organizing medical inventory in the Spa until midnight. The emergency supplies needed to be categorized in case the storm knocked out main power."',
+          correct: 'organizing medical inventory in the Spa until midnight',
+          opts: [
+            'Spa until midnight',
+            'organizing medical inventory in the Spa until midnight',
+            'emergency supplies needed',
+            'storm knocked out'
           ]
         },
         detective: {
-          npc: 'Ret. Det. Frank Silva',
-          dialogue: '"I briefly attended the dinner and checked security perimeter gates until 10:00 PM. Everything was clear when I finished my sweep."',
-          correct: 'checked security perimeter gates until 10:00 PM',
+          npc: 'Oliver Grant',
+          dialogue: '"I sat in the office monitoring server power grids from the main office until 10:00 PM. The grid was showing minor spikes, but nothing critical."',
+          correct: 'monitoring server power grids from the main office until 10:00 PM',
           opts: [
-            'briefly attended the dinner',
-            'checked security perimeter gates until 10:00 PM',
-            'Everything was clear',
-            'finished my sweep'
+            'sat in the office',
+            'monitoring server power grids from the main office until 10:00 PM',
+            'minor spikes',
+            'nothing critical'
           ]
         },
-        rowan: {
-          npc: 'Rowan Ashford',
-          dialogue: '"I hosted the dinner service until 8:00 PM. After that, I was working in the main office checking room bookings from 8:15 PM until I locked up at 10:00 PM."',
-          correct: 'checking room bookings from 8:15 PM',
+        gamer: {
+          npc: 'Daniel Price',
+          dialogue: '"I conducted audits down at the beach. I was auditing the escape vessel dock logs until 10:15 PM. The dock locks were functioning normally."',
+          correct: 'auditing the escape vessel dock logs until 10:15 PM',
           opts: [
-            'hosted the dinner service',
-            'checking room bookings from 8:15 PM',
-            'locked up at 10:00 PM',
-            'working in the main office'
+            'beach perimeter',
+            'auditing the escape vessel dock logs until 10:15 PM',
+            'dock locks',
+            'functioning normally'
           ]
         },
-        mia: {
-          npc: 'Mia Lacroix',
-          dialogue: '"I was in my bedroom and started my live stream at 9:00 PM. My fans saw me live streaming the whole night until 11:30 PM when the storm hit."',
-          correct: 'live streaming the whole night until 11:30 PM',
+        influencer: {
+          npc: 'Sarah Bennett',
+          dialogue: '"I had a photo shoot scheduled. I was attending the VIP beach photoshoot until 11:30 PM. The storm ruined most of the outdoor camera shots."',
+          correct: 'attending the VIP beach photoshoot until 11:30 PM',
           opts: [
-            'started my live stream at 9:00 PM',
-            'live streaming the whole night until 11:30 PM',
-            'when the storm hit',
-            'in my bedroom'
-          ]
-        },
-        james: {
-          npc: 'Dr. James Okoro',
-          dialogue: '"I was meditating in the spa room until late. In fact, I stayed there straight until midnight to clear my head, and went straight back to my cabin afterwards without talking to anyone."',
-          correct: 'stayed there straight until midnight',
-          opts: [
-            'meditating in the spa room',
-            'stayed there straight until midnight',
-            'went straight back to my cabin',
-            'without talking to anyone'
-          ]
-        },
-        sofia: {
-          npc: 'Sofia Reyes',
-          dialogue: '"I cleaned the kitchen stoves after dinner. It is a routine I have done every single night since I started working at this resort three years ago. I went to bed early after that."',
-          correct: 'working at this resort three years ago',
-          opts: [
-            'cleaned the kitchen stoves after dinner',
-            'working at this resort three years ago',
-            'went to bed early after that',
-            'a routine I have done'
+            'photo shoot scheduled',
+            'attending the VIP beach photoshoot until 11:30 PM',
+            'storm ruined most',
+            'outdoor camera shots'
           ]
         }
       };
-      const s = scenes[GS.murderer] || scenes.james;
+      const s = scenes[GS.murderer] || scenes.ceo;
       let attempt=0; window._testBonfireCorrect = s.correct;
       $('bonfire-attempt').textContent=1;
       $('bonfire-dialogue').innerHTML=s.dialogue; $('bonfire-npc').textContent=s.npc;
@@ -4136,17 +4856,16 @@ function finishBeach(t) {
     // ─ GAME 5: BAGGAGE ────────────────────────────────────────────
     function startBaggage(){
       const masterPool = [
-        { owner: 'Dr. Priya Sharma', item: '🩺 Stethoscope' },
-        { owner: 'Marcus Chen', item: '📱 High-End Tablet' },
-        { owner: 'Elena Voss', item: '🎻 Sheet Music' },
-        { owner: 'Zara Okonkwo', item: '📚 Research Notebook' },
-        { owner: 'Rory Walsh', item: '🃏 Joke Notebook' },
-        { owner: 'Ret. Det. Frank Silva', item: '📇 Case Ledger' },
-        { owner: 'Rowan Ashford', item: '🔑 Master Keycard' },
-        { owner: 'Mia Lacroix', item: '🤳 Selfie Stick' },
-        { owner: 'Dr. James Okoro', item: '🧠 EEG Electrodes' },
-        { owner: 'Kai Tanaka', item: '🎮 Gaming Controller' },
-        { owner: 'Sofia Reyes', item: '🍳 Copper Pan' }
+        { owner: 'Dr. Avery Ross', item: '🩺 Clinical Notepad' },
+        { owner: 'Marcus Hale', item: '🔦 Tactical Flashlight' },
+        { owner: 'Lena Brooks', item: '🧪 Water Sampler' },
+        { owner: 'Noah Mercer', item: '💾 Encrypted USB' },
+        { owner: 'Ethan Cross', item: '🎤 Voice Recorder' },
+        { owner: 'Rachel Quinn', item: '💼 Legal Briefcase' },
+        { owner: 'Maya Singh', item: '🩹 First Aid Kit' },
+        { owner: 'Oliver Grant', item: '💻 Network Sniffer' },
+        { owner: 'Daniel Price', item: '📊 Lab Logbook' },
+        { owner: 'Sarah Bennett', item: '💍 Diamond Ring' }
       ];
       const pairs = [...masterPool].sort(() => Math.random() - 0.5).slice(0, 4);
       const shuffledOwners = [...pairs].sort(() => Math.random() - 0.5);
@@ -4322,22 +5041,22 @@ function finishBeach(t) {
     function startEvidenceChallenge() {
       const rounds = [
         {
-          cue: 'DR. J__ES OK_RO — Spa Meditation: [GLITCH]',
+          cue: 'MA_A SI_GH — Spa Inventory: [GLITCH]',
           opts: ['7:30 PM - 9:00 PM', '8:30 PM - 10:00 PM', '9:30 PM - 11:00 PM', '8:00 PM - 9:30 PM'],
           correct: 1,
-          suspectName: 'Dr. James Okoro'
+          suspectName: 'Maya Singh'
         },
         {
-          cue: 'SO_IA RE_ES — Hired on 6-Month Contract: [GLITCH]',
+          cue: 'RA_H_L QU_NN — Hired on 6-Month Contract: [GLITCH]',
           opts: ['April 12, 2026', 'June 12, 2026', 'May 12, 2026', 'May 22, 2026'],
           correct: 2,
-          suspectName: 'Sofia Reyes'
+          suspectName: 'Rachel Quinn'
         },
         {
-          cue: 'M_A LA_R_IX — Device Battery Depleted: [GLITCH]',
+          cue: 'SA_AH BE_N_TT — Beach Photoshoot End: [GLITCH]',
           opts: ['8:30 PM', '9:30 PM', '10:30 PM', '9:00 PM'],
           correct: 1,
-          suspectName: 'Mia Lacroix'
+          suspectName: 'Sarah Bennett'
         },
         {
           cue: 'R_W_N AS_F_RD — Closed Main Office: [GLITCH]',
@@ -4346,40 +5065,40 @@ function finishBeach(t) {
           suspectName: 'Rowan Ashford'
         },
         {
-          cue: 'DR. PR_YA SH_RMA — Logged in to medical portal: [GLITCH]',
-          opts: ['8:00 PM - 9:30 PM', '8:45 PM - 10:15 PM', '9:15 PM - 10:45 PM', '10:30 PM - Midnight'],
+          cue: 'DR. AV_RY RO_S — Patient Log Audit: [GLITCH]',
+          opts: ['8:00 PM - 9:30 PM', '8:45 PM - Midnight', '9:15 PM - 10:45 PM', '10:30 PM - Midnight'],
           correct: 1,
-          suspectName: 'Dr. Priya Sharma'
+          suspectName: 'Dr. Avery Ross'
         },
         {
-          cue: 'MA_CUS CH_N — Sent 14 emails from lobby: [GLITCH]',
-          opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 10:45 PM', '10:45 PM onwards'],
+          cue: 'MA_CUS H_LE — Patrolled Perimeter: [GLITCH]',
+          opts: ['7:30 PM - 8:30 PM', '8:30 PM - 10:30 PM', '9:00 PM - 10:45 PM', '10:45 PM onwards'],
           correct: 1,
-          suspectName: 'Marcus Chen'
+          suspectName: 'Marcus Hale'
         },
         {
-          cue: 'EL_NA VO_S — Walked along South Cliffs: [GLITCH]',
+          cue: 'LE_A BR_OKS — Tide Pool Sampling: [GLITCH]',
           opts: ['8:00 PM - 9:00 PM', '8:30 PM - 9:45 PM', '9:00 PM - 10:15 PM', '9:30 PM - 10:45 PM'],
           correct: 1,
-          suspectName: 'Elena Voss'
+          suspectName: 'Lena Brooks'
         },
         {
-          cue: 'ZA_R OK_NKWO — Reading in resort library: [GLITCH]',
+          cue: 'NO_H ME_C_R — Reading in resort library: [GLITCH]',
           opts: ['7:30 PM - 8:30 PM', '8:30 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:45 PM onwards'],
           correct: 1,
-          suspectName: 'Zara Okonkwo'
+          suspectName: 'Noah Mercer'
         },
         {
-          cue: 'RO_Y WA_SH — Played arcade games in lounge: [GLITCH]',
+          cue: 'ET_AN CR_SS — Lounge Guest Interviews: [GLITCH]',
           opts: ['7:30 PM - 8:30 PM', '8:45 PM - 10:30 PM', '9:00 PM - 11:00 PM', '10:00 PM - Midnight'],
           correct: 1,
-          suspectName: 'Rory Walsh'
+          suspectName: 'Ethan Cross'
         },
         {
-          cue: 'RE_ DET. FR_NK SI_VA — Checked security gates: [GLITCH]',
+          cue: 'OL_V_R GR_NT — Monitor Server Grids: [GLITCH]',
           opts: ['7:30 PM - 8:00 PM', '8:15 PM - 10:00 PM', '9:00 PM - 10:30 PM', '10:15 PM onwards'],
           correct: 1,
-          suspectName: 'Ret. Det. Frank Silva'
+          suspectName: 'Oliver Grant'
         }
       ];
       const r = rounds[Math.floor(Math.random()*rounds.length)];
@@ -4522,12 +5241,12 @@ function finishBeach(t) {
     // ─ GAME 9: STORM SHELTER ──────────────────────────────────────
     function startStormShelter() {
       const clues = [
-        { q: "HR log: Month and Day Sofia Reyes signed her contract (MMDD).", a: "0512", suspectName: "Sofia Reyes" },
-        { q: "Security log: Dr. James Okoro's RFID Cabin 4 entry time (HHMM).", a: "1017", suspectName: "Dr. James Okoro" },
-        { q: "Device log: Mia Lacroix's phone battery depletion time (HHMM).", a: "0930", suspectName: "Mia Lacroix" },
-        { q: "Reservation log: Dr. James Okoro's Spa meditation end time (HHMM).", a: "1000", suspectName: "Dr. James Okoro" },
-        { q: "Kitchen log: Sofia Reyes kitchen stove cleaning end time (HHMM).", a: "0900", suspectName: "Sofia Reyes" },
-        { q: "Dock log: Kai Tanaka's escape vessel inventory audit end time (HHMM).", a: "1015", suspectName: "Kai Tanaka" }
+        { q: "HR log: Month and Day Rachel Quinn signed her contract (MMDD).", a: "0512", suspectName: "Rachel Quinn" },
+        { q: "Security log: Maya Singh's RFID spa exit time (HHMM).", a: "1017", suspectName: "Maya Singh" },
+        { q: "Device log: Sarah Bennett's beach photoshoot end time (HHMM).", a: "0930", suspectName: "Sarah Bennett" },
+        { q: "Reservation log: Maya Singh's Spa inventory management end time (HHMM).", a: "1000", suspectName: "Maya Singh" },
+        { q: "Lobby router log: Rachel Quinn's laptop disconnect time (HHMM).", a: "0900", suspectName: "Rachel Quinn" },
+        { q: "Dock log: Daniel Price's escape vessel registry audit end time (HHMM).", a: "1015", suspectName: "Daniel Price" }
       ];
       const activeClue = clues[Math.floor(Math.random()*clues.length)];
       const code = activeClue.a;
@@ -4866,10 +5585,18 @@ function finishBeach(t) {
       
       accuseBtn.onclick=()=>{
         $('accuse-form').style.display='block';
-        const userJson = localStorage.getItem('elaris_user');
-        const user = userJson ? JSON.parse(userJson) : {};
-        const playerId = user.identity;
-        const potentialAccused = [...IDENTITIES, ...NPCS_BASE].filter(c => c.id !== GS.victim && c.id !== playerId);
+        const playerId = GS.playerIdentity || (() => {
+          const userJson = localStorage.getItem('elaris_user');
+          const user = userJson ? JSON.parse(userJson) : {};
+          return user.identity === 'academic' ? 'student' : user.identity;
+        })();
+        const potentialAccused = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+          c.id !== GS.victim && 
+          c.id !== 'rowan' && 
+          c.id !== 'keeper' && 
+          c.id !== playerId &&
+          c.alive !== false
+        );
         $('accuse-opts').innerHTML=potentialAccused.map(n=>`
           <button class="btn-choice" onclick="makeAccusation('${n.id}','${n.name}')">${n.name} — ${n.role}</button>`).join('');
       };
@@ -4886,8 +5613,9 @@ function finishBeach(t) {
         GS.score += GS.accusationScore;
       }
       
+      const meta = CHARACTER_META[GS.murderer] || {};
       const msg=correct
-        ? `Correct. ${name} was the killer.\n\nThey returned to destroy the last evidence of PROJECT ECHO — and realized the witnesses were the evidence.`
+        ? `Correct. ${name} was the killer.\n\nMOTIVE: ${meta.motive}\n\nThey returned to destroy the last evidence of PROJECT ECHO — and realized the witnesses were the evidence.`
         : `Incorrect. ${name} was not the killer.\n\nSomeone else designed this reunion. The truth is still out there.`;
       
       GS.killerGuess = id;
@@ -4997,48 +5725,114 @@ function finishBeach(t) {
       showModal('modal-evidence');
     }
 
-    // DOSSIER FLIPPING BOOK
+    // DOSSIER FLIPPING BOOK & TABBED DASHBOARD
     let currentDossierPage = 0;
-    const dossierList = [
-      ...IDENTITIES,
-      ...NPCS_BASE
-    ];
+    let dossierList = [];
+
+    function updateDossierList() {
+      const playerId = GS.playerIdentity || (() => {
+        const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+        return user.identity === 'academic' ? 'student' : user.identity;
+      })();
+      
+      // Filter out: player, rowan, keeper, kai from the suspect list!
+      // This is "our file" - about the OTHER suspects.
+      dossierList = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+        c.id !== playerId && 
+        c.id !== 'rowan' && c.id !== 'narrator' && 
+        c.id !== 'keeper' && 
+        c.id !== 'kai'
+      );
+    }
+
+    function isSecretUnlocked(npcId) {
+      if (npcId === 'ceo') return GS.fragments[0] || GS.fragments[7];
+      if (npcId === 'gamer') return GS.fragments[1];
+      if (npcId === 'doctor') return GS.fragments[2];
+      if (npcId === 'musician') return GS.fragments[2];
+      if (npcId === 'rachel') return GS.fragments[3];
+      if (npcId === 'student') return GS.fragments[5];
+      if (npcId === 'detective') return GS.fragments[6];
+      if (npcId === 'comedian') return GS.fragments[7];
+      if (npcId === 'therapist') return GS.fragments[8];
+      if (npcId === 'influencer') return GS.fragments[9];
+      return false;
+    }
+
+    function isVictimTruthUnlocked(victimId) {
+      if (victimId === 'kai') return GS.fragments[0];
+      if (victimId === 'keeper') return GS.fragments[1];
+      if (victimId === 'bonfireVictim') return GS.fragments[3];
+      return false;
+    }
 
     function showDossierCard() {
+      if (dossierList.length === 0) updateDossierList();
       const profile = dossierList[currentDossierPage];
+      if (!profile) return;
+      
       const details = profile.details || 'No detailed records found.';
       const alibi = profile.alibi || 'No verified alibi.';
-      const portraitSrc = profile.image || 'assets/portrait_general_1780832290626.png';
       
       $('cf-page-num').textContent = currentDossierPage + 1;
       $('cf-page-total').textContent = dossierList.length;
 
-      // Determine Status & File No
-      let status = 'SUSPECT';
+      // Determine File No
       let fileNo = 'EL-' + String(currentDossierPage + 101).padStart(4, '0');
-      
-      if (profile.id === 'kai') {
-        status = 'DECEASED (VICTIM)';
-      } else if (profile.id === (JSON.parse(localStorage.getItem('elaris_user') || '{}').identity)) {
-        status = 'INVESTIGATOR (PLAYER)';
-      } else if (IDENTITIES.some(i => i.name === profile.name)) {
-        status = 'SUSPECT (GUEST)';
-      }
+      let status = 'SUSPECT';
+
+      // Check progressive unredaction of secret in individual view
+      const isUnlocked = isSecretUnlocked(profile.id);
+      const secretHtml = isUnlocked 
+        ? `<div style="margin-top: 12px; border-top: 1px dashed rgba(90,75,60,0.3); padding-top: 8px;">
+             <h5 style="color:#c0471f; font-family:var(--ff-m); font-size:0.72rem; margin-bottom:4px; text-transform:uppercase;">UNCOVERED HIDDEN TRUTH</h5>
+             <p style="font-family:var(--ff-m); font-size:0.72rem; color:#2b241a; line-height:1.4;">${profile.secret}</p>
+           </div>`
+        : `<div style="margin-top: 12px; border-top: 1px dashed rgba(90,75,60,0.3); padding-top: 8px;">
+             <h5 style="color:#6e5e4d; font-family:var(--ff-m); font-size:0.72rem; margin-bottom:4px; text-transform:uppercase;">UNCOVERED HIDDEN TRUTH</h5>
+             <span class="redacted-clue">[REDACTED - RECOVER MORE EVIDENCE]</span>
+           </div>`;
 
       $('cf-book-card').innerHTML = `
         <div class="case-stamp">CLASSIFIED</div>
         <div class="book-row">
           <div class="book-page-left">
-            <div style="position: relative; display: inline-block; margin-top: 10px;">
+            <div style="position: relative; display: inline-block; margin-top: 10px; width: 105px; height: 120px;">
               <div class="paperclip"></div>
-              <img class="book-portrait" src="${portraitSrc}" onerror="this.src='assets/portrait_general_1780832290626.png'" />
+              <div style="width: 100%; height: 100%; border: 1px solid #c2b59b; background: #faf6f0; box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transform: rotate(-2deg); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                ${profile.id === 'ceo' 
+                  ? `<img src="assets/MARCUS-HALE.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'doctor'
+                  ? `<img src="assets/AVERY-ROSS.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'musician'
+                  ? `<img src="assets/LENA-BROOKS.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'rachel'
+                  ? `<img src="assets/RACHEL.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'comedian'
+                  ? `<img src="assets/ETHAN.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'therapist'
+                  ? `<img src="assets/MAYA-SINGH.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'detective'
+                  ? `<img src="assets/OLIVER-GRANT.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'gamer'
+                  ? `<img src="assets/DANIEL-PRICE.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'influencer'
+                  ? `<img src="assets/SARAH-BENNETT.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'kai'
+                  ? `<img src="assets/KAI-NAKAMURA.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'student'
+                  ? `<img src="assets/NOAH-MERCER.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : profile.id === 'keeper'
+                  ? `<img src="assets/LIGHTHOUSE-KEEPER.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : makeSVGChar(profile, false)}
+              </div>
             </div>
             <h4 style="font-size:0.85rem; color:#2b241a; font-family:var(--ff-m); margin-bottom: 2px; border-bottom: 1px dashed #8c7e6b; padding-bottom: 2px; word-break: break-word; line-height: 1.2;">${profile.icon || ''} ${profile.name}</h4>
             <p style="font-size:0.62rem; color:#5a4b3c; font-family:var(--ff-m); margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em; line-height: 1.2;">${profile.role}</p>
             
             <div style="font-family: var(--ff-m); font-size: 0.65rem; color: #4a3b2c; border-top: 1px dotted #8c7e6b; width: 90%; padding-top: 8px; margin-top: 5px; text-align: left; line-height: 1.5;">
               <strong>FILE NO:</strong> ${fileNo}<br>
-              <strong>STATUS:</strong> <span style="color: ${status.includes('VICTIM') ? '#b22222' : status.includes('INVESTIGATOR') ? '#2e7d32' : '#8e5b15'}; font-weight: bold;">${status}</span>
+              <strong>STATUS:</strong> <span style="color: #8e5b15; font-weight: bold;">${status}</span>
             </div>
           </div>
           <div class="book-page-right-wrapper" style="position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; width: 100%;">
@@ -5047,6 +5841,7 @@ function finishBeach(t) {
               <p style="margin-bottom:14px; font-size:0.75rem; color:#2b241a; line-height: 1.45;">${details}</p>
               <h5 style="color:#a82e2e; font-family:var(--ff-m); font-size:0.72rem; margin-bottom:4px; text-transform:uppercase; border-bottom: 1px solid rgba(90,75,60,0.25); padding-bottom: 2px; letter-spacing: 0.05em;">CHRONOLOGICAL ALIBI TIMELINE</h5>
               <p style="font-style:italic; font-size:0.72rem; color:#4a3b2c; line-height: 1.4;">${alibi}</p>
+              ${secretHtml}
             </div>
             <div class="scroll-arrow-down" id="dossier-scroll-arrow" style="display: none;">▼</div>
           </div>
@@ -5089,8 +5884,133 @@ function finishBeach(t) {
       }
     }
 
+    // Rendering functions for progressive unredaction tables
+    function renderSuspectsTable() {
+      const body = $('manifest-table-body');
+      body.innerHTML = '';
+      
+      dossierList.forEach(s => {
+        const isUnlocked = isSecretUnlocked(s.id);
+        const secretText = isUnlocked 
+          ? `<div class="unredacted-clue">${s.secret}</div>` 
+          : `<div class="redacted-clue">[REDACTED - RECOVER ENVELOPE]</div>`;
+        
+        body.innerHTML += `
+          <tr>
+            <td style="width: 50px; text-align: center;">
+              <div style="width: 40px; height: 45px; border: 1px solid rgba(196, 164, 101, 0.3); border-radius: 2px; background: rgba(0,0,0,0.3); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                ${s.id === 'ceo' 
+                  ? `<img src="assets/MARCUS-HALE.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'doctor'
+                  ? `<img src="assets/AVERY-ROSS.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'musician'
+                  ? `<img src="assets/LENA-BROOKS.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'rachel'
+                  ? `<img src="assets/RACHEL.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'comedian'
+                  ? `<img src="assets/ETHAN.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'therapist'
+                  ? `<img src="assets/MAYA-SINGH.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'detective'
+                  ? `<img src="assets/OLIVER-GRANT.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'gamer'
+                  ? `<img src="assets/DANIEL-PRICE.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'influencer'
+                  ? `<img src="assets/SARAH-BENNETT.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'kai'
+                  ? `<img src="assets/KAI-NAKAMURA.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'student'
+                  ? `<img src="assets/NOAH-MERCER.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : s.id === 'keeper'
+                  ? `<img src="assets/LIGHTHOUSE-KEEPER.jpeg" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : makeSVGChar(s, false)}
+              </div>
+            </td>
+            <td style="font-family: var(--ff-t); font-weight: bold; color: var(--gold-l);">${s.icon || ''} ${s.name}</td>
+            <td>${s.role}</td>
+            <td style="font-size: 0.72rem; color: var(--text-d); font-style: italic;">${s.trait}</td>
+            <td>${secretText}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderVictimsTable() {
+      const body = $('victims-table-body');
+      body.innerHTML = '';
+      
+      const victims = [];
+      
+      // Kai Nakamura - always dead and announced in the intro
+      const kaiNPC = GS.npcs.find(n => n.id === 'kai');
+      if (kaiNPC && !kaiNPC.alive) {
+        victims.push({ id: 'kai', name: 'Kai Nakamura', role: 'Investigative Journalist', tod: 'Start of Game', truth: 'Not completely innocent. He illegally accessed confidential files and leaked participant information while investigating Project Echo.' });
+      }
+      
+      // Lighthouse Keeper - announced after Module 2 completes (keeper is marked deceased)
+      const keeperNPC = GS.npcs.find(n => n.id === 'keeper');
+      if (keeperNPC && !keeperNPC.alive) {
+        victims.push({ id: 'keeper', name: 'Lighthouse Keeper', role: 'Former Caretaker', tod: 'End of Module 2', truth: 'Secretly maintained a hidden archive of Project Echo documents after the project shut down.' });
+      }
+      
+      // Bonfire Victim - announced after Module 4 completes (bonfireVictim is marked deceased)
+      if (GS.bonfireVictim) {
+        const bonfireVictimNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.bonfireVictim);
+        if (bonfireVictimNPC && !bonfireVictimNPC.alive) {
+          victims.push({ id: 'bonfireVictim', name: bonfireVictimNPC.name, role: bonfireVictimNPC.role, tod: 'End of Module 4', truth: 'Learns a crucial truth and lies about it during the bonfire, triggering their death.' });
+        }
+      }
+      
+      if (victims.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dm);">No victim records announced yet.</td></tr>';
+        return;
+      }
+
+      victims.forEach(v => {
+        const isUnlocked = isVictimTruthUnlocked(v.id);
+        const truthText = isUnlocked 
+          ? `<div class="unredacted-clue">${v.truth}</div>` 
+          : `<div class="redacted-clue">[REDACTED - RECOVER ENVELOPE]</div>`;
+        const statusText = `<span style="color:#b22222; font-weight:bold;">DECEASED</span>`;
+          
+        body.innerHTML += `
+          <tr>
+            <td style="font-family: var(--ff-t); font-weight: bold; color: #ff5e4d;">💀 ${v.name}</td>
+            <td>${v.role}</td>
+            <td style="font-size:0.75rem;">${v.tod}<br>${statusText}</td>
+            <td>${truthText}</td>
+          </tr>
+        `;
+      });
+    }
+
+    window.switchDossierTab = (tabName) => {
+      SFX.click();
+      document.querySelectorAll('.cf-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(tabName));
+      });
+      document.querySelectorAll('.cf-panel').forEach(panel => {
+        panel.style.display = panel.id === 'cf-panel-' + tabName ? 'block' : 'none';
+      });
+      
+      if (tabName === 'manifest') {
+        renderSuspectsTable();
+      } else if (tabName === 'victims') {
+        renderVictimsTable();
+      }
+    };
+
     // Hook Files dossiers button
     $('cf-btn').onclick = () => {
+      updateDossierList();
+      
+      document.querySelectorAll('.cf-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector('.cf-tab-btn[onclick*="dossiers"]');
+      if (activeBtn) activeBtn.classList.add('active');
+      
+      document.querySelectorAll('.cf-panel').forEach(p => p.style.display = 'none');
+      $('cf-panel-dossiers').style.display = 'block';
+
       currentDossierPage = 0;
       showDossierCard();
       showModal('modal-cf');
