@@ -1852,3 +1852,111 @@ h2 { font-size: 1.4rem; margin-bottom: 16px; }
   padding: 15px;
   margin-top: 8px;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━ OPENING SEQUENCE ━━━━━━━━━━━━━━━━━━━━━━━ */
+#sc-opening {
+  background: #000;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 1s ease;
+}
+#sc-opening.on {
+  display: flex;
+}
+#opening-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+#opening-notification {
+  color: var(--gold-l);
+  font-family: var(--ff-t);
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(196,164,101,0.3);
+  margin-bottom: 20px;
+}
+#opening-notification.show {
+  opacity: 1;
+}
+#opening-envelope-container {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: none;
+}
+#opening-envelope-container.show {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+}
+#opening-envelope {
+  width: 280px;
+  height: 180px;
+  background: #141210;
+  border: 2px solid var(--gold-d);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(196,164,101,0.1);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#opening-envelope:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.9), 0 0 25px rgba(196,164,101,0.22);
+}
+#opening-envelope .seal-icon {
+  font-size: 2.5rem;
+  color: var(--gold);
+  animation: pulse 2s infinite ease-in-out;
+}
+#invitation-letter-view {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+  z-index: 2010;
+  padding: 24px;
+}
+#invitation-letter-view.show {
+  display: flex;
+  opacity: 1;
+}
+#invitation-letter-img {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: var(--radius);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.9), 0 0 30px rgba(196,164,101,0.15);
+  border: 1px solid var(--gold-d);
+  object-fit: contain;
+  transform: scale(0.9);
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+#invitation-letter-view.show #invitation-letter-img {
+  transform: scale(1);
+}
+#invitation-close-btn {
+  margin-top: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+

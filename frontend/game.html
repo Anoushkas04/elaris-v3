@@ -92,8 +92,24 @@
     </div>
   </div>
 
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN 0: OPENING SEQUENCE ━━━━━━━━━━━━━━ -->
+  <div class="screen on" id="sc-opening">
+    <div id="opening-backdrop">
+      <div id="opening-notification">You have received an anonymous invitation.</div>
+      <div id="opening-envelope-container">
+        <div id="opening-envelope" onclick="openInvitationLetter()">
+          <div class="seal-icon">✉️</div>
+        </div>
+      </div>
+      <div id="invitation-letter-view">
+        <img src="assets/invitation.jpeg" alt="Invitation Letter" id="invitation-letter-img">
+        <button class="btn-main" id="invitation-close-btn" onclick="finishOpeningSequence()">Accept & Proceed</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN 1: HOME ━━━━━━━━━━━━━━━━━━━━━━━━ -->
-  <div class="screen on" id="sc-home">
+  <div class="screen" id="sc-home">
     <div class="glass-panel">
       <div class="invite-label" style="font-family: var(--ff-m); font-size: 0.65rem; color: var(--text-d); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px;">Pre-Assessment Clearance</div>
       <h1 class="hero-title" style="font-family: var(--ff-t); font-size: clamp(1.8rem, 5vw, 2.6rem); color: var(--gold); letter-spacing: 0.04em;">Elaris Island</h1>

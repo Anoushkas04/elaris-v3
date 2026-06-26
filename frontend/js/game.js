@@ -49,7 +49,37 @@ const SFX = (() => {
     fragment:() => { tone(523,'sine',.2,.15); tone(659,'sine',.25,.12,.15); tone(784,'sine',.3,.1,.3); },
     morse:   () => tone(800,'square',.08,.15),
     drag:    () => tone(400,'sine',.05,.08),
-    alarm:   () => { tone(880,'square',.1,.2); tone(660,'square',.1,.2,.12); }
+    alarm:   () => { tone(880,'square',.1,.2); tone(660,'square',.1,.2,.12); },
+    gunshot: () => {
+      init();
+      // Lowpass filtered noise for the boom
+      const dur = 1.0;
+      const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      const s = ctx.createBufferSource(), g = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(500, ctx.currentTime);
+      s.buffer = buf;
+      s.connect(filter);
+      filter.connect(g);
+      g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.8, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      s.start();
+      
+      // Low sawtooth rumble for resonance
+      const r = ctx.createOscillator(), rg = ctx.createGain();
+      r.type = 'sawtooth';
+      r.frequency.setValueAtTime(80, ctx.currentTime);
+      r.connect(rg);
+      rg.connect(ctx.destination);
+      rg.gain.setValueAtTime(0.4, ctx.currentTime);
+      rg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+      r.start();
+      r.stop(ctx.currentTime + 0.8);
+    }
   };
 })();
 
@@ -840,47 +870,82 @@ function reboardVessel() {
   location.reload();
 }
 
-// ─ NARRATIVE INTRO (And Then There Were None style) ──────────
+// Reusable helper to play video fullscreen and hide dialog/characters
+function playVideo(src, onComplete) {
+  closeDialog();
+  hideChars();
+  
+  const video = document.createElement('video');
+  video.src = src;
+  video.style.position = 'fixed';
+  video.style.inset = '0';
+  video.style.width = '100vw';
+  video.style.height = '100vh';
+  video.style.objectFit = 'cover';
+  video.style.zIndex = '9999';
+  video.style.backgroundColor = '#000';
+  video.autoplay = true;
+  video.controls = false;
+  
+  video.play().catch(e => {
+    console.warn("Autoplay blocked, user interaction required:", e);
+    video.onclick = () => video.play();
+  });
+
+  video.onended = () => {
+    video.remove();
+    onComplete();
+  };
+
+  document.body.appendChild(video);
+}
+
+// ─ NARRATIVE INTRO (Custom Video & Image Flow) ──────────
 function playNarrativeIntro() {
   showScreen('sc-narrative');
-  const lines = [
-    { npc:'narrator', text:'Welcome to Elaris. Every detail of this weekend has been arranged.\nThe island holds secrets older than its guests.' },
-    { npc:'rachel', text:'The kitchen is open all hours. Please — eat, rest. Whatever you need.\nThe island has a way of… revealing things about a person.' },
-    { npc:'therapist', text:'Forgive me if I seem distracted.\nI keep feeling as if I\'ve been here before.' },
-    { npc:'influencer',   text:'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.' },
-    { npc:null,    text:'That night — the lights cut out.\n\nA projector ignited. Text burned across the wall:', projector:true, projtext:'ONE OF YOU CAME HERE TO DISAPPEAR FOREVER.' },
-    { npc:'narrator', text:'A scream from the pool. Kai Nakamura — dead.\nThe storm has destroyed the radio. The only boat is gone.\n\nNobody leaves this island.' },
-    { npc:'narrator', text:'Truth is sealed in records.\nEach step yields a hidden envelope.\nUncover all ten evidence envelopes.' },
-  ];
-  let i=0;
-  function nextLine() {
-    if(i>=lines.length){ beginModules(); return; }
-    const l=lines[i++];
-    if(l.projector){
-      $('proj-flash').classList.add('on');
-      $('proj-text').textContent = l.projtext;
-      const bgImg = $('narrative-bg-img');
-      if (bgImg) {
-        bgImg.style.filter = 'brightness(0.08) contrast(2) saturate(0.05) sepia(0.3) hue-rotate(220deg)';
-        bgImg.style.opacity = '0.15';
-      }
-      SFX.horror();
-      TTS.say(l.projtext, 0.7, 0.65);
-      setTimeout(()=>{ 
-        $('proj-flash').classList.remove('on'); 
-        if (bgImg) {
-          bgImg.style.filter = '';
-          bgImg.style.opacity = '0.22';
-        }
-        nextLine(); 
-      }, 3400);
-      return;
-    }
-    const npc = l.npc ? GS.npcs.find(n=>n.id===l.npc) : null;
-    showDialog(npc?npc.name:'Narrator', l.text, null, nextLine, l.npc||null);
-    if(!l.npc) { SFX.ambient(); }
-  }
-  nextLine();
+  
+  const getNPCName = (id) => {
+    const npc = GS.npcs.find(n => n.id === id) || IDENTITIES.find(i => i.id === id);
+    return npc ? npc.name : id;
+  };
+  
+  // Step 2: Play assets/enter island (1).mp4
+  playVideo('assets/enter island (1).mp4', () => {
+    // Step 3: Narrator dialogue
+    showDialog('Narrator', 'Let me introduce you to the characters.', null, () => {
+      // Play assets/characters intro (2).mp4
+      playVideo('assets/characters intro (2).mp4', () => {
+        // Step 4: Change background to assets/(3).jpeg
+        const bgImg = $('narrative-bg-img');
+        if (bgImg) bgImg.src = 'assets/(3).jpeg';
+        
+        // Resume existing NPC intro conversation
+        showDialog(getNPCName('rachel'), 'The kitchen is open all hours. Please — eat, rest. Whatever you need.\nThe island has a way of… revealing things about a person.', null, () => {
+          showDialog(getNPCName('therapist'), "Forgive me if I seem distracted.\nI keep feeling as if I've been here before.", null, () => {
+            showDialog(getNPCName('influencer'), 'Did anyone else notice how isolated this place is?\nNo signal. No boats. Just us.', null, () => {
+              // Step 5: NPC intro finished, change background to assets/(4).jpeg
+              if (bgImg) bgImg.src = 'assets/(4).jpeg';
+              
+              // Step 6: Play gunshot, then assets/(6).mp4 video
+              if (typeof SFX !== 'undefined' && SFX.gunshot) SFX.gunshot();
+              
+              setTimeout(() => {
+                playVideo('assets/(6).mp4', () => {
+                  // Step 7: Change background to assets/(7).jpeg
+                  if (bgImg) bgImg.src = 'assets/(7).jpeg';
+                  
+                  // Narrator dialogue
+                  showDialog('Narrator', 'Footprints lead to the beach shore.', null, () => {
+                    beginModules();
+                  }, 'narrator');
+                });
+              }, 1000);
+            }, 'influencer');
+          }, 'therapist');
+        }, 'rachel');
+      });
+    }, 'narrator');
+  });
 }
 
 // ─ MODULE ORCHESTRATION ───────────────────────────────────────
@@ -3582,3 +3647,53 @@ function escapeHtmlStr(str) {
 // ─ INIT ───────────────────────────────────────────────────────
 initBG();
 checkProgressButton();
+startOpeningSequence();
+
+function startOpeningSequence() {
+  const opScreen = $('sc-opening');
+  if (opScreen) {
+    opScreen.classList.add('on');
+    // Play subtle ambient background audio
+    if (typeof SFX !== 'undefined' && SFX.ambient) {
+      SFX.ambient();
+    }
+    
+    // 1. Fade in the notification
+    setTimeout(() => {
+      const notif = $('opening-notification');
+      if (notif) notif.classList.add('show');
+    }, 500);
+
+    // 2. Animate envelope sliding into view
+    setTimeout(() => {
+      const notif = $('opening-notification');
+      if (notif) notif.classList.remove('show');
+      
+      setTimeout(() => {
+        const notif = $('opening-notification');
+        if (notif) notif.style.display = 'none';
+        const envContainer = $('opening-envelope-container');
+        if (envContainer) envContainer.classList.add('show');
+      }, 1500);
+    }, 3000);
+  }
+}
+
+window.openInvitationLetter = () => {
+  if (typeof SFX !== 'undefined' && SFX.pickup) SFX.pickup();
+  const letterView = $('invitation-letter-view');
+  if (letterView) letterView.classList.add('show');
+};
+
+window.finishOpeningSequence = () => {
+  if (typeof SFX !== 'undefined' && SFX.click) SFX.click();
+  const opScreen = $('sc-opening');
+  if (opScreen) {
+    opScreen.style.opacity = '0';
+    setTimeout(() => {
+      opScreen.classList.remove('on');
+      showScreen('sc-home');
+    }, 1000);
+  }
+};
+
