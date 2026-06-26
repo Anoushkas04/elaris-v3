@@ -51,34 +51,39 @@ const SFX = (() => {
     drag:    () => tone(400,'sine',.05,.08),
     alarm:   () => { tone(880,'square',.1,.2); tone(660,'square',.1,.2,.12); },
     gunshot: () => {
-      init();
-      // Lowpass filtered noise for the boom
-      const dur = 1.0;
-      const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-      const s = ctx.createBufferSource(), g = ctx.createGain();
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(500, ctx.currentTime);
-      s.buffer = buf;
-      s.connect(filter);
-      filter.connect(g);
-      g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.8, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      s.start();
-      
-      // Low sawtooth rumble for resonance
-      const r = ctx.createOscillator(), rg = ctx.createGain();
-      r.type = 'sawtooth';
-      r.frequency.setValueAtTime(80, ctx.currentTime);
-      r.connect(rg);
-      rg.connect(ctx.destination);
-      rg.gain.setValueAtTime(0.4, ctx.currentTime);
-      rg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-      r.start();
-      r.stop(ctx.currentTime + 0.8);
+      const audio = new Audio('assets/gunshot.wav');
+      audio.volume = 0.8;
+      audio.play().catch(e => {
+        console.warn("Failed to play gunshot audio, falling back to synth:", e);
+        init();
+        // Lowpass filtered noise for the boom
+        const dur = 1.0;
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const s = ctx.createBufferSource(), g = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(500, ctx.currentTime);
+        s.buffer = buf;
+        s.connect(filter);
+        filter.connect(g);
+        g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.8, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        s.start();
+        
+        // Low sawtooth rumble for resonance
+        const r = ctx.createOscillator(), rg = ctx.createGain();
+        r.type = 'sawtooth';
+        r.frequency.setValueAtTime(80, ctx.currentTime);
+        r.connect(rg);
+        rg.connect(ctx.destination);
+        rg.gain.setValueAtTime(0.4, ctx.currentTime);
+        rg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        r.start();
+        r.stop(ctx.currentTime + 0.8);
+      });
     }
   };
 })();
