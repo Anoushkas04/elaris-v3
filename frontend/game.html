@@ -200,10 +200,10 @@
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: BEACH Mini-game ━━━━━━━━━━━━━━ -->
   <div class="screen" id="sc-beach">
     <div class="game-panel on">
-      <h3>Beach Cleanup Panic</h3>
+      <h3>Beach Crime Scene Investigation</h3>
       <div class="divider"></div>
       <p style="font-size: 0.85rem; margin-bottom: 12px; color: var(--text-d);">
-        Clues remaining to collect: <span id="beach-left" style="color:var(--gold); font-weight:700;">5</span>
+        Search the shoreline for critical evidence. Bloody Cloth and Voice Recorder are required.
       </p>
       <div id="beach-area"></div>
     </div>
@@ -540,6 +540,15 @@
         <button class="cf-tab-btn" onclick="switchDossierTab('manifest')">Suspect Manifest</button>
         <button class="cf-tab-btn" onclick="switchDossierTab('victims')">Victims Record</button>
       </div>
+      
+      <!-- Case Filters container, unlocked via Footprint clue -->
+      <div id="cf-filters" style="display: none; padding: 10px 15px; background: rgba(196,164,101,0.06); border: 1px solid rgba(196,164,101,0.2); border-radius: 4px; margin: 12px 0; align-items: center; gap: 10px; font-family: var(--ff-m); font-size: 0.75rem; color: var(--text-d);">
+        <span style="color: var(--gold-l); font-weight: 700; letter-spacing: 0.05em;">🔎 EVIDENCE FILTERS:</span>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+          <input type="checkbox" id="filter-height-checkbox" onchange="toggleHeightFilter()" style="cursor: pointer; width: auto; height: auto; margin: 0;" />
+          <span>Filter by height footprint (<span id="filter-height-range" style="color: var(--gold-l); font-weight: bold;"></span> cm)</span>
+        </label>
+      </div>
 
       <!-- Dossier book page flipping view -->
       <div class="cf-panel" id="cf-panel-dossiers" style="display: block;">
@@ -627,7 +636,7 @@
   </div>
 
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCRIPTS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-    <script src="js/game.js"></script>
+    <script src="js/game.js?v=3"></script>
   <script src="js/npc.js"></script>
   <script src="js/dialogue.js"></script>
 </body>

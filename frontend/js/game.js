@@ -134,6 +134,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Intelligent · Empathetic',
     pitch: 1.1,
     rate: .86,
+    height: 165,
     details: 'Dr. Avery Ross, psychologist. Intelligent, empathetic, she monitored participant profiles. Behind her caring demeanor lies the knowledge that participants were developing severe psychological issues, yet she approved the project\'s continuation to protect her career.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Conducted final participant profile check.<br>• <strong>8:45 PM - Midnight:</strong> Reviewing patient logs in Cabin 3 (Verified by offline log timestamps).</div>',
     image: 'assets/portrait_emily_1780832277768.png'
@@ -146,6 +147,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Calm · Disciplined · Logical',
     pitch: .95,
     rate: .92,
+    height: 188,
     details: 'Marcus Hale, security consultant. Calm, disciplined, and logical. He was hired to oversee resort safety, but his main role was deleting participant incident reports and complaints before external regulators could investigate Project Echo.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:30 PM:</strong> Patrolling the resort perimeter gates (Claimed, but gate sensors recorded no scans).<br>• <strong>10:45 PM:</strong> Returned to Cabin 1.</div>',
     image: 'assets/portrait_philip_1780832251248.png'
@@ -158,6 +160,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Friendly · Optimistic',
     pitch: 1.15,
     rate: .84,
+    height: 170,
     details: 'Lena Brooks, marine biologist. Friendly and optimistic. She secretly stole confidential Echo files intending to expose the project, but later sold a portion of the raw data to a private buyer for financial gain.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:00 PM:</strong> Left welcome dinner early.<br>• <strong>8:30 PM - 9:45 PM:</strong> Collecting water samples near South Cliffs (Sector reported completely vacant by patrol logs).<br>• <strong>10:00 PM:</strong> Returned to Cabin 5.</div>',
     image: 'assets/portrait_vera_1780832238588.png'
@@ -170,6 +173,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Quiet · Withdrawn',
     pitch: 1.2,
     rate: .9,
+    height: 178,
     details: 'Noah Mercer, data analyst. Quiet and withdrawn. He was originally a participant in the Project Echo trials who suffered severe side effects, and was subsequently hired by the organization to buy his silence.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:30 PM:</strong> Reading system logs in the resort Library (Library was locked early at 9:00 PM).<br>• <strong>10:45 PM:</strong> Returned to Cabin 6.</div>',
     image: 'assets/portrait_zara_1781502098030.png'
@@ -182,6 +186,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Charismatic · Competitive',
     pitch: 1.05,
     rate: .95,
+    height: 180,
     details: 'Ethan Cross, journalist. Charismatic, competitive, and desperate for a scoop. He repeatedly sabotaged Kai\'s previous investigations because Kai always beat him to major stories.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:30 PM:</strong> Interviewing guests in the resort lounge (Security footage shows the lounge was completely empty).<br>• <strong>10:45 PM:</strong> Returned to Cabin 8.</div>',
     image: 'assets/portrait_rory_1781502120015.png'
@@ -194,6 +199,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Introverted · Analytical',
     pitch: .9,
     rate: .85,
+    height: 185,
     details: 'Oliver Grant, software engineer. Introverted and analytical. He was hired to build the hidden digital surveillance networks that monitored Project Echo participants without their knowledge or consent.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:15 PM - 10:00 PM:</strong> Monitoring server grids in the main office (Office card log showed no entry).<br>• <strong>10:15 PM:</strong> Returned to Cabin 9.</div>',
     image: 'assets/portrait_william_1780832265198.png'
@@ -206,6 +212,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Caring · Compassionate',
     pitch: 1.0,
     rate: .86,
+    height: 162,
     details: 'Maya Singh, nurse. Caring and compassionate. Under pressure from project leaders, she falsified clinical participant medical records to hide the severe physiological harm caused by the trials.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - 10:00 PM:</strong> Managing first aid inventory in the Spa (RFID badge logs show exit at 10:17 PM).<br>• <strong>10:30 PM:</strong> Returned to Cabin 4.</div>',
     image: 'assets/portrait_james_1780832187054.png'
@@ -218,6 +225,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Nervous · Obedient',
     pitch: 1.05,
     rate: .93,
+    height: 173,
     details: 'Daniel Price, research assistant. Nervous and obedient. He manipulated and falsified raw research data logs under orders to make the Project Echo outcomes appear highly successful to investors.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - 10:15 PM:</strong> Auditing registries at the escape vessel dock (Dock log contains no badge scans after 8:30 PM).<br>• <strong>10:30 PM:</strong> Returned to Cabin 10.</div>',
     image: 'assets/portrait_kai_1780832200618.png'
@@ -230,6 +238,7 @@ image: 'assets/NARRATOR.png'
     trait: 'Confident · Influential',
     pitch: 1.2,
     rate: .95,
+    height: 160,
     details: 'Sarah Bennett, investor. Confident and highly influential. She put immense pressure on research coordinators to expand the trials and collect more data despite severe safety concerns to protect her capital.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - 9:30 PM:</strong> VIP beach photoshoot (Beach security log shows beach lights were shut off at 9:30 PM).<br>• <strong>9:45 PM:</strong> Returned to Cabin 7.</div>',
     image: 'assets/portrait_mia_1780832174257.png'
@@ -247,6 +256,7 @@ const NPCS_BASE = [
     alive: true,
     speak_pitch: .9,
     speak_rate: .82,
+    height: 175,
     details: 'Rowan Ashford, resort host and former Director of Project Echo. He coordinated the trials and shuttered the island facilities three years ago, turning them into a luxury resort to monitor the remaining witnesses.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>6:30 PM - 8:00 PM:</strong> Hosted dinner service.<br>• <strong>8:15 PM - 9:30 PM:</strong> Pantry inventory audit.<br>• <strong>10:00 PM:</strong> Closed main office.</div>',
     image: 'assets/portrait_rowan_1780832160368.png'
@@ -261,6 +271,7 @@ const NPCS_BASE = [
     alive: true,
     speak_pitch: 1.1,
     speak_rate: .88,
+    height: 168,
     details: 'Rachel Quinn, corporate lawyer. Composed and professional. She drafted the legal agreements and strict non-disclosure contracts that prevented the victims of Project Echo from suing the organization.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:15 PM:</strong> Drafting legal files in the resort lobby (Lobby router logs show laptop disconnected after 9:00 PM).<br>• <strong>10:30 PM:</strong> Retired to Cabin 2.</div>',
     image: 'assets/portrait_sofia_1780832213248.png'
@@ -275,6 +286,7 @@ const NPCS_BASE = [
     alive: true,
     speak_pitch: 0.8,
     speak_rate: 0.75,
+    height: 172,
     details: 'The resort\'s Lighthouse Keeper and former facilities caretaker. He secretly archived Project Echo documents after the facility shut down, storing them in a chest inside the lighthouse.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>7:30 PM:</strong> Welcome dinner brief.<br>• <strong>8:30 PM - 9:30 PM:</strong> Maintenance check at the lighthouse tower.</div>',
     image: 'assets/portrait_general_1780832290626.png'
@@ -289,6 +301,7 @@ const NPCS_BASE = [
     alive: false,
     speak_pitch: 1.0,
     speak_rate: 0.9,
+    height: 176,
     details: 'Kai Nakamura, investigative journalist (Victim 1). He illegally accessed Project Echo files to expose the trial operators. He was murdered near the shoreline perimeter shortly after arriving.',
     alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">Deceased. Found on the shoreline at 10:30 PM.</div>',
     image: 'assets/portrait_general_1780832290626.png'
@@ -515,7 +528,7 @@ const DASS_ITEMS = [
 ];
 
 const MODULES_DATA = [
-  {id:'beach',      title:'The Shoreline',    icon:'🏖️', loc:'Beach',      intro:'Footprints lead from the body toward the treeline. A storm is coming. Collect the evidence before the tide destroys everything.', task:'Search the shore — react quickly', hint:'Look for 5 clues scattered across the beach sand: a keycard, a footprint, a match, a locket, and a wine bottle. Ignore the other debris. Ensure you only select these specific items.'},
+  {id:'beach',      title:'The Shoreline',    icon:'🏖️', loc:'Beach',      intro:'Footprints lead from the body toward the treeline. A storm is coming. Collect the evidence before the tide destroys everything.', task:'Search the shore — react quickly', hint:'Search the shoreline for critical evidence.'},
   {id:'lighthouse', title:'The Lighthouse',   icon:'🔦', loc:'Lighthouse', intro:'The lighthouse is flashing unusual coded signals. The keeper vanished. Someone changed the sequence after the murder.',task:'Decode the pattern — repeat it exactly', hint:'Watch the colored light signals flashing from the lighthouse lantern. Replicate the sequence exactly by tapping the colored buttons below.'},
   {id:'room',       title:'Cabin 7',          icon:'🚪', loc:'Resort',     intro:"The victim's room has been searched. One object doesn't belong — planted by whoever was here last.", task:'Identify the intruder object', hint:'Investigate the items in the cabin room. One of these items is an intruder that does not belong to the victim. Select it to log as evidence.'},
   {id:'bonfire',    title:'The Bonfire',      icon:'🔥', loc:'Beach',      intro:"Every guest has a story. At the bonfire, the stories don't match. One person slipped a contradiction into their alibi.", task:'Spot the logical contradiction', hint:'Open the Case Files Dossier (by clicking FILES in the header) to review the suspect\'s verified timeline. Compare their statement at the bonfire to identify and click the phrase that contradicts the official files.'},
@@ -713,24 +726,20 @@ function showScreen(id) {
           <p style="font-weight: 700; color: #1a150e;">${m.task}</p>
           <div class="section-title">Evidence Checklist</div>
           <div id="beach-checklist" style="display: flex; flex-direction: column; gap: 8px; margin: 4px 0;">
-            <label>
-              <input type="checkbox" id="chk-keycard" disabled />
-              <span>Keycard</span>
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <input type="checkbox" id="chk-keycard" disabled style="width: auto; margin: 0;" />
+              <span>Bloody Cloth</span>
             </label>
-            <label>
-              <input type="checkbox" id="chk-footprint" disabled />
-              <span>Footprint</span>
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <input type="checkbox" id="chk-match" disabled style="width: auto; margin: 0;" />
+              <span>Voice Recorder</span>
             </label>
-            <label>
-              <input type="checkbox" id="chk-match" disabled />
-              <span>Matchbox</span>
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <input type="checkbox" id="chk-footprint" disabled style="width: auto; margin: 0;" />
+              <span>Footprints</span>
             </label>
-            <label>
-              <input type="checkbox" id="chk-locket" disabled />
-              <span>Silver Locket</span>
-            </label>
-            <label>
-              <input type="checkbox" id="chk-wine" disabled />
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <input type="checkbox" id="chk-wine" disabled style="width: auto; margin: 0;" />
               <span>Wine Bottle</span>
             </label>
           </div>
@@ -798,22 +807,27 @@ function enterIsland() {
     GS.playerIcon = '🚤';
   }
   
+  // Reset alive property on all suspects and base NPCs to prevent spoilers
+  IDENTITIES.forEach(i => i.alive = true);
+  NPCS_BASE.forEach(n => n.alive = true);
   GS.npcs = JSON.parse(JSON.stringify(NPCS_BASE));
   
-  // Select randomized killer (excluding player, rowan, keeper, kai)
+  // Select randomized killer (excluding player, rowan, keeper, kai, narrator)
   const potentialMurderers = [...IDENTITIES, ...NPCS_BASE].filter(c => 
     c.id !== 'kai' && 
     c.id !== 'keeper' && 
     c.id !== 'rowan' && 
+    c.id !== 'narrator' && 
     c.id !== userIdentityId
   );
   GS.murderer = potentialMurderers[Math.floor(Math.random()*potentialMurderers.length)].id;
   
-  // Select randomized bonfire victim (excluding player, killer, rowan, keeper, kai)
+  // Select randomized bonfire victim (excluding player, killer, rowan, keeper, kai, narrator)
   const potentialBonfireVictims = [...IDENTITIES, ...NPCS_BASE].filter(c => 
     c.id !== 'kai' && 
     c.id !== 'keeper' && 
     c.id !== 'rowan' && 
+    c.id !== 'narrator' && 
     c.id !== userIdentityId && 
     c.id !== GS.murderer
   );
@@ -1134,152 +1148,547 @@ function flashScore(txt) {
 }
 
 // ─ PLACEHOLDER FUNCTIONS FOR BUILDER ──────────────────────────
+function playTapeAudio() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  
+  try {
+    const ctx = new AudioContextClass();
+    
+    // Tactile tape key mechanical click helper
+    const playClickSound = (time) => {
+      // Thump component (low frequency transient)
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.frequency.setValueAtTime(120, time);
+      osc.frequency.exponentialRampToValueAtTime(30, time + 0.08);
+      
+      oscGain.gain.setValueAtTime(0.25, time);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+      
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.08);
+
+      // Noise component (mechanical scratch/snap)
+      const clickBufferSize = ctx.sampleRate * 0.05;
+      const clickBuffer = ctx.createBuffer(1, clickBufferSize, ctx.sampleRate);
+      const clickData = clickBuffer.getChannelData(0);
+      for (let i = 0; i < clickBufferSize; i++) {
+        clickData[i] = (Math.random() * 2 - 1) * 0.15 * Math.exp(-i / (clickBufferSize / 4));
+      }
+      const clickNode = ctx.createBufferSource();
+      clickNode.buffer = clickBuffer;
+      
+      const clickGain = ctx.createGain();
+      clickGain.gain.setValueAtTime(0.7, time);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+      
+      clickNode.connect(clickGain);
+      clickGain.connect(ctx.destination);
+      clickNode.start(time);
+    };
+    
+    // Play start click immediately
+    playClickSound(ctx.currentTime);
+    
+    // Play constant hum (low frequency tape deck hum)
+    const hum = ctx.createOscillator();
+    const humGain = ctx.createGain();
+    hum.type = 'sine';
+    hum.frequency.value = 60;
+    hum.connect(humGain);
+    humGain.connect(ctx.destination);
+    humGain.gain.setValueAtTime(0.04, ctx.currentTime);
+    hum.start();
+    
+    // Play constant static noise with pops/crackles
+    const bufferSize = ctx.sampleRate * 2.5; // 2.5s loop
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      // Base white noise hiss
+      let sample = (Math.random() * 2 - 1) * 0.012;
+      
+      // Random crackles / pops (average 10 per second)
+      if (Math.random() < 0.0002) {
+        const popLen = Math.floor(Math.random() * 250) + 40;
+        const amp = (Math.random() * 2 - 1) * 0.18;
+        for (let j = 0; j < popLen && i + j < bufferSize; j++) {
+          output[i + j] += amp * Math.exp(-j / (popLen / 3.5));
+        }
+      }
+      output[i] += sample;
+    }
+    const whiteNoise = ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+    
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.02, ctx.currentTime);
+    whiteNoise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    whiteNoise.start();
+    
+    return {
+      stop: () => {
+        try {
+          hum.stop();
+          whiteNoise.stop();
+          
+          // Play stop click
+          playClickSound(ctx.currentTime);
+          
+          setTimeout(() => ctx.close(), 150);
+        } catch (e) {
+          console.warn("Audio stop error:", e);
+        }
+      }
+    };
+  } catch (e) {
+    console.warn("Failed to initialize Web Audio tape hum:", e);
+    return null;
+  }
+}
+
+function playVoiceRecorderTape(onComplete) {
+  // Create fullscreen zoom overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'recorder-zoom-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.inset = '0';
+  overlay.style.backgroundColor = 'rgba(10, 8, 5, 0.94)';
+  overlay.style.backdropFilter = 'blur(10px)';
+  overlay.style.zIndex = '999999';
+  overlay.style.display = 'flex';
+  overlay.style.flexDirection = 'column';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.fontFamily = 'var(--ff-m)';
+  
+  if (!$('cassette-style')) {
+    const style = document.createElement('style');
+    style.id = 'cassette-style';
+    style.textContent = `
+      @keyframes spin-clockwise {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .spool-wheel {
+        width: 48px;
+        height: 48px;
+        border: 4px dashed var(--gold-l);
+        border-radius: 50%;
+        animation: spin-clockwise 3s linear infinite;
+        position: relative;
+        background: #191410;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+      }
+      .spool-wheel::after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        background: var(--gold);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .eq-bar {
+        width: 4px;
+        height: 5px;
+        background: var(--teal);
+        transition: height 0.08s ease;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  overlay.innerHTML = `
+    <div style="background: linear-gradient(135deg, #2b241a, #15120e); border: 2px solid var(--gold-l); border-radius: 12px; width: 340px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); display:flex; flex-direction:column; align-items:center; gap: 15px; position: relative;">
+      <div style="font-size: 0.65rem; color: var(--gold-l); letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; margin-bottom: 5px;">TAPE VOICE RECORDER // PLAYBACK</div>
+      
+      <!-- Cassette window view -->
+      <div style="width: 100%; height: 90px; background: #0b0907; border: 1px solid rgba(196,164,101,0.25); border-radius: 6px; display:flex; align-items:center; justify-content:center; gap: 50px; position: relative; overflow: hidden; box-shadow: inset 0 0 15px #000;">
+        <div class="spool-wheel" id="spool-left"></div>
+        <div class="spool-wheel" id="spool-right"></div>
+        <!-- Tape film connection visual -->
+        <div style="position: absolute; bottom: 30px; left: 100px; right: 100px; height: 2px; background: rgba(196,164,101,0.3); z-index: 1;"></div>
+      </div>
+      
+      <!-- Equalizer/LED wave and Counter -->
+      <div style="display:flex; justify-content: space-between; width: 100%; align-items: center; padding: 0 5px;">
+        <div id="eq-container" style="display:flex; gap: 3px; height: 20px; align-items: flex-end;">
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+        </div>
+        <div id="tape-counter" style="font-family: monospace; color: var(--rust); font-size: 0.95rem; font-weight: bold; letter-spacing: 0.05em; text-shadow: 0 0 5px rgba(192,71,31,0.5);">00:00.0</div>
+      </div>
+    </div>
+    
+    <!-- Subtitle transcript view -->
+    <div id="tape-subtitle" style="margin-top: 30px; width: 90%; max-width: 450px; min-height: 80px; text-align: center; color: #f5f0eb; font-size: 0.85rem; line-height: 1.6; border-top: 1px solid rgba(196,164,101,0.15); padding-top: 15px; font-style: italic; white-space: pre-wrap;">
+      [ PLAYBACK STARTING... ]
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  const audioHandle = playTapeAudio();
+  
+  const murdererNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.murderer);
+  const murdererName = murdererNPC ? murdererNPC.name : 'Marcus Hale';
+  const fullText = `[ The tape deck clicks play. Heavy background static and crackling hum fills the audio. ]\n\n[ Two panicked, hushed voices are heard arguing. They mention that their agreement was only to collect data, that someone is dead, and that ${murdererName} was never supposed to find out. ]`;
+  
+  let charIdx = 0;
+  const subtitleEl = $('tape-subtitle');
+  subtitleEl.innerHTML = '';
+  
+  let counterSeconds = 0;
+  const counterEl = $('tape-counter');
+  const eqBars = document.querySelectorAll('.eq-bar');
+  
+  const animInterval = setInterval(() => {
+    counterSeconds += 0.1;
+    const wholeSecs = Math.floor(counterSeconds);
+    const ms = Math.floor((counterSeconds % 1) * 10);
+    counterEl.textContent = `00:${String(wholeSecs).padStart(2, '0')}.${ms}`;
+    
+    eqBars.forEach(bar => {
+      const h = 3 + Math.random() * 15;
+      bar.style.height = h + 'px';
+    });
+  }, 100);
+  
+  setTimeout(() => {
+    const typeInterval = setInterval(() => {
+      if (charIdx < fullText.length) {
+        const char = fullText.charAt(charIdx);
+        if (char === '\n') {
+          subtitleEl.innerHTML += '<br>';
+        } else {
+          subtitleEl.innerHTML += char;
+        }
+        charIdx++;
+      } else {
+        clearInterval(typeInterval);
+        clearInterval(animInterval);
+        
+        eqBars.forEach(bar => bar.style.height = '3px');
+        if (audioHandle) audioHandle.stop();
+        
+        $('spool-left').style.animationPlayState = 'paused';
+        $('spool-right').style.animationPlayState = 'paused';
+        
+        const contBtn = document.createElement('button');
+        contBtn.className = 'btn-main';
+        contBtn.style.marginTop = '25px';
+        contBtn.style.padding = '8px 24px';
+        contBtn.style.cursor = 'pointer';
+        contBtn.textContent = 'Close Playback';
+        contBtn.onclick = () => {
+          overlay.remove();
+          onComplete();
+        };
+        overlay.appendChild(contBtn);
+      }
+    }, 55);
+  }, 800);
+}
+
 function startBeach() {
   const area = $('beach-area');
+  
   area.innerHTML = `
-<div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111;">
+<div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111; border: 1px solid rgba(196,164,101,0.25);">
   <div style="width:100%; height:100%; position:relative;" id="beach-scene">
-    <img src="assets/beach.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.85;">
+    <img src="assets/beach.png?v=${Date.now()}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.7;">
     <div id="beach-canvas-items" style="position:absolute; inset:0;"></div>
     <div id="beach-start-overlay" style="position:absolute;inset:0;background:rgba(5,5,8,0.85);display:flex;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">
-      <button class="btn-main" id="btn-start-beach">Start Search</button>
+      <button class="btn-main" id="btn-start-beach">Investigate Shoreline</button>
     </div>
   </div>
 </div>
   `;
 
-  // CSS for the hover effect
-  if(!$('beach-hover-style')) {
-const style = document.createElement('style');
-style.id = 'beach-hover-style';
-style.textContent = `
-  .beach-item {
-    position: absolute;
-    cursor: pointer;
-    filter: brightness(0.75) sepia(0.2) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
-    transition: all 0.3s ease;
-  }
-  .beach-item:hover {
-    filter: brightness(1.2) sepia(0) drop-shadow(0 0 10px rgba(196,164,101,0.9));
-    transform: scale(1.15) translateY(-5px);
-  }
-`;
-document.head.appendChild(style);
+  if (!$('beach-hover-style')) {
+    const style = document.createElement('style');
+    style.id = 'beach-hover-style';
+    style.textContent = `
+      .beach-clue {
+        position: absolute;
+        cursor: pointer;
+        /* Ambient beach night lighting integration: desaturated, slightly darker, perspective skew, soft dark drop-shadow */
+        filter: brightness(0.85) contrast(1.02) saturate(0.9) drop-shadow(2px 6px 4px rgba(0,0,0,0.65));
+        transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        transform-origin: bottom center;
+      }
+      .beach-clue:hover {
+        filter: brightness(1.15) contrast(1.05) saturate(1.0) drop-shadow(0 0 10px var(--gold-l));
+        transform: scale(1.1) translateY(-3px);
+      }
+    `;
+    document.head.appendChild(style);
   }
 
-  const container = $('beach-canvas-items');
-  let left = 5, attempts = 0; $('beach-left').textContent = left;
-  
-  const targets = [
-{id:'keycard', img:'assets/item_card.png', w:'40px'},
-{id:'footprint', img:'assets/item_foot.png', w:'55px'},
-{id:'match', img:'assets/item_match_v4.png', w:'40px'},
-{id:'locket', img:'assets/item_locket.png', w:'35px'},
-{id:'wine', img:'assets/item_wine.png', w:'30px'}
-  ];
-  const decoys = [
-{id:'bucket', img:'assets/item_bucket.png', w:'55px'},
-{id:'compass', img:'assets/item_compass.png', w:'45px'},
-{id:'shell', img:'assets/item_shell.png', w:'45px'},
-{id:'shovel', img:'assets/item_shovel.png', w:'65px'},
-{id:'cross', img:'assets/item_cross.png', w:'35px'}
-  ];
+  // Set header task title
+  const hudHeader = document.querySelector('#sc-beach h3');
+  if (hudHeader) hudHeader.textContent = 'Beach Crime Scene Investigation';
+
+  let attempts = 0;
+  let bloodyClothCollected = false;
+  let recorderCollected = false;
+  let footprintsCollected = false;
+  let wineCollected = false;
+
+  // Clues tracker for UI header panel
+  const counterLabel = document.querySelector('#sc-beach p');
+  if (counterLabel) {
+    counterLabel.innerHTML = `Search the shoreline for critical evidence. Bloody Cloth and Voice Recorder are required.`;
+  }
 
   $('btn-start-beach').onclick = () => {
-$('beach-start-overlay').remove();
-const gameStart = Date.now();
+    $('beach-start-overlay').remove();
+    const gameStart = Date.now();
 
-// Spawn all items
-const allItems = [...targets.map(t=>({...t, correct:true})), ...decoys.map(d=>({...d, correct:false}))];
-allItems.sort(() => Math.random() - 0.5);
+    // Define 8 pre-set sandy slots to guarantee items stay on the shore and do not overlap
+    const slots = [
+      { left: '7%',  top: '60%' },
+      { left: '14%', top: '74%' },
+      { left: '22%', top: '86%' },
+      { left: '27%', top: '57%' },
+      { left: '33%', top: '65%' },
+      { left: '29%', top: '76%' },
+      { left: '9%',  top: '84%' },
+      { left: '42%', top: '68%' }
+    ];
 
-const W = container.getBoundingClientRect().width || container.clientWidth || 900;
-const H = container.getBoundingClientRect().height || container.clientHeight || 480;
-const placed = [];
-
-const isOverlap = (x, y, itemW, pad) => {
-  const px = (x / 100) * W;
-  const py = (y / 100) * H;
-  
-  const left1 = px - pad;
-  const right1 = px + itemW + pad;
-  const top1 = py - pad;
-  const bottom1 = py + itemW + pad;
-
-  return placed.some(p => {
-    const left2 = p.px - pad;
-    const right2 = p.px + p.w + pad;
-    const top2 = p.py - pad;
-    const bottom2 = p.py + p.w + pad;
-
-    return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
-  });
-};
-
-allItems.forEach(item => {
-  const itemW = parseFloat(item.w);
-  let x, y, tries = 0, pad = 12;
-  do {
-    if (tries > 100) pad = 8;
-    if (tries > 200) pad = 4;
-    if (tries > 250) pad = 0;
-    
-    // Restrict X to 8-80% to utilize wider sand space
-    x = 8 + Math.random() * 72;
-    // Flatter shoreline slope to provide much more vertical sand space on the right
-    let minY = 45 + (x * 0.25);
-    y = minY + Math.random() * (89 - minY);
-    tries++;
-  } while (isOverlap(x, y, itemW, pad) && tries < 500);
-  
-  const px = (x / 100) * W;
-  const py = (y / 100) * H;
-  placed.push({ px, py, w: itemW });
-
-  const c = document.createElement('img');
-  c.className = 'beach-item';
-  c.src = item.img;
-  c.style.width = item.w;
-  c.style.left = x + '%';
-  c.style.top = y + '%';
-  c.style.transform = `rotate(${(Math.random()-0.5)*70}deg)`;
-  
-  c.onclick = () => {
-    if (!GS.gameActive) return;
-    if(item.correct) {
-      SFX.pickup();
-      c.style.pointerEvents = 'none';
-      c.style.transform = 'scale(1.5) rotate(10deg)';
-      c.style.opacity = '0';
-      setTimeout(() => c.remove(), 300);
-      
-      const chk = $('chk-' + item.id);
-      if (chk) chk.checked = true;
-      
-      const rt = Date.now() - gameStart;
-      GS.domains.attention = Math.min(100, GS.domains.attention + 11);
-      GS.domains.processingSpeed = Math.min(100, GS.domains.processingSpeed + (rt<10000 ? 14 : 8));
-      
-      left--;
-      $('beach-left').textContent = left;
-      if(left <= 0) finishBeach(gameStart);
-    } else {
-      SFX.fail();
-      attempts++;
-      GS.domains.attention = Math.max(0, GS.domains.attention - 5);
-      c.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
-      setTimeout(() => { c.style.filter = ''; }, 400);
+    // Simple Durstenfeld shuffle for the slots
+    for (let i = slots.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [slots[i], slots[j]] = [slots[j], slots[i]];
     }
+
+    const objects = [
+      { id: 'wine', img: `assets/item_wine.png?v=${Date.now()}`, w: '52px', rotation: -45, isDecoy: false, type: 'wine' },
+      { id: 'cloth', img: `assets/item_cloth.png?v=${Date.now()}`, w: '62px', rotation: 12, isDecoy: false, type: 'cloth' },
+      { id: 'recorder', img: `assets/item_card.png?v=${Date.now()}`, w: '35px', rotation: -18, isDecoy: false, type: 'recorder' },
+      { id: 'footprint', img: `assets/item_foot.png?v=${Date.now()}`, w: '52px', rotation: 5, isDecoy: false, type: 'footprint' },
+      { id: 'shell1', img: `assets/item_shell.png?v=${Date.now()}`, w: '38px', rotation: 25, isDecoy: true },
+      { id: 'shell2', img: `assets/item_shell.png?v=${Date.now()}`, w: '36px', rotation: -10, isDecoy: true },
+      { id: 'shovel', img: `assets/item_shovel.png?v=${Date.now()}`, w: '58px', rotation: 75, isDecoy: true },
+      { id: 'bucket', img: `assets/item_bucket.png?v=${Date.now()}`, w: '50px', rotation: -5, isDecoy: true }
+    ];
+
+    // Assign shuffled slots to objects
+    objects.forEach((obj, idx) => {
+      obj.left = slots[idx].left;
+      obj.top = slots[idx].top;
+    });
+
+    const container = $('beach-canvas-items');
+    
+    // Spawn clues
+    objects.forEach(obj => {
+      const el = document.createElement('img');
+      el.className = 'beach-clue';
+      el.src = obj.img;
+      el.style.width = obj.w;
+      el.style.left = obj.left;
+      el.style.top = obj.top;
+      // Combine random perspective transform and tilt to ground it
+      el.style.transform = `rotate(${obj.rotation || 0}deg) skewX(5deg) scaleY(0.9)`;
+      
+      el.onclick = () => {
+        if (!GS.gameActive) return;
+        
+        if (obj.isDecoy) {
+          SFX.fail();
+          attempts++;
+          GS.domains.attention = Math.max(0, GS.domains.attention - 5);
+          
+          el.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
+          setTimeout(() => el.style.filter = '', 400);
+          
+          // Warnings if attempts > 4
+          if (attempts === 5) {
+            showDialog('Narrator', 
+              "You are making too many errors. Focus on searching for the Bloody Cloth and the Voice Recorder.", 
+              null, null, 'narrator'
+            );
+          }
+          return;
+        }
+        
+        // Handle actual objects
+        if (obj.type === 'wine') {
+          if (wineCollected) return;
+          wineCollected = true;
+          SFX.click();
+          el.remove(); // Remove immediately from the beach scene
+          
+          const chk = $('chk-wine');
+          if (chk) chk.checked = true;
+          showDialog('Narrator', "Just an empty wine bottle. Nothing useful.", null, null, 'narrator');
+          
+        } else if (obj.type === 'cloth') {
+          if (bloodyClothCollected) return;
+          bloodyClothCollected = true;
+          SFX.pickup();
+          el.remove(); // Remove immediately from the beach scene
+          
+          const chk = $('chk-keycard'); // Use original keycard checklist slot for cloth
+          if (chk) {
+            chk.checked = true;
+            const labelSpan = chk.nextElementSibling;
+            if (labelSpan) labelSpan.textContent = 'Bloody Cloth';
+          }
+          
+          showDialog('Narrator', "Blood... This confirms the victim didn't die naturally.", null, () => {
+            checkBeachCompletion(gameStart);
+          }, 'narrator');
+          
+        } else if (obj.type === 'footprint') {
+          if (footprintsCollected) return;
+          footprintsCollected = true;
+          SFX.pickup();
+          el.remove(); // Remove immediately from the beach scene
+          
+          const chk = $('chk-footprint');
+          if (chk) chk.checked = true;
+          
+          const killerHeight = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.murderer).height || 175;
+          GS.footprintMinHeight = killerHeight - 5;
+          GS.footprintMaxHeight = killerHeight + 5;
+          GS.heightFilterUnlocked = true;
+          
+          showDialog('Narrator', 
+            `These footprints reveal an approximate height range. It suggests the suspect is between ${GS.footprintMinHeight} cm and ${GS.footprintMaxHeight} cm tall. Height filter unlocked in Case Dossier FILES.`, 
+            null, 
+            () => {
+              checkBeachCompletion(gameStart);
+            }, 
+            'narrator'
+          );
+          
+        } else if (obj.type === 'recorder') {
+          if (recorderCollected) return;
+          el.style.pointerEvents = 'none';
+          
+          // Zoom slightly into the recorder and play audio
+          el.style.transform = 'scale(2) rotate(0deg)';
+          el.style.zIndex = '99999';
+          
+          playVoiceRecorderTape(() => {
+            recorderCollected = true;
+            el.remove(); // Remove immediately from the beach scene upon completion
+            
+            const chk = $('chk-match'); // Use original match checklist slot for recorder
+            if (chk) {
+              chk.checked = true;
+              const labelSpan = chk.nextElementSibling;
+              if (labelSpan) labelSpan.textContent = 'Voice Recorder';
+            }
+            
+            showDialog('Narrator', 
+              "The recording reveals a conversation between two people shortly before the murder.", 
+              null, 
+              () => {
+                // Unlock first two suspects: killer and one random suspect
+                const playerId = GS.playerIdentity || (() => {
+                  const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+                  return user.identity === 'academic' ? 'student' : user.identity;
+                })();
+                
+                const possible = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+                  c.id !== playerId && 
+                  c.id !== 'rowan' && c.id !== 'narrator' && 
+                  c.id !== 'keeper' && 
+                  c.id !== 'kai' && 
+                  c.id !== GS.murderer
+                );
+                
+                const suspect2 = possible[0].id;
+                
+                if (!GS.unlockedSuspects) GS.unlockedSuspects = [];
+                if (!GS.unlockedSuspects.includes(GS.murderer)) GS.unlockedSuspects.push(GS.murderer);
+                if (!GS.unlockedSuspects.includes(suspect2)) GS.unlockedSuspects.push(suspect2);
+                updateDossierList();
+                
+                showNotification("New suspects identified");
+                checkBeachCompletion(gameStart);
+              }, 
+              'narrator'
+            );
+          });
+        }
+      };
+      
+      container.appendChild(el);
+    });
   };
-  container.appendChild(c);
-});
-  };
+
+  function checkBeachCompletion(startTime) {
+    if (bloodyClothCollected && recorderCollected) {
+      finishBeach(startTime);
+    }
+  }
 }
+
 function finishBeach(t) {
   GS.gameActive = false;
   const activeScreen = document.querySelector('.screen.game-screen');
   if (activeScreen) activeScreen.style.pointerEvents = 'none';
-  const rt=Date.now()-t; onModuleComplete(15,rt,true);
+  
+  const rt = Date.now() - t;
+  showNotification("Module Complete");
+  flashScore("+15");
+  
+  showScreen('sc-narrative');
+  
+  // Select suspect3 (not the player, Rowan, or the first two unlocked suspects)
+  const playerId = GS.playerIdentity || (() => {
+    const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+    return user.identity === 'academic' ? 'student' : user.identity;
+  })();
+  
+  const allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+    c.id !== playerId && 
+    c.id !== 'rowan' && c.id !== 'narrator' && 
+    c.id !== 'keeper' && 
+    c.id !== 'kai'
+  );
+  
+  const suspect3Obj = allSuspects.find(c => !GS.unlockedSuspects.includes(c.id));
+  const suspect3 = suspect3Obj ? suspect3Obj.id : null;
+  
+  showDialog('Narrator', "Something still doesn't add up...", null, () => {
+    if (suspect3 && suspect3Obj) {
+      GS.unlockedSuspects.push(suspect3);
+      updateDossierList();
+      
+      const desc = suspect3Obj.role ? `the ${suspect3Obj.role}` : 'another guest';
+      showDialog('Narrator', 
+        `My logs reveal that ${suspect3Obj.name}, ${desc}, has also been seen near the shore earlier. Why is their name omitted from the logs? We must investigate them further.`, 
+        null, 
+        () => {
+          showNotification(`New suspect unlocked: ${suspect3Obj.name}`);
+          onModuleComplete(15, rt, true);
+        }, 
+        'narrator'
+      );
+    } else {
+      onModuleComplete(15, rt, true);
+    }
+  }, 'narrator');
 }
 
 function startLighthouse(){
@@ -2587,14 +2996,29 @@ function updateDossierList() {
     return user.identity === 'academic' ? 'student' : user.identity;
   })();
   
-  // Filter out: player, rowan, keeper, kai from the suspect list!
-  // This is "our file" - about the OTHER suspects.
-  dossierList = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+  if (!GS.unlockedSuspects) {
+    GS.unlockedSuspects = [];
+  }
+  
+  let allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
     c.id !== playerId && 
     c.id !== 'rowan' && c.id !== 'narrator' && 
     c.id !== 'keeper' && 
     c.id !== 'kai'
   );
+  
+  // Filter by unlocked suspects
+  allSuspects = allSuspects.filter(c => GS.unlockedSuspects.includes(c.id));
+  
+  // Filter by height if height filter is active
+  if (GS.heightFilterActive && GS.footprintMinHeight && GS.footprintMaxHeight) {
+    allSuspects = allSuspects.filter(c => {
+      const h = c.height || 175;
+      return h >= GS.footprintMinHeight && h <= GS.footprintMaxHeight;
+    });
+  }
+  
+  dossierList = allSuspects;
 }
 
 function isSecretUnlocked(npcId) {
@@ -2620,6 +3044,20 @@ function isVictimTruthUnlocked(victimId) {
 
 function showDossierCard() {
   if (dossierList.length === 0) updateDossierList();
+  
+  if (dossierList.length === 0) {
+    $('cf-book-card').innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-dm); font-family:var(--ff-m); font-size:0.85rem; padding: 40px; text-align: center; width: 100%;">
+        <span style="font-size: 2.5rem; margin-bottom: 15px;">🔒</span>
+        <div style="font-family:var(--ff-t); font-size:1.1rem; color:var(--gold-l); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">Dossiers Locked</div>
+        No suspects identified yet.<br><br>Continue the investigation on the beach to unlock suspect case files.
+      </div>
+    `;
+    $('cf-page-num').textContent = '0';
+    $('cf-page-total').textContent = '0';
+    return;
+  }
+  
   const profile = dossierList[currentDossierPage];
   if (!profile) return;
   
@@ -2741,6 +3179,11 @@ function renderSuspectsTable() {
   const body = $('manifest-table-body');
   body.innerHTML = '';
   
+  if (dossierList.length === 0) {
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dm);padding:40px;font-family:var(--ff-m);font-size:0.85rem;">🔒 No suspects identified yet.</td></tr>';
+    return;
+  }
+  
   dossierList.forEach(s => {
     const isUnlocked = isSecretUnlocked(s.id);
     const secretText = isUnlocked 
@@ -2793,28 +3236,39 @@ function renderVictimsTable() {
   
   const victims = [];
   
-  // Kai Nakamura - always dead and announced in the intro
-  const kaiNPC = GS.npcs.find(n => n.id === 'kai');
-  if (kaiNPC && !kaiNPC.alive) {
-    victims.push({ id: 'kai', name: 'Kai Nakamura', role: 'Investigative Journalist', tod: 'Start of Game', truth: 'Not completely innocent. He illegally accessed confidential files and leaked participant information while investigating Project Echo.' });
+  // Kai Nakamura - always dead and announced in the intro, so visible from Module 1 (GS.moduleIdx >= 0)
+  if (GS.moduleIdx >= 0) {
+    const kaiNPC = GS.npcs.find(n => n.id === 'kai');
+    if (kaiNPC && !kaiNPC.alive) {
+      victims.push({ id: 'kai', name: 'Kai Nakamura', role: 'Investigative Journalist', tod: 'Start of Game', truth: 'Not completely innocent. He illegally accessed confidential files and leaked participant information while investigating Project Echo.' });
+    }
   }
   
   // Lighthouse Keeper - announced after Module 2 completes (keeper is marked deceased)
-  const keeperNPC = GS.npcs.find(n => n.id === 'keeper');
-  if (keeperNPC && !keeperNPC.alive) {
-    victims.push({ id: 'keeper', name: 'Lighthouse Keeper', role: 'Former Caretaker', tod: 'End of Module 2', truth: 'Secretly maintained a hidden archive of Project Echo documents after the project shut down.' });
+  if (GS.moduleIdx >= 2) {
+    const keeperNPC = GS.npcs.find(n => n.id === 'keeper');
+    if (keeperNPC && !keeperNPC.alive) {
+      victims.push({ id: 'keeper', name: 'Lighthouse Keeper', role: 'Former Caretaker', tod: 'End of Module 2', truth: 'Secretly maintained a hidden archive of Project Echo documents after the project shut down.' });
+    }
   }
   
   // Bonfire Victim - announced after Module 4 completes (bonfireVictim is marked deceased)
-  if (GS.bonfireVictim) {
-    const bonfireVictimNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.bonfireVictim);
+  if (GS.moduleIdx >= 4 && GS.bonfireVictim && GS.bonfireVictim !== 'narrator') {
+    const bonfireVictimNPC = [...IDENTITIES, ...GS.npcs].find(c => c.id === GS.bonfireVictim);
     if (bonfireVictimNPC && !bonfireVictimNPC.alive) {
       victims.push({ id: 'bonfireVictim', name: bonfireVictimNPC.name, role: bonfireVictimNPC.role, tod: 'End of Module 4', truth: 'Learns a crucial truth and lies about it during the bonfire, triggering their death.' });
     }
   }
   
   if (victims.length === 0) {
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dm);">No victim records announced yet.</td></tr>';
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center; padding: 25px 10px; color:var(--text-dm);">
+          <div style="font-family:var(--ff-t); font-size:1.1rem; color:var(--gold-l); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">[CLASSIFIED]</div>
+          Victim data unavailable. Continue the investigation to unlock this section.
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -2852,9 +3306,38 @@ window.switchDossierTab = (tabName) => {
   }
 };
 
+window.toggleHeightFilter = () => {
+  SFX.click();
+  const checkbox = $('filter-height-checkbox');
+  GS.heightFilterActive = checkbox ? checkbox.checked : false;
+  
+  updateDossierList();
+  currentDossierPage = 0;
+  
+  // Refresh current active view
+  const activeTabBtn = document.querySelector('.cf-tab-btn.active');
+  if (activeTabBtn) {
+    const clickAttr = activeTabBtn.getAttribute('onclick');
+    if (clickAttr.includes('manifest')) {
+      renderSuspectsTable();
+    } else if (clickAttr.includes('dossiers')) {
+      showDossierCard();
+    }
+  }
+};
+
 // Hook Files dossiers button
 $('cf-btn').onclick = () => {
   updateDossierList();
+  
+  if (GS.heightFilterUnlocked) {
+    $('cf-filters').style.display = 'flex';
+    $('filter-height-range').textContent = `${GS.footprintMinHeight} - ${GS.footprintMaxHeight}`;
+    const cb = $('filter-height-checkbox');
+    if (cb) cb.checked = GS.heightFilterActive;
+  } else {
+    $('cf-filters').style.display = 'none';
+  }
   
   document.querySelectorAll('.cf-tab-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.querySelector('.cf-tab-btn[onclick*="dossiers"]');
@@ -3701,4 +4184,56 @@ window.finishOpeningSequence = () => {
     }, 1000);
   }
 };
+
+function showNotification(msg) {
+  let container = $('game-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'game-toast-container';
+    container.style.position = 'fixed';
+    container.style.top = '20px';
+    container.style.right = '20px';
+    container.style.zIndex = '100000';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '10px';
+    container.style.pointerEvents = 'none';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.style.background = 'rgba(15, 10, 5, 0.95)';
+  toast.style.border = '1px solid var(--gold-l)';
+  toast.style.borderRadius = '4px';
+  toast.style.padding = '12px 20px';
+  toast.style.color = '#fff';
+  toast.style.fontFamily = 'var(--ff-m)';
+  toast.style.fontSize = '0.72rem';
+  toast.style.letterSpacing = '0.08em';
+  toast.style.textTransform = 'uppercase';
+  toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+  toast.style.backdropFilter = 'blur(10px)';
+  toast.style.display = 'flex';
+  toast.style.alignItems = 'center';
+  toast.style.gap = '10px';
+  toast.style.transition = 'all 0.35s cubic-bezier(0.19, 1, 0.22, 1)';
+  toast.style.transform = 'translateX(100px)';
+  toast.style.opacity = '0';
+  
+  toast.innerHTML = `<span style="color:var(--gold-l); font-size: 1rem; text-shadow: 0 0 5px var(--gold);">✦</span> <span>${msg}</span>`;
+  container.appendChild(toast);
+  
+  // Trigger animation
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateX(0)';
+    toast.style.opacity = '1';
+  });
+  
+  // Fade out
+  setTimeout(() => {
+    toast.style.transform = 'translateX(100px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
 
