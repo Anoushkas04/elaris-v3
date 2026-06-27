@@ -469,8 +469,8 @@ function getMemoryFragment(idx) {
     },
     // Module 3 (Cabin 7)
     {
-      text: `"[Item recovered from Cabin 7: a ${meta.item}, confirmed to be registered to ${meta.name}.]\n\n'Verified possession during initial check-in.' —Quartermaster Log"`,
-      clue: `A ${meta.item} registered to ${meta.name} was found inside Cabin 7.`
+      text: `"[Evidence Decrypted: Kai's Dossier on ${meta.name}]\n\nRelationship: Secret financial coordinator for Project Echo.\nInvestigation Focus: Tracing the offshore accounts used to fund the suppressed clinical trials.\nHidden Fact: Surveillance records place them meeting with the caretaker hours before the lighthouse went dark."`,
+      clue: `Linked the Cabin 7 intruder item to ${meta.name}, revealing their secret financial coordination of Project Echo and meetings before the murder.`
     },
     // Module 4 (The Bonfire)
     {
@@ -531,7 +531,7 @@ const DASS_ITEMS = [
 const MODULES_DATA = [
   {id:'beach',      title:'The Shoreline',    icon:'🏖️', loc:'Beach',      intro:'Footprints lead from the body toward the treeline. A storm is coming. Collect the evidence before the tide destroys everything.', task:'Search the shore — react quickly', hint:'Search the shoreline for critical evidence.'},
   {id:'lighthouse', title:'The Lighthouse',   icon:'🔦', loc:'Lighthouse', intro:'The security panel requires an access code. Solve the lock mechanism to enter the keeper\'s room.',task:'Solve the lock mechanism to enter the keeper\'s room', hint:'Watch the colored light signals flashing from the lighthouse lantern. Replicate the sequence exactly by tapping the colored buttons below.'},
-  {id:'room',       title:'Cabin 7',          icon:'🚪', loc:'Resort',     intro:"The victim's room has been searched. One object doesn't belong — planted by whoever was here last.", task:'Identify the intruder object', hint:'Investigate the items in the cabin room. One of these items is an intruder that does not belong to the victim. Select it to log as evidence.'},
+  {id:'room',       title:'Cabin 7',          icon:'🚪', loc:'Resort',     intro:'The cabin door is slightly open. Search the room carefully to find what was left behind.', task:'Examine the cabin for anything that seems out of place.', hint:'Someone was here recently. Look closely at the room and investigate the clues left behind.'},
   {id:'bonfire',    title:'The Bonfire',      icon:'🔥', loc:'Beach',      intro:"Every guest has a story. At the bonfire, the stories don't match. One person slipped a contradiction into their alibi.", task:'Spot the logical contradiction', hint:'Open the Case Files Dossier (by clicking FILES in the header) to review the suspect\'s verified timeline. Compare their statement at the bonfire to identify and click the phrase that contradicts the official files.'},
   {id:'baggage',    title:'Lost Baggage',     icon:'🧳', loc:'Dock',       intro:"The storm scattered luggage across the resort. Worse — someone swapped items. Restore order before more evidence is lost.", task:'Match owners to their belongings', hint:'Review character occupations in the Case Files. Select a character owner first, then select their professional belonging to pair them.'},
   {id:'forest',     title:'The Forest Trail', icon:'🌲', loc:'Forest',     intro:'A witness claims to have seen a figure running through the forest. But the paths keep changing. Someone rerouted them.', task:'Follow the correct path through shifting signs', hint:'To escape the looping trees, follow the path: walk forward to start, turn right at the mossy trunk, head left past the deep roots, turn back when the path darkens, then push forward to the clearing.'},
@@ -1090,6 +1090,50 @@ function runModule(idx) {
             );
           },
           observer1.id
+        );
+      },
+      'narrator'
+    );
+    return;
+  }
+
+  // Custom narrative intro transition for Module 3 (Cabin 7)
+  if (idx === 2) {
+    const bgImg = $('narrative-bg-img');
+    showDialog('Narrator',
+      'The lighthouse keeper left us only two words.',
+      null,
+      () => {
+        showDialog('Narrator',
+          'Cabin 7.',
+          null,
+          () => {
+            showDialog('Narrator',
+              'Whatever happened here... he wanted us to find it.',
+              null,
+              () => {
+                if (bgImg) bgImg.src = 'assets/cabin7.jpeg';
+                
+                showDialog('Narrator',
+                  'The cabin appears abandoned.\n\nThe front door is slightly open.',
+                  null,
+                  () => {
+                    showDialog('Narrator',
+                      'Someone was here recently.',
+                      null,
+                      () => {
+                        launchGame('room');
+                      },
+                      'narrator'
+                    );
+                  },
+                  'narrator'
+                );
+              },
+              'narrator'
+            );
+          },
+          'narrator'
         );
       },
       'narrator'
@@ -1946,73 +1990,320 @@ function startLighthouse(){
   playSequence();
 }
 
+function openJournalModal(js1, js2, cb) {
+  // Styles for the journal modal
+  if (!$('journal-styles')) {
+    const s = document.createElement('style');
+    s.id = 'journal-styles';
+    s.textContent = `
+      .journal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 150000;
+        backdrop-filter: blur(8px);
+        animation: journalFadeIn 0.3s ease-out;
+      }
+      .journal-container {
+        width: 95%;
+        max-width: 820px;
+        height: 80vh;
+        background: #3a221d;
+        border-radius: 8px;
+        box-shadow: 0 30px 70px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.7);
+        padding: 16px;
+        position: relative;
+        display: flex;
+        gap: 12px;
+        border: 6px solid #23120f;
+        box-sizing: border-box;
+        transform: rotate(-0.5deg);
+      }
+      .journal-spine {
+        position: absolute;
+        top: 16px;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        background: linear-gradient(90deg, rgba(0,0,0,0.5), rgba(255,255,255,0.1) 30%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.1) 70%, rgba(0,0,0,0.5));
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+        z-index: 10;
+        border-radius: 2px;
+      }
+      .journal-page {
+        flex: 1;
+        background: #f1e7cf;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        padding: 22px 20px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #dfd2b4;
+        box-sizing: border-box;
+        position: relative;
+        overflow-y: auto;
+      }
+      .journal-page-left {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        border-right: 1px solid rgba(0,0,0,0.15);
+      }
+      .journal-page-right {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        border-left: 1px solid rgba(0,0,0,0.15);
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%);
+      }
+      .journal-page-right::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 24px;
+        height: 24px;
+        background: #3a221d;
+        box-shadow: -2px -2px 6px rgba(0,0,0,0.25);
+        transform: rotate(0deg);
+        pointer-events: none;
+        z-index: 4;
+      }
+      .folded-page-corner {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 24px;
+        height: 24px;
+        background: #dfd2b4;
+        border-top-left-radius: 4px;
+        box-shadow: -3px -3px 8px rgba(0,0,0,0.15);
+        z-index: 5;
+        pointer-events: none;
+      }
+      .journal-content {
+        font-family: 'Caveat', cursive, 'Courier New', sans-serif;
+        font-size: 1.15rem;
+        line-height: 1.5;
+        color: #2c241c;
+      }
+      .journal-close-btn {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        width: 32px;
+        height: 32px;
+        background: #2b1a15;
+        color: #f4ecd8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border: 2px solid #dfd2b4;
+        z-index: 1000;
+        transition: all 0.2s ease;
+      }
+      .journal-close-btn:hover {
+        background: var(--gold-l);
+        color: #2b1a15;
+        transform: scale(1.1);
+      }
+      @keyframes journalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Load the fonts if they aren't loaded yet
+  if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Special+Elite&display=swap';
+    document.head.appendChild(l);
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'journal-overlay';
+  overlay.id = 'journal-modal';
+
+  overlay.innerHTML = `
+    <div class="journal-container">
+      <div class="journal-close-btn" id="journal-close">×</div>
+      <div class="journal-spine"></div>
+      
+      <!-- LEFT PAGE -->
+      <div class="journal-page journal-page-left">
+        <!-- Tiny margins watermark of symbol -->
+        <div style="position:absolute; top:10px; right:15px; width:20px; height:20px; opacity:0.18; transform:rotate(-12deg);">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#a23a1f" stroke-width="4"/><path d="M20,50 L80,50 M50,20 L50,80" stroke="#a23a1f" stroke-width="5"/></svg>
+        </div>
+
+        <div class="journal-content">
+          <!-- Coffee Stain Ring -->
+          <div style="position:absolute; width:100px; height:100px; border-radius:50%; border: 3px solid rgba(110,80,50,0.08); filter: blur(1.5px); top: 120px; left: -20px; pointer-events:none; transform: rotate(15deg);"></div>
+          <div style="position:absolute; width:80px; height:70px; background: rgba(130,90,60,0.04); filter: blur(5px); top: 130px; left: -10px; pointer-events:none;"></div>
+
+          <div style="border-bottom: 1.5px solid rgba(139,125,107,0.25); padding-bottom: 4px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:'Special Elite', monospace; font-size:0.68rem; color:#8c7e6b; letter-spacing:0.05em; text-transform:uppercase;">Kai's Journal // Page 1</span>
+          </div>
+
+          <div style="line-height: 1.95rem; background: repeating-linear-gradient(transparent, transparent 1.9rem, rgba(90,75,60,0.1) 1.9rem, rgba(90,75,60,0.1) 1.95rem); text-align: left; padding: 0 4px;">
+            <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem;">Oct 24 - Groundwork</p>
+            <p style="margin: 0;">Ferry ride was completely silent. Rowan Ashford gave us a rehearsed pitch about recovery, but the old Echo footprint is still visible. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">They think I came here to write a review.</span> I need to make sure my notes stay hidden.</p>
+            
+            <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem; margin-top: 1rem;">Oct 25 - The Caretaker</p>
+            <p style="margin: 0;">The keeper knows something. He is terrified of the management team. He whispered that <span style="border-bottom: 2.5px solid rgba(162,58,31,0.75); padding-bottom:1px; font-weight: bold;">critical documents are locked inside the lighthouse panel</span>.</p>
+            <p style="margin: 0;">Who is coordinating the cover-up? Is it <span style="border: 1.5px dashed #3c54aa; border-radius: 50% 45% 52% 48%; padding: 1px 5px; display: inline-block; transform: rotate(-2.5deg); margin: 0 1px; color:#21338a; font-weight:bold;">${js1.name}</span>? Or is <span style="border: 1.5px dashed #3c54aa; border-radius: 48% 50% 45% 52%; padding: 1px 5px; display: inline-block; transform: rotate(1.5deg); margin: 0 1px; color:#21338a; font-weight:bold;">${js2.name}</span> the main agent? Heard them arguing near the tidepools last night. They mentioned files going missing.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PAGE -->
+      <div class="journal-page journal-page-right" style="position:relative;">
+        <div class="folded-page-corner"></div>
+        
+        <!-- Tiny margins watermark of symbol -->
+        <div style="position:absolute; bottom:15px; left:15px; width:25px; height:25px; opacity:0.15; transform:rotate(25deg);">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#a23a1f" stroke-width="4"/><path d="M20,50 L80,50 M50,20 L50,80" stroke="#a23a1f" stroke-width="5"/></svg>
+        </div>
+
+        <div class="journal-content">
+          <div style="border-bottom: 1.5px solid rgba(139,125,107,0.25); padding-bottom: 4px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:'Special Elite', monospace; font-size:0.68rem; color:#8c7e6b; letter-spacing:0.05em; text-transform:uppercase;">Kai's Journal // Page 2</span>
+            <span style="font-family:'Special Elite', monospace; font-size:0.68rem; color:#a23a1f;">[CLASSIFIED]</span>
+          </div>
+
+          <div style="line-height: 1.95rem; background: repeating-linear-gradient(transparent, transparent 1.9rem, rgba(90,75,60,0.1) 1.9rem, rgba(90,75,60,0.1) 1.95rem); text-align: left; padding: 0 4px;">
+            <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem;">Oct 26 - Warning</p>
+            <p style="margin: 0;">Rowan asked about my archives. They are tracking my queries. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">I'm running out of time.</span> The backup security panels are active. If they trigger a lockdown, check the timelines logs of the guests to extract the digit code. One guest left an item behind in the cabin that bridges the network.</p>
+
+            <!-- Draw/Sketch section -->
+            <div style="display:flex; justify-content: space-between; margin-top: 0.8rem; align-items: center; border-top: 1px dotted rgba(90,75,60,0.3); padding-top: 0.8rem; position:relative;">
+              <div style="width: 50%; line-height: 1.35; font-size: 1.05rem;">
+                <p style="margin: 0; font-style: italic; color: #5a4b3c;">The key leads to the control panels. Watch the sequence. Repeat. Don't fail.</p>
+              </div>
+              
+              <!-- Sketches -->
+              <div style="width: 45%; text-align: center; opacity: 0.9; transform: rotate(1deg); position:relative;">
+                <!-- SVG Arrow connecting sketch to note -->
+                <svg style="position:absolute; top:-25px; left:-35px; width:45px; height:45px; pointer-events:none; overflow:visible;">
+                  <path d="M 40,5 C 20,20 5,30 2,40" fill="none" stroke="#3c54aa" stroke-width="1.5" stroke-dasharray="2 2" stroke-linecap="round"/>
+                  <path d="M 2,40 L 8,36 M 2,40 L 4,46" fill="none" stroke="#3c54aa" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+
+                <svg width="95" height="95" viewBox="0 0 100 100" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15)); background: rgba(0,0,0,0.02); border-radius: 4px; padding: 2px;">
+                  <path d="M 35,80 L 42,35 L 48,35 L 55,80 Z" fill="none" stroke="#42352b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M 42,35 L 45,20 L 48,35" fill="none" stroke="#42352b" stroke-width="1.5" />
+                  <line x1="38" y1="62" x2="52" y2="62" stroke="#42352b" stroke-width="1" />
+                  <line x1="40" y1="48" x2="50" y2="48" stroke="#42352b" stroke-width="1" />
+                  
+                  <circle cx="45" cy="50" r="16" fill="none" stroke="#a23a1f" stroke-width="2" stroke-dasharray="1.5 2.5" />
+                  <path d="M 32,50 L 58,50 M 45,37 L 45,63" fill="none" stroke="#a23a1f" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <div style="font-family:'Special Elite', monospace; font-size: 0.52rem; color: #a23a1f; margin-top: 1px; transform: rotate(-2deg);">SYMBOL IN THE ARCHIVE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#journal-close').onclick = () => {
+    SFX.click();
+    overlay.remove();
+    if (cb) cb();
+  };
+}
+
 function startRoom(){
   let attempt=0;
+  window._cabinStartTime = Date.now();
+  window._foundCabinJournal = false;
+  window._foundCabinIntruder = false;
+  
   $('room-attempt').textContent=1;
-  const gameStart=Date.now();
   const grid=$('room-grid');
   
   if(!$('cabin-styles')) {
-const s=document.createElement('style');
-s.id='cabin-styles';
-s.textContent = `
-  .room-item {
-    position: absolute;
-    cursor: pointer;
-    filter: brightness(0.8) sepia(0.1) drop-shadow(0 3px 5px rgba(0,0,0,0.7));
-    transition: all 0.25s ease;
-  }
-  .room-item:hover {
-    filter: brightness(1.25) sepia(0) drop-shadow(0 0 12px rgba(196,164,101,0.95));
-    transform: scale(1.18) translateY(-4px) !important;
-  }
-  .room-item.wrong {
-    animation: shake 0.4s;
-  }
-  .room-item.right {
-    filter: brightness(1.2) drop-shadow(0 0 15px #4ecda8) !important;
-  }
-`;
-document.head.appendChild(s);
+    const s=document.createElement('style');
+    s.id='cabin-styles';
+    s.textContent = `
+      .room-item {
+        position: absolute;
+        cursor: pointer;
+        filter: brightness(0.8) sepia(0.1) drop-shadow(0 3px 5px rgba(0,0,0,0.7));
+        transition: all 0.25s ease;
+      }
+      .room-item:hover {
+        filter: brightness(1.25) sepia(0) drop-shadow(0 0 12px rgba(196,164,101,0.95));
+        transform: scale(1.18) translateY(-4px) !important;
+      }
+      .room-item.wrong {
+        animation: shake 0.4s;
+      }
+      .room-item.right {
+        filter: brightness(1.2) drop-shadow(0 0 15px #4ecda8) !important;
+      }
+    `;
+    document.head.appendChild(s);
   }
 
   const items = [
-{id:'wine', img:'assets/wine_clean_v2.png', label:'Wine Glass', w:'22px'},
-{id:'notebook', img:'assets/notebook_clean_v2.png', label:'Hidden Notebook', w:'36px'},
-{id:'novel', img:'assets/novel_clean_v2.png', label:'Mystery Novel', w:'34px'},
-{id:'perfume', img:'assets/perfume_clean_v2.png', label:'Perfume Bottle', w:'25px'},
-{id:'locket', img:'assets/locket_clean_v2.png', label:'Silver Locket', w:'26px'},
-{id:'compass', img:'assets/compass_clean_v2.png', label:'Old Compass', w:'30px'},
-{id:'magnifying', img:'assets/magnifying_clean_v2.png', label:'Magnifying Glass', w:'32px'},
-{id:'cross', img:'assets/cross_clean_v2.png', label:'Wooden Cross', w:'25px'},
-{id:'medal', img:'assets/medal_clean_v2.png', label:'Military Medal', w:'28px'}
+    {id:'wine', img:'assets/wine_clean_v2.png', label:'Wine Glass', w:'22px'},
+    {id:'notebook', img:'assets/notebook_clean_v2.png', label:'Hidden Notebook', w:'36px'},
+    {id:'novel', img:'assets/novel_clean_v2.png', label:'Mystery Novel', w:'34px'},
+    {id:'perfume', img:'assets/perfume_clean_v2.png', label:'Perfume Bottle', w:'25px'},
+    {id:'locket', img:'assets/locket_clean_v2.png', label:'Silver Locket', w:'26px'},
+    {id:'compass', img:'assets/compass_clean_v2.png', label:'Old Compass', w:'30px'},
+    {id:'magnifying', img:'assets/magnifying_clean_v2.png', label:'Magnifying Glass', w:'32px'},
+    {id:'cross', img:'assets/cross_clean_v2.png', label:'Wooden Cross', w:'25px'},
+    {id:'medal', img:'assets/medal_clean_v2.png', label:'Military Medal', w:'28px'}
   ];
   
+  // Select a random suspect (excluding player and Kai) as the intruder suspect for this playthrough
+  const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+  const playerId = user.identity === 'academic' ? 'student' : user.identity;
+  const candidates = ['doctor', 'ceo', 'musician', 'student', 'comedian', 'detective', 'influencer', 'therapist', 'rachel', 'gamer'].filter(id => id !== playerId);
+  
+  // Pick target suspect
+  const targetSuspect = candidates[Math.floor(Math.random() * candidates.length)];
+  window._cabinIntruderSuspect = targetSuspect;
+
   const killerIntruderMap = {
-doctor: 'locket',
-ceo: 'medal',
-musician: 'cross',
-student: 'magnifying',
-comedian: 'compass',
-detective: 'medal',
-rowan: 'wine',
-influencer: 'perfume',
-therapist: 'notebook',
-rachel: 'novel',
-gamer: 'notebook'
+    doctor: 'locket',
+    ceo: 'medal',
+    musician: 'cross',
+    student: 'magnifying',
+    comedian: 'compass',
+    detective: 'medal',
+    rowan: 'wine',
+    influencer: 'perfume',
+    therapist: 'notebook',
+    rachel: 'novel',
+    gamer: 'notebook'
   };
-  const targetId = killerIntruderMap[GS.murderer] || 'wine';
+
+  const targetId = killerIntruderMap[targetSuspect] || 'wine';
   const intruderIdx = items.findIndex(item => item.id === targetId);
   window._testRoomIntruder = items[intruderIdx].id;
 
   grid.className = '';
   grid.innerHTML = `
-<div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111;box-shadow: 0 8px 32px rgba(0,0,0,0.5);border: 1px solid var(--glass-border);">
-  <div style="width:100%; height:100%; position:relative;" id="room-scene">
-    <img src="assets/cabin_bg_v3.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.85;">
-    <div id="room-canvas-items" style="position:absolute; inset:0;"></div>
-  </div>
-</div>
+    <div style="position:relative;width:100%;height:480px;border-radius:4px;overflow:hidden;background:#111;box-shadow: 0 8px 32px rgba(0,0,0,0.5);border: 1px solid var(--glass-border);">
+      <div style="width:100%; height:100%; position:relative;" id="room-scene">
+        <img src="assets/cabin_bg_v3.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.85;">
+        <div id="room-canvas-items" style="position:absolute; inset:0;"></div>
+      </div>
+    </div>
   `;
 
   const container = $('room-canvas-items');
@@ -2021,94 +2312,133 @@ gamer: 'notebook'
   const placed = [];
 
   const isOverlap = (x, y, itemW, pad) => {
-const px = (x / 100) * W;
-const py = (y / 100) * H;
-
-const left1 = px - pad;
-const right1 = px + itemW + pad;
-const top1 = py - pad;
-const bottom1 = py + itemW + pad;
-
-return placed.some(p => {
-  const left2 = p.px - pad;
-  const right2 = p.px + p.w + pad;
-  const top2 = p.py - pad;
-  const bottom2 = p.py + p.w + pad;
-
-  return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
-});
+    const px = (x / 100) * W;
+    const py = (y / 100) * H;
+    const left1 = px - pad;
+    const right1 = px + itemW + pad;
+    const top1 = py - pad;
+    const bottom1 = py + itemW + pad;
+    return placed.some(p => {
+      const left2 = p.px - pad;
+      const right2 = p.px + p.w + pad;
+      const top2 = p.py - pad;
+      const bottom2 = p.py + p.w + pad;
+      return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
+    });
   };
 
   const zones = [
-{ minX: 5,  maxX: 24, minY: 60, maxY: 75 },  // bed
-{ minX: 20, maxX: 42, minY: 72, maxY: 88 },  // rug
-{ minX: 34, maxX: 44, minY: 52, maxY: 58 },  // nightstand
-{ minX: 49, maxX: 75, minY: 48, maxY: 54 },  // desk
-{ minX: 38, maxX: 50, minY: 24, maxY: 26 },  // shelf
-{ minX: 82, maxX: 98, minY: 52, maxY: 58 },  // dresser
-{ minX: 52, maxX: 78, minY: 75, maxY: 88 }   // floor
+    { minX: 5,  maxX: 24, minY: 60, maxY: 75 },  // bed
+    { minX: 20, maxX: 42, minY: 72, maxY: 88 },  // rug
+    { minX: 34, maxX: 44, minY: 52, maxY: 58 },  // nightstand
+    { minX: 49, maxX: 75, minY: 48, maxY: 54 },  // desk
+    { minX: 38, maxX: 50, minY: 24, maxY: 26 },  // shelf
+    { minX: 82, maxX: 98, minY: 52, maxY: 58 },  // dresser
+    { minX: 52, maxX: 78, minY: 75, maxY: 88 }   // floor
   ];
 
   items.forEach((item, i) => {
-const itemW = parseFloat(item.w);
-let x, y, tries = 0, pad = 10;
-do {
-  if (tries > 100) pad = 6;
-  if (tries > 200) pad = 2;
-  if (tries > 250) pad = 0;
+    const itemW = parseFloat(item.w);
+    let x, y, tries = 0, pad = 10;
+    do {
+      if (tries > 100) pad = 6;
+      if (tries > 200) pad = 2;
+      if (tries > 250) pad = 0;
+      const zone = zones[Math.floor(Math.random() * zones.length)];
+      x = zone.minX + Math.random() * (zone.maxX - zone.minX);
+      y = zone.minY + Math.random() * (zone.maxY - zone.minY);
+      tries++;
+    } while (isOverlap(x, y, itemW, pad) && tries < 500);
 
-  // Select a random zone
-  const zone = zones[Math.floor(Math.random() * zones.length)];
-  x = zone.minX + Math.random() * (zone.maxX - zone.minX);
-  y = zone.minY + Math.random() * (zone.maxY - zone.minY);
-  tries++;
-} while (isOverlap(x, y, itemW, pad) && tries < 500);
+    const px = (x / 100) * W;
+    const py = (y / 100) * H;
+    placed.push({ px, py, w: itemW });
 
-const px = (x / 100) * W;
-const py = (y / 100) * H;
-placed.push({ px, py, w: itemW });
+    const c = document.createElement('img');
+    c.className = 'room-item';
+    c.src = item.img;
+    c.style.width = item.w;
+    c.style.left = x + '%';
+    c.style.top = y + '%';
+    c.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
+    c.title = item.label;
 
-const c = document.createElement('img');
-c.className = 'room-item';
-c.src = item.img;
-c.style.width = item.w;
-c.style.left = x + '%';
-c.style.top = y + '%';
-c.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
-c.title = item.label;
-
-c.onclick = () => {
-  if (!GS.gameActive) return;
-  if(i === intruderIdx){ 
-    SFX.success(); 
-    c.classList.add('right'); 
-    GS.gameActive = false;
-    const activeScreen = document.querySelector('.screen.game-screen');
-    if (activeScreen) activeScreen.style.pointerEvents = 'none';
-    setTimeout(()=>onModuleComplete(15,Date.now()-gameStart,true), 600);
-  } else {
-    SFX.fail(); 
-    c.classList.add('wrong'); 
-    attempt++; 
-    $('room-attempt').textContent=attempt+1;
-    GS.domains.recognition=Math.max(0,GS.domains.recognition-10);
-    
-    c.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
-    setTimeout(()=>{
-      c.classList.remove('wrong');
-      c.style.filter = '';
-    }, 500);
-    
-    if(attempt>=2) {
-      GS.gameActive = false;
-      const activeScreen = document.querySelector('.screen.game-screen');
-      if (activeScreen) activeScreen.style.pointerEvents = 'none';
-      setTimeout(()=>onModuleComplete(5,null,false), 500);
-    }
-  }
-};
-container.appendChild(c);
+    c.onclick = () => {
+      if (!GS.gameActive) return;
+      if (i === intruderIdx) { 
+        SFX.success(); 
+        c.classList.add('right'); 
+        window._foundCabinIntruder = true;
+        
+        showDialog('Narrator', 
+          'Whoever owns this... was here.', 
+          null, 
+          () => {
+            showDialog('Narrator',
+              'The identity remains unknown. Open the Case File Dossier to compare this object against the guests\' profiles.',
+              null,
+              null,
+              'narrator'
+            );
+          }, 
+          'narrator'
+        );
+      } else {
+        SFX.fail(); 
+        c.classList.add('wrong'); 
+        attempt++; 
+        $('room-attempt').textContent = attempt + 1;
+        GS.domains.recognition = Math.max(0, GS.domains.recognition - 5);
+        c.style.filter = 'brightness(0.5) sepia(1) hue-rotate(-50deg) drop-shadow(0 0 10px red)';
+        setTimeout(() => {
+          c.classList.remove('wrong');
+          c.style.filter = '';
+        }, 500);
+      }
+    };
+    container.appendChild(c);
   });
+
+  // Place Kai's Journal
+  const journal = document.createElement('img');
+  journal.className = 'room-item';
+  journal.src = 'assets/notebook_clean_v2.png';
+  journal.style.width = '35px';
+  journal.style.left = '64%';
+  journal.style.top = '48%';
+  journal.style.transform = 'rotate(5deg)';
+  journal.title = "Kai's Journal";
+  journal.style.filter = 'drop-shadow(0 0 8px rgba(212,175,55,0.7))';
+  
+  journal.onclick = () => {
+    if (!GS.gameActive) return;
+    SFX.pickup();
+    journal.style.display = 'none';
+    window._foundCabinJournal = true;
+    
+    const allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+      c.id !== playerId && 
+      c.id !== 'rowan' && c.id !== 'narrator' && 
+      c.id !== 'keeper' && 
+      c.id !== 'kai'
+    );
+    allSuspects.forEach(s => {
+      if (!GS.unlockedSuspects.includes(s.id)) {
+        GS.unlockedSuspects.push(s.id);
+      }
+    });
+    updateDossierList();
+    
+    const journalCandidates = allSuspects.filter(s => s.id !== GS.murderer);
+    const js1 = journalCandidates[0] || { name: 'Dr. Avery Ross' };
+    const js2 = journalCandidates[1] || { name: 'Marcus Hale' };
+    
+    openJournalModal(js1, js2, () => {
+      showNotification("Suspect Profiles Unlocked in Dossier");
+    });
+  };
+  
+  container.appendChild(journal);
 }
 // ─ GAME 4: BONFIRE ────────────────────────────────────────────
 function startBonfire(){
@@ -3185,6 +3515,23 @@ function isVictimTruthUnlocked(victimId) {
   return false;
 }
 
+function getSuspectBelongingName(id) {
+  const map = {
+    doctor: 'Silver Locket',
+    ceo: 'Military Medal',
+    musician: 'Wooden Cross',
+    student: 'Magnifying Glass',
+    comedian: 'Old Compass',
+    detective: 'Military Medal',
+    rowan: 'Wine Glass',
+    influencer: 'Perfume Bottle',
+    therapist: 'Hidden Notebook',
+    rachel: 'Mystery Novel',
+    gamer: 'Hidden Notebook'
+  };
+  return map[id] || 'Unknown Belonging';
+}
+
 function showDossierCard() {
   if (dossierList.length === 0) updateDossierList();
   
@@ -3226,6 +3573,17 @@ function showDossierCard() {
          <span class="redacted-clue">[REDACTED - RECOVER MORE EVIDENCE]</span>
        </div>`;
 
+  let linkBtnHtml = '';
+  if (GS.moduleIdx === 2 && window._foundCabinIntruder) {
+    linkBtnHtml = `
+      <div style="margin-top: 15px; border-top: 1px solid rgba(90,75,60,0.25); padding-top: 12px; text-align: center;">
+        <button class="btn-main" onclick="linkCabinEvidence('${profile.id}')" style="width: 100%; font-size: 0.72rem; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">
+          Link Discovered Object to ${profile.name}
+        </button>
+      </div>
+    `;
+  }
+
   $('cf-book-card').innerHTML = `
     <div class="case-stamp">CLASSIFIED</div>
     <div class="book-row">
@@ -3265,7 +3623,8 @@ function showDossierCard() {
         
         <div style="font-family: var(--ff-m); font-size: 0.65rem; color: #4a3b2c; border-top: 1px dotted #8c7e6b; width: 90%; padding-top: 8px; margin-top: 5px; text-align: left; line-height: 1.5;">
           <strong>FILE NO:</strong> ${fileNo}<br>
-          <strong>STATUS:</strong> <span style="color: #8e5b15; font-weight: bold;">${status}</span>
+          <strong>STATUS:</strong> <span style="color: #8e5b15; font-weight: bold;">${status}</span><br>
+          <strong>BELONGING:</strong> ${getSuspectBelongingName(profile.id)}
         </div>
       </div>
       <div class="book-page-right-wrapper" style="position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; width: 100%;">
@@ -3275,6 +3634,7 @@ function showDossierCard() {
           <h5 style="color:#a82e2e; font-family:var(--ff-m); font-size:0.72rem; margin-bottom:4px; text-transform:uppercase; border-bottom: 1px solid rgba(90,75,60,0.25); padding-bottom: 2px; letter-spacing: 0.05em;">CHRONOLOGICAL ALIBI TIMELINE</h5>
           <p style="font-style:italic; font-size:0.72rem; color:#4a3b2c; line-height: 1.4;">${alibi}</p>
           ${secretHtml}
+          ${linkBtnHtml}
         </div>
         <div class="scroll-arrow-down" id="dossier-scroll-arrow" style="display: none;">▼</div>
       </div>
@@ -3299,6 +3659,55 @@ function showDossierCard() {
   arrow.onclick = () => {
     pageRight.scrollBy({ top: 60, behavior: 'smooth' });
   };
+}
+
+window.linkCabinEvidence = function(suspectId) {
+  if (suspectId === window._cabinIntruderSuspect) {
+    showNotification('Evidence linked successfully.<br>New suspect connection established.');
+    SFX.success();
+    finishModule3Narrative();
+  } else {
+    showNotification('The evidence doesn\'t match this suspect.<br>Try again.');
+    SFX.fail();
+  }
+};
+
+function finishModule3Narrative() {
+  closeModal('modal-cf');
+  showScreen('sc-narrative');
+  const bgImg = $('narrative-bg-img');
+  if (bgImg) bgImg.src = 'assets/cabin_bg_v3.png';
+  
+  showDialog('Narrator',
+    'Kai wasn\'t collecting memories...',
+    null,
+    () => {
+      showDialog('Narrator',
+        'He was collecting evidence.',
+        null,
+        () => {
+          showDialog('Narrator',
+            'And someone wanted to make sure he never finished.',
+            null,
+            () => {
+              showDialog('Narrator',
+                'The group notices a mysterious symbol drawn inside the journal.\n\nNo explanation is given.\n\nThe symbol is automatically stored as evidence.',
+                null,
+                () => {
+                  const rt = Date.now() - (window._cabinStartTime || Date.now());
+                  onModuleComplete(15, rt, true);
+                },
+                'narrator'
+              );
+            },
+            'narrator'
+          );
+        },
+        'narrator'
+      );
+    },
+    'narrator'
+  );
 }
 
 function prevDossierPage() {
