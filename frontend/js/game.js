@@ -43,6 +43,7 @@ const SFX = (() => {
     fail:    () => { tone(200,'sawtooth',.25,.2); },
     click:   () => tone(800,'sine',.06,.1),
     pickup:  () => { tone(600,'sine',.08,.15); tone(900,'sine',.1,.12,.07); },
+    unlock:  () => { tone(440,'sine',.1,.15); tone(554,'sine',.1,.15,.06); tone(659,'sine',.18,.12,.12); },
     horror:  () => { tone(80,'sawtooth',.8,.25); tone(60,'sawtooth',.9,.2,.1); },
     ambient: () => { for(let i=0;i<4;i++) tone(220+i*30,'sine',1.5,.04,i*.4); },
     scream:  () => { noise(.3,.3); tone(300,'sawtooth',.5,.2,.1); },
@@ -463,8 +464,8 @@ function getMemoryFragment(idx) {
     },
     // Module 2 (The Lighthouse)
     {
-      text: `"The archives are hidden safe in the lighthouse. The Caretaker is keeping them secure. Nobody else must know."\n\n[Decrypted journal entry. Dated: 1 year ago.]`,
-      clue: `The Lighthouse Keeper secretly maintained a hidden archive of Project Echo documents, linking to ${meta.name}'s past.`
+      text: `"[Evidence recovered: A handwritten note found in the deceased Lighthouse Keeper's hand]\n\n'Cabin 7' [Marked with a large red X]"`,
+      clue: `The dead Lighthouse Keeper was holding a note reading 'Cabin 7' marked with a large red X.`
     },
     // Module 3 (Cabin 7)
     {
@@ -529,7 +530,7 @@ const DASS_ITEMS = [
 
 const MODULES_DATA = [
   {id:'beach',      title:'The Shoreline',    icon:'🏖️', loc:'Beach',      intro:'Footprints lead from the body toward the treeline. A storm is coming. Collect the evidence before the tide destroys everything.', task:'Search the shore — react quickly', hint:'Search the shoreline for critical evidence.'},
-  {id:'lighthouse', title:'The Lighthouse',   icon:'🔦', loc:'Lighthouse', intro:'The lighthouse is flashing unusual coded signals. The keeper vanished. Someone changed the sequence after the murder.',task:'Decode the pattern — repeat it exactly', hint:'Watch the colored light signals flashing from the lighthouse lantern. Replicate the sequence exactly by tapping the colored buttons below.'},
+  {id:'lighthouse', title:'The Lighthouse',   icon:'🔦', loc:'Lighthouse', intro:'The security panel requires an access code. Solve the lock mechanism to enter the keeper\'s room.',task:'Solve the lock mechanism to enter the keeper\'s room', hint:'Watch the colored light signals flashing from the lighthouse lantern. Replicate the sequence exactly by tapping the colored buttons below.'},
   {id:'room',       title:'Cabin 7',          icon:'🚪', loc:'Resort',     intro:"The victim's room has been searched. One object doesn't belong — planted by whoever was here last.", task:'Identify the intruder object', hint:'Investigate the items in the cabin room. One of these items is an intruder that does not belong to the victim. Select it to log as evidence.'},
   {id:'bonfire',    title:'The Bonfire',      icon:'🔥', loc:'Beach',      intro:"Every guest has a story. At the bonfire, the stories don't match. One person slipped a contradiction into their alibi.", task:'Spot the logical contradiction', hint:'Open the Case Files Dossier (by clicking FILES in the header) to review the suspect\'s verified timeline. Compare their statement at the bonfire to identify and click the phrase that contradicts the official files.'},
   {id:'baggage',    title:'Lost Baggage',     icon:'🧳', loc:'Dock',       intro:"The storm scattered luggage across the resort. Worse — someone swapped items. Restore order before more evidence is lost.", task:'Match owners to their belongings', hint:'Review character occupations in the Case Files. Select a character owner first, then select their professional belonging to pair them.'},
@@ -1017,6 +1018,85 @@ function runModule(idx) {
     c.id !== 'kai' && 
     c.alive !== false
   );
+
+  // Custom narrative intro transition for Module 2 (The Lighthouse)
+  if (idx === 1) {
+    const bgImg = $('narrative-bg-img');
+    showDialog('Narrator',
+      'As the investigation continues, something catches everyone\'s attention.',
+      null,
+      () => {
+        if (bgImg) bgImg.src = 'assets/lighthouse_entry(1).jpeg';
+        
+        const dialogueNPCs = aliveNPCs.filter(c => c.id !== 'narrator');
+        const observer1 = dialogueNPCs[0] || { name: 'Marcus Hale', id: 'ceo' };
+        const observer2 = dialogueNPCs[1] || dialogueNPCs[0] || { name: 'Dr. Avery Ross', id: 'doctor' };
+        
+        showDialog(observer1.name,
+          'That\'s strange... the lighthouse shouldn\'t be operating like that.',
+          null,
+          () => {
+            showDialog(observer2.name,
+              'Where\'s the keeper? Someone should be maintaining it.',
+              null,
+              () => {
+                showDialog('Narrator',
+                  'With no sign of the lighthouse keeper, the group decides to investigate.',
+                  null,
+                  () => {
+                    if (bgImg) bgImg.src = 'assets/lighthouse_arrival(2).jpeg';
+                    
+                    showDialog('Narrator',
+                      'The player reaches the lighthouse entrance.\n\nThe front door is unlocked.\n\nInside, the building appears abandoned.\n\nThere are signs that someone left in a hurry.\n\nThe group proceeds further inside until they reach a heavy locked security door.',
+                      null,
+                      () => {
+                        showDialog('Narrator',
+                          'Someone locked this door from the inside.',
+                          null,
+                          () => {
+                            showDialog(observer1.name,
+                              'If the keeper is here... we\'re running out of time.',
+                              null,
+                              () => {
+                                showDialog('Narrator',
+                                  'The security panel requires an access code.',
+                                  null,
+                                  () => {
+                                    showDialog('Narrator',
+                                      'Solve the lock mechanism to enter the keeper\'s room.',
+                                      null,
+                                      () => {
+                                        launchGame('lighthouse');
+                                      },
+                                      'narrator'
+                                    );
+                                  },
+                                  'narrator'
+                                );
+                              },
+                              observer1.id
+                            );
+                          },
+                          'narrator'
+                        );
+                      },
+                      'narrator'
+                    );
+                  },
+                  'narrator'
+                );
+              },
+              observer2.id
+            );
+          },
+          observer1.id
+        );
+      },
+      'narrator'
+    );
+    return;
+  }
+
   // Select Rowan or another alive suspect
   let briefNPC = aliveNPCs[idx % aliveNPCs.length] || NPCS_BASE.find(n => n.id === 'rowan');
   if (m.id === 'storm') {
@@ -1111,10 +1191,73 @@ function onModuleComplete(score, rt, correct) {
   if (GS.moduleIdx === 1) { // Module 2 (Lighthouse) completes
     markDeceased('keeper');
     showScreen('sc-narrative');
+    
+    // Play unlocking sound
+    if (SFX.unlock) SFX.unlock();
+    
+    const bgImg = $('narrative-bg-img');
+    if (bgImg) bgImg.src = 'assets/lighthouse_arrival(2).jpeg';
+    
     showDialog('Narrator',
-      'ALERT: A sudden radio broadcast cuts through the wind. A search party has found the Lighthouse Keeper lifeless at the bottom of the spiral stairs. The secret archive has been compromised.',
+      'The security door unlocks. The door slowly opens, and the group enters the keeper\'s room.',
       null,
-      proceed,
+      () => {
+        if (bgImg) bgImg.src = 'assets/lighthouse_dead(3).jpeg';
+        
+        showDialog('Narrator',
+          'Inside the room, the lighthouse keeper is found dead. The room shows signs of a struggle.',
+          null,
+          () => {
+            const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+            const userIdentityId = user.identity === 'academic' ? 'student' : user.identity;
+            const aliveNPCs = [...IDENTITIES, ...GS.npcs].filter(c => 
+              c.id !== userIdentityId && 
+              c.id !== 'kai' && 
+              c.alive !== false
+            );
+            const dialogueNPCs = aliveNPCs.filter(c => c.id !== 'narrator');
+            const observer = dialogueNPCs[0] || { name: 'Marcus Hale', id: 'ceo' };
+            
+            showDialog(observer.name,
+              'Look... he\'s holding something in his hand.',
+              null,
+              () => {
+                showDialog('Narrator',
+                  'He\'s holding a note...',
+                  null,
+                  () => {
+                    if (bgImg) bgImg.src = 'assets/lighhouse_end(4).jpeg';
+                    
+                    showDialog('Narrator',
+                      'The note reads:\n\nCabin 7\n\nwith a large red X marked across it.',
+                      null,
+                      () => {
+                        showDialog('Narrator',
+                          'This wasn\'t left by accident.',
+                          null,
+                          () => {
+                            showDialog('Narrator',
+                              'Cabin 7 has become our next destination.',
+                              null,
+                              proceed,
+                              'narrator'
+                            );
+                          },
+                          'narrator'
+                        );
+                      },
+                      'narrator'
+                    );
+                  },
+                  'narrator'
+                );
+              },
+              observer.id
+            );
+          },
+          'narrator'
+        );
+      },
       'narrator'
     );
   } else if (GS.moduleIdx === 3) { // Module 4 (Bonfire) completes
