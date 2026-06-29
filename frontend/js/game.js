@@ -2369,6 +2369,9 @@ function startRoom(){
         SFX.success(); 
         c.classList.add('right'); 
         window._foundCabinIntruder = true;
+        GS.gameActive = false;
+        const activeScreen = document.querySelector('.screen.game-screen');
+        if (activeScreen) activeScreen.style.pointerEvents = 'none';
         
         showDialog('Narrator', 
           'Whoever owns this... was here.', 
@@ -2377,7 +2380,9 @@ function startRoom(){
             showDialog('Narrator',
               'The identity remains unknown. Open the Case File Dossier to compare this object against the guests\' profiles.',
               null,
-              null,
+              () => {
+                onModuleComplete(15, Date.now() - window._cabinStartTime, true);
+              },
               'narrator'
             );
           }, 
@@ -2394,6 +2399,15 @@ function startRoom(){
           c.classList.remove('wrong');
           c.style.filter = '';
         }, 500);
+
+        if (attempt >= 2) {
+          GS.gameActive = false;
+          const activeScreen = document.querySelector('.screen.game-screen');
+          if (activeScreen) activeScreen.style.pointerEvents = 'none';
+          setTimeout(() => {
+            onModuleComplete(5, null, false);
+          }, 600);
+        }
       }
     };
     container.appendChild(c);
