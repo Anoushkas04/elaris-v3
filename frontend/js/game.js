@@ -736,8 +736,8 @@ function onModuleComplete(score, rt, correct) {
     const bgImg = $('narrative-bg-img');
     if (bgImg) bgImg.src = 'assets/bonfiredeath.jpeg';
     
-    if (typeof SFX !== 'undefined' && SFX.gunshot) {
-      SFX.gunshot();
+    if (typeof SFX !== 'undefined' && SFX.scream) {
+      SFX.scream();
     }
     
     const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
@@ -752,11 +752,11 @@ function onModuleComplete(score, rt, correct) {
     const npc2 = aliveNPCs[1] || aliveNPCs[0] || { name: 'Marcus Hale', id: 'ceo' };
     
     showDialog(npc1.name,
-      'A gunshot?! Where did it come from?!',
+      "Wait... what's happening to them?! Why are they collapsing?!",
       null,
       () => {
         showDialog(npc2.name,
-          'Oh no, look at the bonfire! Someone has been shot!',
+          "Oh no, look at the bonfire! They've been poisoned!",
           null,
           () => {
             showDialog(npc1.name,
