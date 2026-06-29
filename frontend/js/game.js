@@ -790,6 +790,9 @@ function onModuleComplete(score, rt, correct) {
 
 function showMidgameTwist(cb) {
   showScreen('sc-narrative');
+  const bgImg = $('narrative-bg-img');
+  if (bgImg) bgImg.src = 'assets/module5map.jpeg';
+  
   showDialog('Narrator',
     'Every envelope so far contains the same date.\nThree years ago. Exactly.\nThis isn\'t a random crime.\nSomething happened on this island three years ago.\nAnd every person here was part of it.',
     null, cb, 'narrator'
