@@ -19,10 +19,10 @@ function startEvidenceChallenge() {
       suspectName: 'Sarah Bennett'
     },
     {
-      cue: 'R_W_N AS_F_RD — Closed Main Office: [GLITCH]',
+      cue: 'NA_RA_OR — Closed Main Office: [GLITCH]',
       opts: ['9:30 PM', '10:00 PM', '10:30 PM', '11:00 PM'],
       correct: 1,
-      suspectName: 'Rowan Ashford'
+      suspectName: 'Narrator'
     },
     {
       cue: 'DR. AV_RY RO_S — Patient Log Audit: [GLITCH]',

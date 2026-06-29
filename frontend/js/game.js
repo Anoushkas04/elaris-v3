@@ -60,9 +60,9 @@ function revealFragment(idx, correct, cb) {
         const pathDirs = (window._testForestPath || []).map(dirIdx => ['Left', 'Right', 'Forward', 'Back'][dirIdx]).join(' ➔ ');
         msg = `The correct path was: <strong>${pathDirs}</strong>`;
       } else if (idx === 6) {
-        msg = `The correct timeline decryption was: <strong>${window._testEvidenceCorrectText || ''}</strong>`;
-      } else if (idx === 8) {
         msg = `The correct passcode was: <strong>${window._testStormCode || ''}</strong>`;
+      } else if (idx === 8) {
+        msg = `The correct timeline decryption was: <strong>${window._testEvidenceCorrectText || ''}</strong>`;
       }
       revealEl.innerHTML = msg;
       revealEl.style.display = 'block';
@@ -482,8 +482,8 @@ function runModule(idx) {
     return;
   }
 
-  // Select Rowan or another alive suspect
-  let briefNPC = aliveNPCs[idx % aliveNPCs.length] || NPCS_BASE.find(n => n.id === 'rowan');
+  // Select Narrator or another alive suspect
+  let briefNPC = aliveNPCs[idx % aliveNPCs.length] || IDENTITIES.find(i => i.id === 'narrator');
   if (m.id === 'storm') {
     briefNPC = IDENTITIES.find(i => i.id === 'narrator') || briefNPC;
   }
@@ -856,13 +856,13 @@ function getDeductionClues() {
     { id: 'opp_decoy', cat: 'Opportunity', isDecoy: true, text: "The resort gate security alarm was deactivated from the front desk computer." },
     
     { id: 'rel_1', cat: 'Relationship', isDecoy: false, fragmentIdx: 1 },
-    { id: 'rel_2', cat: 'Relationship', isDecoy: false, fragmentIdx: 8 },
-    { id: 'rel_decoy', cat: 'Relationship', isDecoy: true, text: "Rowan Ashford's secret personal journal reveals he has a long-lost sibling among the guests." },
+    { id: 'rel_2', cat: 'Relationship', isDecoy: false, fragmentIdx: 6 },
+    { id: 'rel_decoy', cat: 'Relationship', isDecoy: true, text: "The Narrator's secret personal journal reveals they have a long-lost sibling among the guests." },
     
     { id: 'contra_1', cat: 'Contradiction', isDecoy: false, fragmentIdx: 3 },
     { id: 'contra_2', cat: 'Contradiction', isDecoy: false, fragmentIdx: 7 },
     
-    { id: 'time_1', cat: 'Timeline', isDecoy: false, fragmentIdx: 6 },
+    { id: 'time_1', cat: 'Timeline', isDecoy: false, fragmentIdx: 8 },
     { id: 'time_2', cat: 'Timeline', isDecoy: false, fragmentIdx: 9 },
     { id: 'time_decoy', cat: 'Timeline', isDecoy: true, text: "A guest register from a neighboring island records a boat rental at 2:00 AM." }
   ];

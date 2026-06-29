@@ -150,21 +150,6 @@ const IDENTITIES = [
 
 const NPCS_BASE = [
   {
-    id: 'rowan',
-    icon: '🛎️',
-    name: 'Rowan Ashford',
-    role: 'Resort Host & Project Director',
-    color: '#c4a465',
-    x: '12%',
-    alive: true,
-    speak_pitch: .9,
-    speak_rate: .82,
-    height: 175,
-    details: 'Rowan Ashford, resort host and former Director of Project Echo. He coordinated the trials and shuttered the island facilities three years ago, turning them into a luxury resort to monitor the remaining witnesses.',
-    alibi: '<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>6:30 PM - 8:00 PM:</strong> Hosted dinner service.<br>• <strong>8:15 PM - 9:30 PM:</strong> Pantry inventory audit.<br>• <strong>10:00 PM:</strong> Closed main office.</div>',
-    image: 'assets/portrait_rowan_1780832160368.png'
-  },
-  {
     id: 'rachel',
     icon: '⚖️',
     name: 'Rachel Quinn',
@@ -389,20 +374,20 @@ function getMemoryFragment(idx) {
       text: `"[Security footage: 3:14 AM. A user logged in as ${meta.name} is seen deleting files from the data server. The monitor displays: PROJECT ECHO — ARCHIVE CLEAR.]"`,
       clue: `${meta.name} was seen deleting Project Echo files from the server room at 3:14 AM.`
     },
-    // Module 7 (Evidence Challenge)
+    // Module 7 (The Storm Shelter)
     {
-      text: `"If the truth about the secret gets out, we're finished. Marcus, Avery, all of us. Not just the ones who ran the tests."\n\n[Decrypted control room audio log belonging to ${meta.name}.]`,
-      clue: `Surveillance logs decrypt to expose ${meta.name}'s secret: ${meta.secret}`
+      text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed.'\n\n[Suppress-Signatures: The Narrator (Director), Dr. Avery Ross, and ${meta.name} (Consultant)]"`,
+      clue: `${meta.name} is documented as an operator in the suppressed Project Echo report.`
     },
     // Module 8 (CCTV Reconstruction)
     {
       text: `"[Boardroom CCTV Reconstruction]\n\nAt 11:00 PM, a meeting took place in the boardroom. The footage clearly shows ${meta.name} present, contradicting their alibi."`,
       clue: `CCTV footage places ${meta.name} in the boardroom at 11:00 PM, contradicting their alibi.`
     },
-    // Module 9 (The Storm Shelter)
+    // Module 9 (Evidence Challenge)
     {
-      text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed.'\n\n[Suppress-Signatures: Rowan Ashford (Director), Dr. Avery Ross, and ${meta.name} (Consultant)]"`,
-      clue: `${meta.name} is documented as an operator in the suppressed Project Echo report.`
+      text: `"If the truth about the secret gets out, we're finished. Marcus, Avery, all of us. Not just the ones who ran the tests."\n\n[Decrypted control room audio log belonging to ${meta.name}.]`,
+      clue: `Surveillance logs decrypt to expose ${meta.name}'s secret: ${meta.secret}`
     },
     // Module 10 (The Dock / Pathfinder)
     {
@@ -437,8 +422,8 @@ const MODULES_DATA = [
   {id:'bonfire',    title:'The Bonfire',      icon:'🔥', loc:'Beach',      intro:"Every guest has a story. At the bonfire, the stories don't match. One person slipped a contradiction into their alibi.", task:'Spot the logical contradiction', hint:'Open the Case Files Dossier (by clicking FILES in the header) to review the suspect\'s verified timeline. Compare their statement at the bonfire to identify and click the phrase that contradicts the official files.'},
   {id:'baggage',    title:'Lost Baggage',     icon:'🧳', loc:'Dock',       intro:"The storm scattered luggage across the resort. Worse — someone swapped items. Restore order before more evidence is lost.", task:'Match owners to their belongings', hint:'Review character occupations in the Case Files. Select a character owner first, then select their professional belonging to pair them.'},
   {id:'forest',     title:'The Forest Trail', icon:'🌲', loc:'Forest',     intro:'A witness claims to have seen a figure running through the forest. But the paths keep changing. Someone rerouted them.', task:'Follow the correct path through shifting signs', hint:'To escape the looping trees, follow the path: walk forward to start, turn right at the mossy trunk, head left past the deep roots, turn back when the path darkens, then push forward to the clearing.'},
-  {id:'evidence',   title:'Evidence Challenge', icon:'📂', loc:'Resort',     intro:"The main server contains encrypted timeline fragments corrupted by visual noise. Decrypt the files before they are wiped.", task:'Match glitched logs with FILES Dossier', hint:'Read the corrupted character log. Open the FILES Dossier in the HUD, check the corresponding character\'s verified timeline, and select the option that correctly decrypts the missing value.'},
-  {id:'cctv',       title:'Server Room',      icon:'📼', loc:'Resort',     intro:"The CCTV server was damaged — files scrambled. Piece together the footage timeline to establish who was where.", task:'Restore the footage sequence', hint:'Drag and drop the security clips into chronological order from Dinner (early evening) to Alarms (midnight) to restore the server logs.'},
   {id:'storm',      title:'The Storm Shelter', icon:'🚨', loc:'Forest',     intro:"The storm is at full strength. Power systems are failing. Decode clues to discover a password, then input the numbers on a server panel to restore the CCTV system under emergency sirens.", task:'Decode password and input on keypad', hint:'Read the decoding clue on the screen. Click on the FILES Dossier in the HUD, navigate to the correct suspect\'s profile to find their verified timeline logs, and enter the MMDD or HHMM code into the security keypad.'},
+  {id:'cctv',       title:'Server Room',      icon:'📼', loc:'Resort',     intro:"The CCTV server was damaged — files scrambled. Piece together the footage timeline to establish who was where.", task:'Restore the footage sequence', hint:'Drag and drop the security clips into chronological order from Dinner (early evening) to Alarms (midnight) to restore the server logs.'},
+  {id:'evidence',   title:'Evidence Challenge', icon:'📂', loc:'Resort',     intro:"The main server contains encrypted timeline fragments corrupted by visual noise. Decrypt the files before they are wiped.", task:'Match glitched logs with FILES Dossier', hint:'Read the corrupted character log. Open the FILES Dossier in the HUD, check the corresponding character\'s verified timeline, and select the option that correctly decrypts the missing value.'},
   {id:'pathfinder', title:'The Dock',         icon:'🚤', loc:'Dock',       intro:"The escape boat has been found — but the ignition lock is a sequence puzzle. Someone sabotaged it. This is the last chance.", task:'Complete the sequence under pressure', hint:'Tap the nodes in the exact alpha-numeric sequence: 1, 2, 3, A, 4, B, 5, C, 6, D. Avoid errors to unlock the ignition sequence.'},
 ];

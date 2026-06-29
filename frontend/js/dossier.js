@@ -167,7 +167,7 @@ function openJournalModal(js1, js2, cb) {
 
           <div style="line-height: 1.95rem; background: repeating-linear-gradient(transparent, transparent 1.9rem, rgba(90,75,60,0.1) 1.9rem, rgba(90,75,60,0.1) 1.95rem); text-align: left; padding: 0 4px;">
             <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem;">Oct 24 - Groundwork</p>
-            <p style="margin: 0;">Ferry ride was completely silent. Rowan Ashford gave us a rehearsed pitch about recovery, but the old Echo footprint is still visible. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">They think I came here to write a review.</span> I need to make sure my notes stay hidden.</p>
+            <p style="margin: 0;">Ferry ride was completely silent. The Narrator gave us a rehearsed pitch about recovery, but the old Echo footprint is still visible. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">They think I came here to write a review.</span> I need to make sure my notes stay hidden.</p>
             
             <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem; margin-top: 1rem;">Oct 25 - The Caretaker</p>
             <p style="margin: 0;">The keeper knows something. He is terrified of the management team. He whispered that <span style="border-bottom: 2.5px solid rgba(162,58,31,0.75); padding-bottom:1px; font-weight: bold;">critical documents are locked inside the lighthouse panel</span>.</p>
