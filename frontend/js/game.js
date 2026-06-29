@@ -752,11 +752,11 @@ function onModuleComplete(score, rt, correct) {
     const npc2 = aliveNPCs[1] || aliveNPCs[0] || { name: 'Marcus Hale', id: 'ceo' };
     
     showDialog(npc1.name,
-      "Wait... what's happening to them?! Why are they collapsing?!",
+      "Wait... what's happening to the liar?! Why are they collapsing?!",
       null,
       () => {
         showDialog(npc2.name,
-          "Oh no, look at the bonfire! They've been poisoned!",
+          "Oh no, look at the bonfire! The liar has been poisoned!",
           null,
           () => {
             showDialog(npc1.name,
