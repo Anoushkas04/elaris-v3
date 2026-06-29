@@ -775,7 +775,7 @@ function onModuleComplete(score, rt, correct) {
                       () => {
                         if (bgImg) bgImg.src = 'assets/bonfirecluefinal.jpeg';
                         showDialog('Narrator',
-                          `ALERT: The bonfire dies down to cold embers. Suddenly, a cry of terror rings out. ${victimName} lies dead on the beach, poisoned. The liar who knew the truth has been silenced.`,
+                          `ALERT: The bonfire dies down to cold embers. The poisoned suspect ${victimName} lies dead. The liar who knew the truth has been silenced forever.`,
                           null,
                           proceed,
                           'narrator'
