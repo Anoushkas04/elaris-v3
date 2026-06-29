@@ -55,7 +55,7 @@ function revealFragment(idx, correct, cb) {
         const itemLabel = roomLabels[window._testRoomIntruder] || 'Wine Glass';
         msg = `The correct intruder item was: <strong>${itemLabel}</strong>`;
       } else if (idx === 3) {
-        msg = `The correct contradiction was: <strong>${window._testBonfireCorrect || ''}</strong>`;
+        msg = `The liar was: <strong>${window._testBonfireCorrect || ''}</strong>`;
       } else if (idx === 5) {
         const pathDirs = (window._testForestPath || []).map(dirIdx => ['Left', 'Right', 'Forward', 'Back'][dirIdx]).join(' ➔ ');
         msg = `The correct path was: <strong>${pathDirs}</strong>`;
@@ -717,7 +717,19 @@ function onModuleComplete(score, rt, correct) {
     );
   } else if (GS.moduleIdx === 3) { // Module 4 (Bonfire) completes
     markDeceased(GS.bonfireVictim);
-    const victimNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.bonfireVictim);
+    
+    // Ensure truth-tellers from the module statements are added as unlocked suspects
+    if (window._bonfireTruthTellers) {
+      if (!GS.unlockedSuspects) GS.unlockedSuspects = [];
+      window._bonfireTruthTellers.forEach(tid => {
+        if (!GS.unlockedSuspects.includes(tid)) {
+          GS.unlockedSuspects.push(tid);
+        }
+      });
+      updateDossierList();
+    }
+    
+    const victimNPC = [...IDENTITIES, ...GS.npcs].find(c => c.id === GS.bonfireVictim);
     const victimName = victimNPC ? victimNPC.name : 'one of the suspects';
     
     showScreen('sc-narrative');
