@@ -727,29 +727,36 @@ window.showNarratorSideBubble = function() {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
       }
+      #narrator-side-bubble {
+        position: fixed;
+        z-index: 1000000;
+        background: linear-gradient(135deg, #1c1917, #0c0a09);
+        border: 1.5px solid #d4af37;
+        border-radius: 8px;
+        padding: 12px 16px;
+        width: 280px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        color: #f5f0eb;
+        font-family: var(--ff-m);
+        font-size: 0.82rem;
+        line-height: 1.45;
+        animation: fadeInBubble 0.4s ease;
+        right: 30px;
+        top: 150px;
+      }
+      @media (max-width: 1140px) {
+        #narrator-side-bubble {
+          left: 20px;
+          top: 20px;
+          right: auto;
+        }
+      }
     `;
     document.head.appendChild(s);
   }
   
   const bubble = document.createElement('div');
   bubble.id = 'narrator-side-bubble';
-  bubble.style.cssText = `
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999999;
-    background: linear-gradient(135deg, #1c1917, #0c0a09);
-    border: 1.5px solid #d4af37;
-    border-radius: 8px;
-    padding: 12px 16px;
-    width: 280px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-    color: #f5f0eb;
-    font-family: var(--ff-m);
-    font-size: 0.82rem;
-    line-height: 1.45;
-    animation: fadeInBubble 0.4s ease;
-  `;
   
   bubble.innerHTML = `
     <div style="font-weight: bold; color: #d4af37; margin-bottom: 4px; text-transform: uppercase; font-size: 0.72rem; display: flex; align-items: center; gap: 6px;">
@@ -760,6 +767,5 @@ window.showNarratorSideBubble = function() {
       Mandatory Side Task
     </div>
   `;
-  const modalContent = $('modal-cf').querySelector('.modal-content');
-  if (modalContent) modalContent.appendChild(bubble);
+  document.body.appendChild(bubble);
 };
