@@ -3,6 +3,9 @@ function startRoom(){
   window._cabinStartTime = Date.now();
   window._foundCabinJournal = false;
   window._foundCabinIntruder = false;
+  window._cabinEvidenceLinked = false;
+  window._dossierStartTime = null;
+  window._dossierMistakes = 0;
   
   $('room-attempt').textContent=1;
   const grid=$('room-grid');
@@ -220,7 +223,9 @@ function startRoom(){
             'The identity remains unknown. Open the Case File Dossier to compare this object against the guests\' profiles.',
             null,
             () => {
-              onModuleComplete(15, Date.now() - window._cabinStartTime, true);
+              // Open the dossier modal automatically
+              const cfBtn = $('cf-btn');
+              if (cfBtn) cfBtn.click();
             },
             'narrator'
           );

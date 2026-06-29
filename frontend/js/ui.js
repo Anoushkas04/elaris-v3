@@ -190,6 +190,10 @@ function showModal(id) {
 function closeModal(id) {
   SFX.click();
   $(id).classList.remove('on');
+  if (id === 'modal-cf') {
+    const bubble = document.getElementById('narrator-side-bubble');
+    if (bubble) bubble.remove();
+  }
 }
 
 function updateMapActive(currentLoc) {

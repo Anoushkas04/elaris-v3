@@ -438,10 +438,34 @@ window.linkCabinEvidence = function(suspectId) {
   if (suspectId === window._cabinIntruderSuspect) {
     showNotification('Evidence linked successfully.<br>New suspect connection established.');
     SFX.success();
+    window._cabinEvidenceLinked = true;
+    
+    // Calculate and record DASS metrics based on player performance
+    const elapsed = (Date.now() - (window._dossierStartTime || Date.now())) / 1000;
+    const mistakes = window._dossierMistakes || 0;
+    
+    let stressVal = 0;
+    if (elapsed > 45) stressVal = 3;
+    else if (elapsed > 30) stressVal = 2;
+    else if (elapsed > 15) stressVal = 1;
+    
+    let anxietyVal = 0;
+    if (mistakes >= 3) anxietyVal = 3;
+    else if (mistakes === 2) anxietyVal = 2;
+    else if (mistakes === 1) anxietyVal = 1;
+    
+    recordDASS('stress', stressVal, 'Cabin 7 Evidence Linking speed');
+    recordDASS('anxiety', anxietyVal, 'Cabin 7 Evidence Linking mistakes');
+    
+    // Remove the side bubble
+    const bubble = document.getElementById('narrator-side-bubble');
+    if (bubble) bubble.remove();
+    
     finishModule3Narrative();
   } else {
     showNotification('The evidence doesn\'t match this suspect.<br>Try again.');
     SFX.fail();
+    window._dossierMistakes = (window._dossierMistakes || 0) + 1;
   }
 };
 
@@ -674,9 +698,68 @@ $('cf-btn').onclick = () => {
   currentDossierPage = 0;
   showDossierCard();
   showModal('modal-cf');
+  
+  // Show side bubble if in Module 3 and evidence is not linked yet
+  if (GS.moduleIdx === 2 && window._foundCabinIntruder && !window._cabinEvidenceLinked) {
+    window.showNarratorSideBubble();
+  }
 };
 
 // Hook Map button
 $('map-btn').onclick = () => {
   showModal('modal-map');
+};
+
+window.showNarratorSideBubble = function() {
+  const existing = document.getElementById('narrator-side-bubble');
+  if (existing) existing.remove();
+
+  if (!window._dossierStartTime) {
+    window._dossierStartTime = Date.now();
+    window._dossierMistakes = 0;
+  }
+
+  if (!document.getElementById('narrator-bubble-styles')) {
+    const s = document.createElement('style');
+    s.id = 'narrator-bubble-styles';
+    s.textContent = `
+      @keyframes fadeInBubble {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+  
+  const bubble = document.createElement('div');
+  bubble.id = 'narrator-side-bubble';
+  bubble.style.cssText = `
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999999;
+    background: linear-gradient(135deg, #1c1917, #0c0a09);
+    border: 1.5px solid #d4af37;
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 280px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    color: #f5f0eb;
+    font-family: var(--ff-m);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    animation: fadeInBubble 0.4s ease;
+  `;
+  
+  bubble.innerHTML = `
+    <div style="font-weight: bold; color: #d4af37; margin-bottom: 4px; text-transform: uppercase; font-size: 0.72rem; display: flex; align-items: center; gap: 6px;">
+      🔊 Narrator
+    </div>
+    <div>scroll down in all characters profile to check if the evidence found belongs to them</div>
+    <div style="font-size: 0.68rem; color: #a29b94; margin-top: 6px; font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
+      Mandatory Side Task
+    </div>
+  `;
+  const modalContent = $('modal-cf').querySelector('.modal-content');
+  if (modalContent) modalContent.appendChild(bubble);
 };
