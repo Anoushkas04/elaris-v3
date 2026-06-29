@@ -185,7 +185,6 @@ function startRoom(){
     window._foundCabinJournal = true;
     
     const allSuspects = [...IDENTITIES, ...GS.npcs].filter(c => 
-      c.id !== playerId && 
       c.id !== 'narrator' && 
       c.id !== 'keeper' && 
       c.id !== 'kai'

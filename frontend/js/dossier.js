@@ -247,7 +247,6 @@ function updateDossierList() {
   }
   
   let allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
-    c.id !== playerId && 
     c.id !== 'rowan' && c.id !== 'narrator' && 
     c.id !== 'keeper' && 
     c.id !== 'kai'
