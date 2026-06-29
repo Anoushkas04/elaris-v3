@@ -303,7 +303,7 @@ function startBeach() {
   // Clues tracker for UI header panel
   const counterLabel = document.querySelector('#sc-beach p');
   if (counterLabel) {
-    counterLabel.innerHTML = `Search the shoreline for critical evidence. Bloody Cloth and Voice Recorder are required.`;
+    counterLabel.innerHTML = `Search the shoreline for critical evidence. All four items are required.`;
   }
 
   $('btn-start-beach').onclick = () => {
@@ -372,7 +372,7 @@ function startBeach() {
           // Warnings if attempts > 4
           if (attempts === 5) {
             showDialog('Narrator', 
-              "You are making too many errors. Focus on searching for the Bloody Cloth and the Voice Recorder.", 
+              "You are making too many errors. Focus on searching for all four items of interest.", 
               null, null, 'narrator'
             );
           }
@@ -388,7 +388,7 @@ function startBeach() {
           
           const chk = $('chk-wine');
           if (chk) chk.checked = true;
-          showDialog('Narrator', "Just an empty wine bottle. Nothing useful.", null, null, 'narrator');
+          checkBeachCompletion(gameStart);
           
         } else if (obj.type === 'cloth') {
           if (bloodyClothCollected) return;
@@ -402,10 +402,7 @@ function startBeach() {
             const labelSpan = chk.nextElementSibling;
             if (labelSpan) labelSpan.textContent = 'Bloody Cloth';
           }
-          
-          showDialog('Narrator', "Blood... This confirms the victim didn't die naturally.", null, () => {
-            checkBeachCompletion(gameStart);
-          }, 'narrator');
+          checkBeachCompletion(gameStart);
           
         } else if (obj.type === 'footprint') {
           if (footprintsCollected) return;
@@ -415,20 +412,7 @@ function startBeach() {
           
           const chk = $('chk-footprint');
           if (chk) chk.checked = true;
-          
-          const killerHeight = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.murderer).height || 175;
-          GS.footprintMinHeight = killerHeight - 5;
-          GS.footprintMaxHeight = killerHeight + 5;
-          GS.heightFilterUnlocked = true;
-          
-          showDialog('Narrator', 
-            `These footprints reveal an approximate height range. It suggests the suspect is between ${GS.footprintMinHeight} cm and ${GS.footprintMaxHeight} cm tall. Height filter unlocked in Case Dossier FILES.`, 
-            null, 
-            () => {
-              checkBeachCompletion(gameStart);
-            }, 
-            'narrator'
-          );
+          checkBeachCompletion(gameStart);
           
         } else if (obj.type === 'recorder') {
           if (recorderCollected) return;
@@ -448,37 +432,7 @@ function startBeach() {
               const labelSpan = chk.nextElementSibling;
               if (labelSpan) labelSpan.textContent = 'Voice Recorder';
             }
-            
-            showDialog('Narrator', 
-              "The recording reveals a conversation between two people shortly before the murder.", 
-              null, 
-              () => {
-                // Unlock first two suspects: killer and one random suspect
-                const playerId = GS.playerIdentity || (() => {
-                  const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
-                  return user.identity === 'academic' ? 'student' : user.identity;
-                })();
-                
-                const possible = [...IDENTITIES, ...NPCS_BASE].filter(c => 
-                  c.id !== playerId && 
-                  c.id !== 'rowan' && c.id !== 'narrator' && 
-                  c.id !== 'keeper' && 
-                  c.id !== 'kai' && 
-                  c.id !== GS.murderer
-                );
-                
-                const suspect2 = possible[0].id;
-                
-                if (!GS.unlockedSuspects) GS.unlockedSuspects = [];
-                if (!GS.unlockedSuspects.includes(GS.murderer)) GS.unlockedSuspects.push(GS.murderer);
-                if (!GS.unlockedSuspects.includes(suspect2)) GS.unlockedSuspects.push(suspect2);
-                updateDossierList();
-                
-                showNotification("New suspects identified");
-                checkBeachCompletion(gameStart);
-              }, 
-              'narrator'
-            );
+            checkBeachCompletion(gameStart);
           });
         }
       };
@@ -488,8 +442,61 @@ function startBeach() {
   };
 
   function checkBeachCompletion(startTime) {
-    if (bloodyClothCollected && recorderCollected) {
-      finishBeach(startTime);
+    if (bloodyClothCollected && recorderCollected && footprintsCollected && wineCollected) {
+      // 1. Wine description
+      showDialog('Narrator', "Just an empty wine bottle. Nothing useful.", null, () => {
+        // 2. Cloth description
+        showDialog('Narrator', "Blood... This confirms the victim didn't die naturally.", null, () => {
+          // 3. Footprint description
+          const killerHeight = [...IDENTITIES, ...GS.npcs].find(c => c.id === GS.murderer)?.height || 175;
+          GS.footprintMinHeight = killerHeight - 5;
+          GS.footprintMaxHeight = killerHeight + 5;
+          GS.heightFilterUnlocked = true;
+          
+          showDialog('Narrator', 
+            `These footprints reveal an approximate height range. It suggests the suspect is between ${GS.footprintMinHeight} cm and ${GS.footprintMaxHeight} cm tall. Height filter unlocked in Case Dossier FILES.`, 
+            null, 
+            () => {
+              // 4. Recorder description + unlock suspects
+              showDialog('Narrator', 
+                "The recording reveals a conversation between two people shortly before the murder.", 
+                null, 
+                () => {
+                  // Unlock first two suspects: killer and one random suspect
+                  const playerId = GS.playerIdentity || (() => {
+                    const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+                    return user.identity === 'academic' ? 'student' : user.identity;
+                  })();
+                  
+                  const possible = [...IDENTITIES, ...GS.npcs].filter(c => 
+                    c.id !== playerId && 
+                    c.id !== 'narrator' && 
+                    c.id !== 'keeper' && 
+                    c.id !== 'kai' && 
+                    c.id !== GS.murderer
+                  );
+                  
+                  const suspect2 = possible[0]?.id;
+                  
+                  if (!GS.unlockedSuspects) GS.unlockedSuspects = [];
+                  if (!GS.unlockedSuspects.includes(GS.murderer)) GS.unlockedSuspects.push(GS.murderer);
+                  if (suspect2 && !GS.unlockedSuspects.includes(suspect2)) GS.unlockedSuspects.push(suspect2);
+                  updateDossierList();
+                  
+                  showNotification("New suspects identified");
+                  finishBeach(startTime);
+                }, 
+                'narrator'
+              );
+            }, 
+            'narrator'
+          );
+        }, 
+        'narrator'
+      );
+      },
+      'narrator'
+    );
     }
   }
 }
@@ -511,9 +518,9 @@ function finishBeach(t) {
     return user.identity === 'academic' ? 'student' : user.identity;
   })();
   
-  const allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+  const allSuspects = [...IDENTITIES, ...GS.npcs].filter(c => 
     c.id !== playerId && 
-    c.id !== 'rowan' && c.id !== 'narrator' && 
+    c.id !== 'narrator' && 
     c.id !== 'keeper' && 
     c.id !== 'kai'
   );
