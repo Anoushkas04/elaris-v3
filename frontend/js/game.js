@@ -503,9 +503,53 @@ function runModule(idx) {
       }
 
       if (batch.length > 0) {
-        askDASSBatch(briefNPC, batch, () => { launchGame(m.id); });
+        askDASSBatch(briefNPC, batch, () => {
+          if (idx === 3) {
+            const bgImg = $('narrative-bg-img');
+            if (bgImg) bgImg.src = 'assets/bonfireinvitation.jpeg';
+            showDialog('Narrator',
+              'someone has called everyone to be gathered in one place, shall we check it out?',
+              null,
+              () => {
+                if (bgImg) bgImg.src = 'assets/bonfirecrowd.jpeg';
+                showDialog('Narrator',
+                  'be careful...',
+                  null,
+                  () => {
+                    launchGame(m.id);
+                  },
+                  'narrator'
+                );
+              },
+              'narrator'
+            );
+          } else {
+            launchGame(m.id);
+          }
+        });
       } else {
-        launchGame(m.id);
+        if (idx === 3) {
+          const bgImg = $('narrative-bg-img');
+          if (bgImg) bgImg.src = 'assets/bonfireinvitation.jpeg';
+          showDialog('Narrator',
+            'someone has called everyone to be gathered in one place, shall we check it out?',
+            null,
+            () => {
+              if (bgImg) bgImg.src = 'assets/bonfirecrowd.jpeg';
+              showDialog('Narrator',
+                'be careful...',
+                null,
+                () => {
+                  launchGame(m.id);
+                },
+                'narrator'
+              );
+            },
+            'narrator'
+          );
+        } else {
+          launchGame(m.id);
+        }
       }
     },
     briefNPC.id
@@ -649,12 +693,69 @@ function onModuleComplete(score, rt, correct) {
     markDeceased(GS.bonfireVictim);
     const victimNPC = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === GS.bonfireVictim);
     const victimName = victimNPC ? victimNPC.name : 'one of the suspects';
+    
     showScreen('sc-narrative');
-    showDialog('Narrator',
-      `ALERT: The bonfire dies down to cold embers. Suddenly, a cry of terror rings out. ${victimName} lies dead on the beach, poisoned. The liar who knew the truth has been silenced.`,
+    const bgImg = $('narrative-bg-img');
+    if (bgImg) bgImg.src = 'assets/bonfiredeath.jpeg';
+    
+    if (typeof SFX !== 'undefined' && SFX.gunshot) {
+      SFX.gunshot();
+    }
+    
+    const user = JSON.parse(localStorage.getItem('elaris_user') || '{}');
+    const userIdentityId = user.identity === 'academic' ? 'student' : user.identity;
+    const aliveNPCs = [...IDENTITIES, ...GS.npcs].filter(c => 
+      c.id !== userIdentityId && 
+      c.id !== 'kai' && 
+      c.id !== 'narrator' &&
+      c.alive !== false
+    );
+    const npc1 = aliveNPCs[0] || { name: 'Dr. Avery Ross', id: 'doctor' };
+    const npc2 = aliveNPCs[1] || aliveNPCs[0] || { name: 'Marcus Hale', id: 'ceo' };
+    
+    showDialog(npc1.name,
+      'A gunshot?! Where did it come from?!',
       null,
-      proceed,
-      'narrator'
+      () => {
+        showDialog(npc2.name,
+          'Oh no, look at the bonfire! Someone has been shot!',
+          null,
+          () => {
+            showDialog(npc1.name,
+              'Look...',
+              null,
+              () => {
+                if (bgImg) bgImg.src = 'assets/bonfireclue1.jpeg';
+                showDialog('Narrator',
+                  'another clue.',
+                  null,
+                  () => {
+                    if (bgImg) bgImg.src = 'assets/bonfireclue2.jpeg';
+                    showDialog(npc2.name,
+                      'open it',
+                      null,
+                      () => {
+                        if (bgImg) bgImg.src = 'assets/bonfirecluefinal.jpeg';
+                        showDialog('Narrator',
+                          `ALERT: The bonfire dies down to cold embers. Suddenly, a cry of terror rings out. ${victimName} lies dead on the beach, poisoned. The liar who knew the truth has been silenced.`,
+                          null,
+                          proceed,
+                          'narrator'
+                        );
+                      },
+                      npc2.id
+                    );
+                  },
+                  'narrator'
+                );
+              },
+              npc1.id
+            );
+          },
+          npc2.id
+        );
+      },
+      npc1.id
     );
   } else {
     proceed();
