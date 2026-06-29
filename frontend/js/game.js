@@ -488,6 +488,32 @@ function runModule(idx) {
     briefNPC = IDENTITIES.find(i => i.id === 'narrator') || briefNPC;
   }
 
+  if (idx === 6) {
+    const bgImg = $('narrative-bg-img');
+    if (bgImg) bgImg.src = 'assets/enterserverroom.jpeg';
+    
+    showDialog(briefNPC.name,
+      "we found a control server room, let's check it out, we might find something useful here",
+      null,
+      () => {
+        showDialog(briefNPC.name,
+          `${m.intro}\n\nYou need to go to the ${m.loc}. Stay sharp.`,
+          null,
+          () => {
+            if (bgImg) bgImg.src = 'assets/serverroom.jpeg';
+            const batch = [DASS_ITEMS[1], DASS_ITEMS[4], DASS_ITEMS[7]];
+            askDASSBatch(briefNPC, batch, () => {
+              launchGame(m.id);
+            });
+          },
+          briefNPC.id
+        );
+      },
+      briefNPC.id
+    );
+    return;
+  }
+
   showDialog(briefNPC.name,
     `${m.intro}\n\nYou need to go to the ${m.loc}. Stay sharp.`,
     null,
