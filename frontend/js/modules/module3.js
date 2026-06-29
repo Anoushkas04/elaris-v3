@@ -139,29 +139,14 @@ function startRoom(){
 
     c.onclick = () => {
       if (!GS.gameActive) return;
+      if (window._foundCabinIntruder) return;
+      
       if (i === intruderIdx) { 
         SFX.success(); 
         c.classList.add('right'); 
+        setTimeout(() => c.style.display = 'none', 400);
         window._foundCabinIntruder = true;
-        GS.gameActive = false;
-        const activeScreen = document.querySelector('.screen.game-screen');
-        if (activeScreen) activeScreen.style.pointerEvents = 'none';
-        
-        showDialog('Narrator', 
-          'Whoever owns this... was here.', 
-          null, 
-          () => {
-            showDialog('Narrator',
-              'The identity remains unknown. Open the Case File Dossier to compare this object against the guests\' profiles.',
-              null,
-              () => {
-                onModuleComplete(15, Date.now() - window._cabinStartTime, true);
-              },
-              'narrator'
-            );
-          }, 
-          'narrator'
-        );
+        checkCabinCompletion();
       } else {
         SFX.fail(); 
         c.classList.add('wrong'); 
@@ -173,15 +158,6 @@ function startRoom(){
           c.classList.remove('wrong');
           c.style.filter = '';
         }, 500);
-
-        if (attempt >= 2) {
-          GS.gameActive = false;
-          const activeScreen = document.querySelector('.screen.game-screen');
-          if (activeScreen) activeScreen.style.pointerEvents = 'none';
-          setTimeout(() => {
-            onModuleComplete(5, null, false);
-          }, 600);
-        }
       }
     };
     container.appendChild(c);
@@ -200,13 +176,14 @@ function startRoom(){
   
   journal.onclick = () => {
     if (!GS.gameActive) return;
+    if (window._foundCabinJournal) return;
     SFX.pickup();
     journal.style.display = 'none';
     window._foundCabinJournal = true;
     
-    const allSuspects = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+    const allSuspects = [...IDENTITIES, ...GS.npcs].filter(c => 
       c.id !== playerId && 
-      c.id !== 'rowan' && c.id !== 'narrator' && 
+      c.id !== 'narrator' && 
       c.id !== 'keeper' && 
       c.id !== 'kai'
     );
@@ -223,8 +200,33 @@ function startRoom(){
     
     openJournalModal(js1, js2, () => {
       showNotification("Suspect Profiles Unlocked in Dossier");
+      checkCabinCompletion();
     });
   };
   
   container.appendChild(journal);
+
+  function checkCabinCompletion() {
+    if (window._foundCabinJournal && window._foundCabinIntruder) {
+      GS.gameActive = false;
+      const activeScreen = document.querySelector('.screen.game-screen');
+      if (activeScreen) activeScreen.style.pointerEvents = 'none';
+      
+      showDialog('Narrator', 
+        'Whoever owns this... was here.', 
+        null, 
+        () => {
+          showDialog('Narrator',
+            'The identity remains unknown. Open the Case File Dossier to compare this object against the guests\' profiles.',
+            null,
+            () => {
+              onModuleComplete(15, Date.now() - window._cabinStartTime, true);
+            },
+            'narrator'
+          );
+        }, 
+        'narrator'
+      );
+    }
+  }
 }

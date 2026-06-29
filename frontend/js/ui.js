@@ -164,20 +164,7 @@ function showScreen(id) {
       } else {
         let hintText = m.hint;
         if (id === 'sc-room') {
-          const killerHints = {
-            doctor: "Clue: The intruder item is a silver locket, possibly dropped by the psychologist.",
-            ceo: "Clue: The intruder item is an elite service medal belonging to the security consultant.",
-            musician: "Clue: The intruder item is a wooden cross keepsake, potentially dropped by the marine biologist.",
-            student: "Clue: The intruder item is a magnifying glass used for inspecting fine details, belonging to the data analyst.",
-            comedian: "Clue: The intruder item is an old brass compass direction finder, potentially dropped by the journalist.",
-            detective: "Clue: The intruder item is a service medal, potentially dropped by the software engineer.",
-            rowan: "Clue: The intruder item is a wine glass, likely dropped by the resort host.",
-            influencer: "Clue: The intruder item is a perfume bottle, belonging to the investor.",
-            therapist: "Clue: The intruder item is a notebook with research logs, belonging to the nurse.",
-            rachel: "Clue: The intruder item is a mystery novel, belonging to the corporate lawyer.",
-            gamer: "Clue: The intruder item is a notebook with research logs, belonging to the research assistant."
-          };
-          hintText = killerHints[GS.murderer] || m.hint;
+          hintText = "Conduct a complete search of Cabin 7. Secure Kai's journal and recover any suspicious belongings found within the room by tapping on the objects in the room. Leave no evidence behind!";
         }
         sidebar.innerHTML = `
           <h3>Field Manual</h3>
