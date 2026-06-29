@@ -19,47 +19,58 @@ function startForest(){
   window._testForestPath = correctPath;
 
   // Generate dynamic hint
-  const stepPhrases = [
+  const stepClues = [
+    // Step 1: Signpost (North = Forward, West = Left, East = Right, South = Back)
     [
-      "turn left to enter the trail",
-      "turn right to enter the trail",
-      "walk forward to start the trail",
-      "go back from the signpost"
+      "Step 1: The signpost has collapsed, pointing only toward the direction of the sunset.", // Left
+      "Step 1: The signpost points toward the direction of the morning dawn.",  // Right
+      "Step 1: A narrow, misty path beckons you straight ahead into the unknown.", // Forward
+      "Step 1: An overwhelming sense of dread warns you to turn around and return." // Back
     ],
+    // Step 2: Mossy Trunk (Moss = West/Left, Dry = East/Right, Straight = Forward, Retrace = Back)
     [
-      "head left past the mossy trunk",
-      "turn right at the mossy trunk",
-      "push forward past the mossy trunk",
-      "go back near the mossy trunk"
+      "Step 2: Walk toward the damp side of the trunk where green moss thrives.", // Left
+      "Step 2: Turn opposite the mossy side of the trunk, toward the dry bark.", // Right
+      "Step 2: Keep the mossy trunk directly on your left and push straight ahead.", // Forward
+      "Step 2: The trees close in; you must retrace your steps to find a way around." // Back
     ],
+    // Step 3: Deep Roots
     [
-      "veer left past the deep roots",
-      "go right around the deep roots",
-      "climb forward over the deep roots",
-      "head back from the deep roots"
+      "Step 3: Walk along the stable, walkable roots on your left side.", // Left
+      "Step 3: Avoid the left roots; pass through the clear opening on your right.", // Right
+      "Step 3: A fallen log stretches straight over the roots. Cross it.", // Forward
+      "Step 3: The deep roots are impassable; turn back from them." // Back
     ],
+    // Step 4: Darkening Path
     [
-      "slide left where the path darkens",
-      "steer right as the path darkens",
-      "press forward when the path darkens",
-      "head back where the path darkens"
+      "Step 4: Faint light filters from the West; walk toward it to avoid the shadows.", // Left
+      "Step 4: The wind whispers to follow the long shadows stretching to the East.", // Right
+      "Step 4: The path is swallowed by darkness ahead; brave the fog and push forward.", // Forward
+      "Step 4: You are walking in circles; turn around to break the loop." // Back
     ],
+    // Step 5: Bright Clearing
     [
-      "make a final left turn to reach the clearing",
-      "take a final right turn to reach the clearing",
-      "push forward into the bright clearing",
-      "turn back one last time to reach the clearing"
+      "Step 5: A rustle in the leaves on your left reveals the clearing's exit.", // Left
+      "Step 5: Follow the sound of the ocean waves on your right to escape the maze.", // Right
+      "Step 5: A bright, warm clearing opens up straight ahead.", // Forward
+      "Step 5: To find the exit, you must make a sudden retreat." // Back
     ]
   ];
-  const hintParts = correctPath.map((dir, stepIdx) => stepPhrases[stepIdx][dir]);
-  const generatedHint = "To escape the looping trees, follow the path: " + hintParts.join(", ") + ".";
+  const hintParts = correctPath.map((dir, stepIdx) => stepClues[stepIdx][dir]);
+  const generatedHint = `<strong>Decipher the navigation clues to find the path:</strong><br><br>` + 
+                        hintParts.map(p => `• ${p}`).join("<br>");
   
   // Update the hint dynamically in MODULES_DATA and active sidebar notes
   if (window.MODULES_DATA && window.MODULES_DATA[5]) {
     window.MODULES_DATA[5].hint = generatedHint;
   }
-  const notesEl = document.querySelector('#sc-forest .field-manual-sidebar p:last-of-type');
-  if (notesEl) notesEl.innerHTML = generatedHint;
+  const sidebar = document.querySelector('#sc-forest .field-manual-sidebar');
+  if (sidebar) {
+    const ps = sidebar.querySelectorAll('p');
+    if (ps.length >= 2) {
+      ps[ps.length - 1].innerHTML = generatedHint;
+    }
+  }
 
   let step=0, attempt=0;
   $('maze-step').textContent='0'; $('forest-attempt').textContent=1;
