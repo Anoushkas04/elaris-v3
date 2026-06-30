@@ -267,6 +267,7 @@ function updateDossierList() {
 }
 
 function isSecretUnlocked(npcId) {
+  if (GS.fragments[7]) return true; // Unlock everyone's secret after Module 8
   if (npcId === 'ceo') return GS.fragments[0] || GS.fragments[7];
   if (npcId === 'gamer') return GS.fragments[1];
   if (npcId === 'doctor') return GS.fragments[2];
@@ -346,7 +347,7 @@ function showDossierCard() {
        </div>`;
 
   let linkBtnHtml = '';
-  if (GS.moduleIdx === 2 && window._foundCabinIntruder) {
+  if (GS.moduleIdx === 2 && window._foundCabinIntruder && !window._cabinEvidenceLinked) {
     linkBtnHtml = `
       <div style="margin-top: 15px; border-top: 1px solid rgba(90,75,60,0.25); padding-top: 12px; text-align: center;">
         <button class="btn-main" onclick="linkCabinEvidence('${profile.id}')" style="width: 100%; font-size: 0.72rem; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">

@@ -382,7 +382,7 @@ function getMemoryFragment(idx) {
     // Module 8 (CCTV Reconstruction)
     {
       text: `"[Boardroom CCTV Reconstruction]\n\nAt 11:00 PM, a meeting took place in the boardroom. The footage clearly shows ${meta.name} present, contradicting their alibi."`,
-      clue: `CCTV footage places ${meta.name} in the boardroom at 11:00 PM, contradicting their alibi.`
+      clue: `you can now see everyone's hiddden truth unlocked in the dossier file`
     },
     // Module 9 (Evidence Challenge)
     {
@@ -485,10 +485,41 @@ function initializeRandomAlibis() {
     danielDockText: danielDock.text
   };
 
+  // Map of new roles and secrets
+  const newRolesAndSecrets = {
+    ceo: { role: 'Security Officer', secret: 'Covered up complaints' },
+    doctor: { role: 'Psychologist', secret: 'Led experiments' },
+    student: { role: 'Analyst', secret: 'Former participant' },
+    musician: { role: 'Marine Biologist', secret: 'Stole project data' },
+    rachel: { role: 'Lawyer', secret: 'Protected Project Echo legally' },
+    comedian: { role: 'Journalist', secret: 'Competed with Kai' },
+    influencer: { role: 'Investor', secret: 'Funded Echo' },
+    detective: { role: 'Programmer', secret: 'Built monitoring system' },
+    therapist: { role: 'Nurse', secret: 'Witnessed participant harm' },
+    gamer: { role: 'Research Assistant', secret: 'Falsified records' }
+  };
+
+  // Update IDENTITIES, NPCS_BASE and CHARACTER_META with new roles and secrets
+  [...IDENTITIES, ...NPCS_BASE].forEach(c => {
+    const metaObj = newRolesAndSecrets[c.id];
+    if (metaObj) {
+      c.role = metaObj.role;
+      c.secret = metaObj.secret;
+    }
+  });
+
+  for (const k in CHARACTER_META) {
+    const metaObj = newRolesAndSecrets[k];
+    if (metaObj) {
+      CHARACTER_META[k].role = metaObj.role;
+      CHARACTER_META[k].secret = metaObj.secret;
+    }
+  }
+
   // Update alibi text fields in IDENTITIES & NPCS_BASE to reflect the randomized values
   const rachel = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === 'rachel');
   if (rachel) {
-    rachel.details = `Rachel Quinn, corporate lawyer. Composed and professional. She signed a 6-month contract with the resort on ${rachelContractText}. She drafted the legal agreements and strict non-disclosure contracts that prevented the victims of Project Echo from suing the organization.`;
+    rachel.details = `Rachel Quinn, lawyer. Composed and professional. She signed a 6-month contract with the resort on ${rachelContractText}. She drafted the legal agreements and strict non-disclosure contracts that prevented the victims of Project Echo from suing the organization.`;
     rachel.alibi = `<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:15 PM:</strong> Drafting legal files in the resort lobby (Lobby router logs show laptop disconnected at ${rachelLaptop.text}).<br>• <strong>10:30 PM:</strong> Retired to Cabin 2.</div>`;
   }
 
