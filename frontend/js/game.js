@@ -800,7 +800,7 @@ function onModuleComplete(score, rt, correct) {
   } else if (GS.moduleIdx === 8) { // Module 9 completes
     showScreen('sc-narrative');
     const bgImg = $('narrative-bg-img');
-    if (bgImg) bgImg.src = 'assets/serverroom_empty_1782738257519.jpg';
+    if (bgImg) bgImg.src = 'assets/aftermod9.jpeg';
     showDialog('Narrator',
       'so now the truth has been uncovered...about the project echo that started it all three years ago',
       null,
