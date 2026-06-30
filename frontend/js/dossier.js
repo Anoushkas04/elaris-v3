@@ -472,7 +472,7 @@ function finishModule3Narrative() {
   closeModal('modal-cf');
   showScreen('sc-narrative');
   const bgImg = $('narrative-bg-img');
-  if (bgImg) bgImg.src = 'assets/cabin_bg_v3.png';
+  if (bgImg) bgImg.src = 'assets/cabin7.jpeg';
   
   showDialog('Narrator',
     'Kai wasn\'t collecting memories...',
