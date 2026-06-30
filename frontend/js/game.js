@@ -797,6 +797,19 @@ function onModuleComplete(score, rt, correct) {
     );
   } else if (GS.moduleIdx === 6) { // Module 7 completes
     playModule7Video(proceed);
+  } else if (GS.moduleIdx === 8) { // Module 9 completes
+    showScreen('sc-narrative');
+    const bgImg = $('narrative-bg-img');
+    if (bgImg) bgImg.src = 'assets/serverroom_empty_1782738257519.jpg';
+    showDialog('Narrator',
+      'so now the truth has been uncovered...about the project echo that started it all three years ago',
+      null,
+      () => {
+        closeDialog();
+        playModule9Video(proceed);
+      },
+      'narrator'
+    );
   } else {
     proceed();
   }
@@ -818,6 +831,98 @@ function playModule7Video(onDone) {
   
   const video = document.createElement('video');
   video.src = 'assets/replayaftermodule7.mp4';
+  video.style.cssText = `
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  `;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.controls = false;
+  
+  const skipBtn = document.createElement('button');
+  skipBtn.textContent = 'Skip Video ➔';
+  skipBtn.className = 'btn-choice';
+  skipBtn.style.cssText = `
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    z-index: 10000001;
+    padding: 10px 20px;
+    background: rgba(28,25,23,0.8);
+    border: 1.5px solid var(--gold);
+    color: #fff;
+    cursor: pointer;
+    font-family: var(--ff-m);
+    font-size: 0.85rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  `;
+  skipBtn.onmouseover = () => {
+    skipBtn.style.background = 'var(--gold)';
+    skipBtn.style.color = '#000';
+  };
+  skipBtn.onmouseout = () => {
+    skipBtn.style.background = 'rgba(28,25,23,0.8)';
+    skipBtn.style.color = '#fff';
+  };
+
+  const cleanup = () => {
+    video.pause();
+    container.remove();
+    onDone();
+  };
+
+  video.onended = cleanup;
+  skipBtn.onclick = cleanup;
+  
+  container.appendChild(video);
+  container.appendChild(skipBtn);
+  document.body.appendChild(container);
+
+  video.play().catch(err => {
+    console.warn("Autoplay prevented, showing manual play button.", err);
+    const playBtn = document.createElement('button');
+    playBtn.textContent = '▶ Play Video';
+    playBtn.className = 'btn-choice';
+    playBtn.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000002;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    `;
+    playBtn.onclick = () => {
+      playBtn.remove();
+      video.play();
+    };
+    container.appendChild(playBtn);
+  });
+}
+
+function playModule9Video(onDone) {
+  // Create fullscreen video player overlay
+  const container = document.createElement('div');
+  container.id = 'module9-video-player';
+  container.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 10000000;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  const video = document.createElement('video');
+  video.src = 'assets/thetruth.mp4';
   video.style.cssText = `
     width: 100%;
     height: 100%;
