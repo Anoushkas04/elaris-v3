@@ -816,6 +816,7 @@ function onModuleComplete(score, rt, correct) {
 }
 
 function playModule7Video(onDone) {
+  if (typeof window.pauseBGMusic === 'function') window.pauseBGMusic();
   // Create fullscreen video player overlay
   const container = document.createElement('div');
   container.id = 'module7-video-player';
@@ -870,6 +871,7 @@ function playModule7Video(onDone) {
   const cleanup = () => {
     video.pause();
     container.remove();
+    if (typeof window.resumeBGMusic === 'function') window.resumeBGMusic();
     onDone();
   };
 
@@ -908,6 +910,7 @@ function playModule7Video(onDone) {
 }
 
 function playModule9Video(onDone) {
+  if (typeof window.pauseBGMusic === 'function') window.pauseBGMusic();
   // Create fullscreen video player overlay
   const container = document.createElement('div');
   container.id = 'module9-video-player';
@@ -962,6 +965,7 @@ function playModule9Video(onDone) {
   const cleanup = () => {
     video.pause();
     container.remove();
+    if (typeof window.resumeBGMusic === 'function') window.resumeBGMusic();
     onDone();
   };
 
@@ -998,6 +1002,29 @@ function playModule9Video(onDone) {
     container.appendChild(playBtn);
   });
 }
+
+// ─ LOOPING BACKGROUND MUSIC ────────────────────────────────────
+let bgMusicInstance = null;
+function playBGMusic() {
+  if (bgMusicInstance) return;
+  bgMusicInstance = new Audio('assets/bgmusic.mp3');
+  bgMusicInstance.loop = true;
+  bgMusicInstance.volume = 0.15; // Kept at a subtle volume to avoid TTS clashing
+  bgMusicInstance.play().catch(e => {
+    console.warn("Autoplay block: background music will resume on next click.", e);
+  });
+}
+
+window.pauseBGMusic = () => {
+  if (bgMusicInstance) bgMusicInstance.pause();
+};
+
+window.resumeBGMusic = () => {
+  if (bgMusicInstance) bgMusicInstance.play().catch(e => console.warn(e));
+};
+
+// Start background music immediately upon the first user interaction gesture on the document
+document.addEventListener('click', playBGMusic, { once: true });
 
 function showMidgameTwist(cb) {
   showScreen('sc-narrative');
