@@ -4,15 +4,15 @@
   bottom: 16px; left: 50%;
   transform: translateX(-50%) translateY(30px);
   width: 92%;
-  max-width: 720px;
-  min-height: 120px;
+  max-width: 800px;
+  min-height: 145px;
   height: auto;
   background: var(--ink-ss);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   backdrop-filter: blur(15px);
   z-index: 90;
-  padding: 14px 20px;
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -29,23 +29,23 @@
 
 #dialog-speaker {
   font-family: var(--ff-t);
-  font-size: 0.8rem;
+  font-size: 1.05rem;
   color: var(--gold-l);
   letter-spacing: 0.08em;
-  margin-bottom: 2px;
+  margin-bottom: 6px;
 }
 
 #dialog-text {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   color: var(--text-p);
-  line-height: 1.45;
+  line-height: 1.55;
   overflow-y: auto;
   flex-grow: 1;
 }
 
 #dialog-cursor {
   display: inline-block;
-  width: 6px; height: 12px;
+  width: 8px; height: 16px;
   background: var(--gold);
   margin-left: 2px;
   animation: blink 0.8s infinite;
@@ -53,18 +53,18 @@
 
 #dialog-choices {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .btn-choice {
   font-family: var(--ff-b);
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: var(--text-p);
   background: rgba(196,164,101,0.06);
   border: 1px solid rgba(196,164,101,0.3);
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
   transition: var(--transition);
@@ -82,7 +82,7 @@
 #dialog-next {
   position: absolute;
   bottom: 8px; right: 14px;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-family: var(--ff-m);
   color: var(--text-d);
   cursor: pointer;
