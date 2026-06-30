@@ -23,10 +23,10 @@ function startEvidenceChallenge() {
       getDistractors: () => ['8:30 PM', '9:30 PM', '10:30 PM']
     },
     {
-      cue: 'NA_RA_OR — Closed Main Office: [GLITCH]',
-      suspectName: 'Narrator',
-      getCorrect: () => '9:30 PM',
-      getDistractors: () => ['10:00 PM', '10:30 PM', '11:00 PM']
+      cue: 'DA_I_L PR_C_ — Auditing Registries: [GLITCH]',
+      suspectName: 'Daniel Price',
+      getCorrect: () => `9:00 PM - ${GS.randomAlibis.danielDockText}`,
+      getDistractors: () => ['8:00 PM - 9:30 PM', '10:00 PM - 11:30 PM', '9:30 PM - 11:00 PM']
     },
     {
       cue: 'DR. AV_RY RO_S — Patient Log Audit: [GLITCH]',

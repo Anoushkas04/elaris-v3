@@ -343,6 +343,9 @@ function getMemoryFragment(idx) {
   const murdererId = GS.murderer || 'ceo';
   const meta = CHARACTER_META[murdererId] || CHARACTER_META.ceo;
   
+  const victimId = GS.bonfireVictim || 'influencer';
+  const vMeta = CHARACTER_META[victimId] || CHARACTER_META.influencer;
+  
   const list = [
     // Module 1 (The Shoreline)
     {
@@ -366,17 +369,17 @@ function getMemoryFragment(idx) {
     },
     // Module 5 (Lost Baggage)
     {
-      text: `"[Baggage search report]\n\nA folder of historical documents was found hidden in the luggage of ${meta.name}. It contains clinical trial blueprints and a detailed layout of the island's server room."`,
-      clue: `${meta.name} was carrying server blueprints and suppressed clinical trial records.`
+      text: `"[Baggage search report]\n\nA folder of historical documents was found hidden in the luggage of ${vMeta.name}. It contains clinical trial blueprints and a detailed layout of the island's server room."`,
+      clue: `${vMeta.name} was carrying server blueprints and suppressed clinical trial records.`
     },
     // Module 6 (The Forest Trail)
     {
-      text: `"[Security footage: 3:14 AM. A user logged in as ${meta.name} is seen deleting files from the data server. The monitor displays: PROJECT ECHO — ARCHIVE CLEAR.]"`,
-      clue: `${meta.name} was seen deleting Project Echo files from the server room at 3:14 AM.`
+      text: `"You reach at the end of the forest to discover a hidden Server room with a board that says 'Project Echo'."`,
+      clue: `"You reach at the end of the forest to discover a hidden Server room with a board that says 'Project Echo'."`
     },
     // Module 7 (The Storm Shelter)
     {
-      text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed.'\n\n[Suppress-Signatures: The Narrator (Director), Dr. Avery Ross, and ${meta.name} (Consultant)]"`,
+      text: `"[Final pages of PROJECT ECHO report]\n\n'Participants exhibited severe and sustained increases in stress, anxiety, and depressive cognition. Data was suppressed.'\n\n[Suppress-Signatures: Project Director, Dr. Avery Ross, and ${meta.name} (Consultant)]"`,
       clue: `${meta.name} is documented as an operator in the suppressed Project Echo report.`
     },
     // Module 8 (CCTV Reconstruction)

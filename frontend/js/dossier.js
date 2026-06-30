@@ -193,7 +193,7 @@ function openJournalModal(js1, js2, cb) {
 
           <div style="line-height: 1.95rem; background: repeating-linear-gradient(transparent, transparent 1.9rem, rgba(90,75,60,0.1) 1.9rem, rgba(90,75,60,0.1) 1.95rem); text-align: left; padding: 0 4px;">
             <p style="margin: 0; font-weight: bold; color: #a23a1f; font-size: 1.25rem;">Oct 26 - Warning</p>
-            <p style="margin: 0;">Rowan asked about my archives. They are tracking my queries. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">I'm running out of time.</span> The backup security panels are active. If they trigger a lockdown, check the timelines logs of the guests to extract the digit code. One guest left an item behind in the cabin that bridges the network.</p>
+            <p style="margin: 0;">Lighthouse keeper asked about my archives. They are tracking my queries. <span style="text-decoration: line-through; opacity: 0.65; color: #6e5e4d; font-style: italic;">I'm running out of time.</span> The backup security panels are active. If they trigger a lockdown, check the timelines logs of the guests to extract the digit code. One guest left an item behind in the cabin that bridges the network.</p>
 
             <!-- Draw/Sketch section -->
             <div style="display:flex; justify-content: space-between; margin-top: 0.8rem; align-items: center; border-top: 1px dotted rgba(90,75,60,0.3); padding-top: 0.8rem; position:relative;">
