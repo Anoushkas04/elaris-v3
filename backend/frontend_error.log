@@ -1,0 +1,5 @@
+ERROR: ReferenceError: Can't find variable: startBeach at http://localhost:8080/js/game.js?v=6:588:21
+launchGame@http://localhost:8080/js/game.js:588:21
+@http://localhost:8080/js/game.js:577:21
+@http://localhost:8080/js/dialogue.js:90:88
+onclick@http://localhost:8080/game.html:60:11

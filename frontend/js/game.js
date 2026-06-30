@@ -1182,90 +1182,83 @@ function verifyDeductions() {
   showDeductionBoard();
 }
 
-function showDeductionBoard(){
-  const clues = getDeductionClues();
-  const categories = ['Motive', 'Opportunity', 'Relationship', 'Contradiction', 'Timeline'];
-  
-  const gridHtml = categories.map(cat => {
-    const catClues = clues.filter(c => c.cat === cat);
-    const cluesHtml = catClues.map(c => {
-      if (c.isDecoy) {
-        const isConnected = GS.deductionSelections && GS.deductionSelections.includes(c.id);
-        const classList = isConnected ? 'clue-card connected' : 'clue-card';
-        const onclickStr = GS.deductionVerified ? '' : `onclick="toggleClueCard(this, '${c.id}')"`;
-        return `<div class="${classList}" id="clue-${c.id}" ${onclickStr} style="margin-bottom:7px">
-          <div class="clue-cat">Evidence (Decoy)</div>
-          ${c.text}
-        </div>`;
-      } else {
-        const isUnlocked = GS.fragments[c.fragmentIdx];
-        if (!isUnlocked) {
-          return `<div class="clue-card locked" style="margin-bottom:7px">
-            <div class="clue-cat">Locked Evidence</div>
-            [Locked Clue - Recover Envelope ${c.fragmentIdx + 1}]
-          </div>`;
-        } else {
-          const clueText = getMemoryFragment(c.fragmentIdx).clue;
-          const isConnected = GS.deductionSelections && GS.deductionSelections.includes(c.id);
-          const classList = isConnected ? 'clue-card connected' : 'clue-card';
-          const onclickStr = GS.deductionVerified ? '' : `onclick="toggleClueCard(this, '${c.id}')"`;
-          return `<div class="${classList}" id="clue-${c.id}" ${onclickStr} style="margin-bottom:7px">
-            <div class="clue-cat">Evidence (Envelope ${c.fragmentIdx + 1})</div>
-            ${clueText}
-          </div>`;
-        }
-      }
-    }).join('');
-    
-    return `<div style="border:1px solid rgba(196,164,101,.18);padding:14px;border-radius:3px;background:var(--ink-ss)">
-      <div style="font-family:var(--ff-t);font-size:.7rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">${cat}</div>
-      ${cluesHtml}
-    </div>`;
-  }).join('');
-  
-  $('deduction-grid').innerHTML = gridHtml;
-  
-  if (!GS.deductionSelections) {
-    GS.deductionSelections = [];
-  }
-  
-  const verifyBtn = $('verify-deduction-btn');
-  const accuseBtn = $('accuse-btn');
-  const feedbackEl = $('deduction-feedback');
-  
-  if (GS.deductionVerified) {
-    verifyBtn.style.display = 'none';
-    accuseBtn.style.display = 'block';
-    
-    feedbackEl.style.display = 'block';
-    feedbackEl.innerHTML = `<strong>Deduction Complete</strong><br>Connections verified. Score added: +${GS.deductionScore || 0} points.<br><span style="color:var(--gold-l);">Proceed to accuse the suspect.</span>`;
-    
-    applyVerificationStyles();
-  } else {
-    verifyBtn.style.display = 'block';
-    accuseBtn.style.display = 'none';
-    feedbackEl.style.display = 'none';
-  }
-  
-  accuseBtn.onclick=()=>{
-    $('accuse-form').style.display='block';
-    const playerId = GS.playerIdentity || (() => {
-      const userJson = localStorage.getItem('elaris_user');
-      const user = userJson ? JSON.parse(userJson) : {};
-      return user.identity === 'academic' ? 'student' : user.identity;
-    })();
-    const potentialAccused = [...IDENTITIES, ...NPCS_BASE].filter(c => 
-      c.id !== GS.victim && 
-      c.id !== 'rowan' && 
-      c.id !== 'keeper' && 
-      c.id !== 'narrator' && 
-      c.id !== playerId &&
-      c.alive !== false
-    );
-    $('accuse-opts').innerHTML=potentialAccused.map(n=>`
-      <button class="btn-choice" onclick="makeAccusation('${n.id}','${n.name}')">${n.name} — ${n.role}</button>`).join('');
+function showDeductionBoard() {
+  const playerId = GS.playerIdentity || (() => {
+    const userJson = localStorage.getItem('elaris_user');
+    const user = userJson ? JSON.parse(userJson) : {};
+    return user.identity === 'academic' ? 'student' : user.identity;
+  })();
+
+  const potentialAccused = [...IDENTITIES, ...NPCS_BASE].filter(c => 
+    c.id !== GS.victim && 
+    c.id !== 'rowan' && 
+    c.id !== 'keeper' && 
+    c.id !== 'narrator' && 
+    c.id !== playerId &&
+    c.alive !== false
+  );
+
+  const getDossierImgPath = (id) => {
+    if (id === 'ceo') return 'assets/MARCUS-HALE.jpeg';
+    if (id === 'doctor') return 'assets/AVERY-ROSS.jpeg';
+    if (id === 'musician') return 'assets/LENA-BROOKS.jpeg';
+    if (id === 'rachel') return 'assets/RACHEL.jpeg';
+    if (id === 'comedian') return 'assets/ETHAN.jpeg';
+    if (id === 'therapist') return 'assets/MAYA-SINGH.jpeg';
+    if (id === 'detective') return 'assets/OLIVER-GRANT.jpeg';
+    if (id === 'gamer') return 'assets/DANIEL-PRICE.jpeg';
+    if (id === 'influencer') return 'assets/SARAH-BENNETT.jpeg';
+    if (id === 'student') return 'assets/NOAH-MERCER.jpeg';
+    return 'assets/NARRATOR.png';
   };
-  
+
+  const gridHtml = potentialAccused.map(n => `
+    <div class="suspect-accuse-card" onclick="makeAccusation('${n.id}', '${n.name}')" style="
+      background: rgba(28, 25, 23, 0.5);
+      border: 1.5px solid rgba(196, 164, 101, 0.25);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    ">
+      <div style="width: 100%; height: 160px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(196, 164, 101, 0.15);">
+        <img src="${getDossierImgPath(n.id)}" style="width: 100%; height: 100%; object-fit: cover;" alt="${n.name}">
+      </div>
+      <div style="text-align: center; width: 100%;">
+        <div style="font-family: var(--ff-t); color: var(--gold-l); font-size: 0.95rem; font-weight: bold; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          ${n.name}
+        </div>
+        <div style="font-family: var(--ff-m); color: var(--text-d); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          ${n.role}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  const gridContainer = $('accuse-suspect-grid');
+  if (gridContainer) {
+    gridContainer.innerHTML = gridHtml;
+  }
+
+  // Add styles for hover interaction in document head if not present
+  if (!$('suspect-accuse-hover-style')) {
+    const style = document.createElement('style');
+    style.id = 'suspect-accuse-hover-style';
+    style.textContent = `
+      .suspect-accuse-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold) !important;
+        background: rgba(196, 164, 101, 0.12) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 12px rgba(196,164,101,0.25);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   showScreen('sc-deduction');
 }
 

@@ -91,3 +91,29 @@
 #dialog-next:hover { color: var(--gold); }
 
 @keyframes blink { 0%, 100% { opacity:0 } 50% { opacity:1 } }
+
+/* ─ SUSPECT ROW / CIRCLES STYLES FOR MODULE 10 ─ */
+.suspect-row-item {
+  transition: background 0.2s ease;
+}
+.suspect-row-item:hover .suspect-circle {
+  transform: scale(1.1);
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 8px rgba(196,164,101,0.4);
+}
+.suspect-row-item:hover .suspect-name-label {
+  color: var(--gold) !important;
+}
+.suspect-row-item.highlighted .suspect-circle {
+  border-color: var(--teal) !important;
+  box-shadow: 0 0 10px var(--teal) !important;
+}
+.suspect-row-item.highlighted .suspect-name-label {
+  color: var(--teal) !important;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}

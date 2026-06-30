@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Special+Elite&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="css/main.css?v=28">
-  <link rel="stylesheet" href="css/npc.css?v=28">
-  <link rel="stylesheet" href="css/dialogue.css?v=28">
+    <link rel="stylesheet" href="css/main.css?v=34">
+  <link rel="stylesheet" href="css/npc.css?v=34">
+  <link rel="stylesheet" href="css/dialogue.css?v=34">
 </head>
 <body>
 
@@ -337,38 +337,84 @@
   </div>
 
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: PATHFINDER Mini-game ━━━━━━━━━━━━ -->
-  <div class="screen" id="sc-pathfinder">
-    <div class="game-panel on">
-      <h3>The Dock Escape Lock</h3>
-      <div class="divider"></div>
-      <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-d);">
-        Connect elements in order. <span id="pf-next" style="display:none;">1</span> (Errors: <span id="pf-errors">0</span> | Attempt: <span id="pf-attempt">1</span>)
-      </p>
-      <div id="pf-board">
-        <canvas id="pf-canvas"></canvas>
+  <div class="screen" id="sc-pathfinder" style="padding: 0; overflow: hidden; align-items: stretch; justify-content: stretch;">
+    <!-- Full-screen wrapper, no scroll -->
+    <div style="display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; background: transparent;">
+      
+      <!-- Header bar -->
+      <div style="flex-shrink: 0; text-align: center; padding: 12px 24px 8px; border-bottom: 1px solid rgba(196,164,101,0.18);">
+        <h3 style="font-family: var(--ff-t); color: var(--gold-l); font-size: 1.4rem; letter-spacing: 0.1em; margin-bottom: 2px;">CASE RECONSTRUCTION</h3>
+        <p style="font-family: var(--ff-m); font-size: 0.78rem; color: var(--text-d); margin: 0;">Review the case files and complete the relationship chains to reconstruct the events.</p>
+      </div>
+
+      <!-- Three-column body — fills remaining height -->
+      <div style="flex: 1; display: grid; grid-template-columns: 220px 1fr 200px; gap: 0; overflow: hidden; min-height: 0;">
+
+        <!-- LEFT: Clue Cards -->
+        <div style="border-right: 1px solid rgba(196,164,101,0.15); display: flex; flex-direction: column; overflow: hidden; padding: 14px 12px;">
+          <div style="font-family: var(--ff-t); color: var(--gold); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid rgba(196,164,101,0.2); padding-bottom: 6px;">Evidence Files</div>
+          <div id="pf-clue-list" style="flex: 1; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; padding-right: 4px;">
+            <!-- Clue cards rendered here -->
+          </div>
+        </div>
+
+        <!-- CENTER: Chain Solver + Solved Summary -->
+        <div style="display: flex; flex-direction: column; overflow: hidden; padding: 16px 20px;">
+
+          <!-- Chain indicator -->
+          <div style="font-family: var(--ff-m); font-size: 0.72rem; color: var(--gold-l); text-transform: uppercase; letter-spacing: 0.12em; text-align: center; margin-bottom: 10px;" id="pf-chain-step">CHAIN 1 OF 5</div>
+
+          <!-- The deduction chain display -->
+          <div style="flex-shrink: 0; background: rgba(28,25,23,0.55); border: 1px solid rgba(196,164,101,0.25); border-radius: 8px; padding: 18px; text-align: center; margin-bottom: 14px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 7px; margin-bottom: 14px;">
+              <div id="pf-chain-subject" style="font-family: var(--ff-t); font-size: 1.15rem; color: #fff; background: rgba(196,164,101,0.15); border: 1px solid var(--gold); padding: 5px 18px; border-radius: 6px; min-width: 120px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">Marcus</div>
+              <div style="color: var(--gold); font-size: 1rem; line-height: 1;">↓</div>
+              <div id="pf-chain-verb" style="font-family: var(--ff-m); font-size: 0.88rem; color: var(--text-p); font-style: italic;">Covered up complaints for</div>
+              <div style="color: var(--gold); font-size: 1rem; line-height: 1;">↓</div>
+              <div id="pf-chain-target" style="font-family: var(--ff-t); font-size: 1.15rem; color: var(--gold-l); font-weight: bold; background: rgba(0,0,0,0.4); border: 1px dashed rgba(196,164,101,0.5); padding: 5px 18px; border-radius: 6px; min-width: 120px; text-shadow: 0 0 10px rgba(196,164,101,0.3);">?</div>
+            </div>
+            <!-- Choice buttons -->
+            <div id="pf-solver-choices" style="display: flex; flex-direction: column; gap: 7px; margin-top: 10px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Solved Case Summary -->
+          <div style="flex: 1; overflow-y: auto; background: rgba(28,25,23,0.3); border: 1px dashed rgba(196,164,101,0.18); border-radius: 8px; padding: 12px; min-height: 0;">
+            <div style="font-family: var(--ff-t); color: var(--gold-l); font-size: 0.72rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.08em;">Constructed Case Report</div>
+            <div id="pf-summary-list" style="display: flex; flex-direction: column; gap: 4px; font-family: var(--ff-m); font-size: 0.78rem; color: var(--text-p); text-align: left;">
+              <span style="color: var(--text-d); font-style: italic;">No links established yet.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Character Icons -->
+        <div style="border-left: 1px solid rgba(196,164,101,0.15); display: flex; flex-direction: column; overflow: hidden; padding: 14px 12px;">
+          <div style="font-family: var(--ff-t); color: var(--gold); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid rgba(196,164,101,0.2); padding-bottom: 6px; text-align: center;">Characters</div>
+          <div id="pf-suspect-circles-list" style="flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto;">
+            <!-- Suspect rows rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom progress bar -->
+      <div style="flex-shrink: 0; border-top: 1px solid rgba(196,164,101,0.18); padding: 8px 24px; text-align: center; font-family: var(--ff-m); font-size: 0.88rem; color: var(--gold-l); font-weight: bold;" id="pf-progress-indicator">
+        0 / 5 Chains Completed
       </div>
     </div>
   </div>
 
-  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: DEDUCTION BOARD ━━━━━━━━━━━━━━ -->
+  <!-- ━━━━━━━━━━━━━━━━━━━━ SCREEN: DEDUCTION BOARD (Suspect Confrontation) ━━━━━━━━━━━━━━ -->
   <div class="screen" id="sc-deduction">
-    <div class="glass-panel" style="max-width: 660px;">
-      <h3>Deduction Board</h3>
-      <div class="divider"></div>
-      <p class="subtitle" style="margin-bottom: 15px;">Connect items that form contradictions or links. Choose a suspect to confront.</p>
+    <div class="glass-panel" style="max-width: 840px; width: 95%; padding: 24px; text-align: center;">
+      <h3 style="font-family: var(--ff-t); color: var(--gold-l); font-size: 1.6rem; letter-spacing: 0.1em; margin-bottom: 4px;">CONFRONT SUSPECT</h3>
+      <div class="divider" style="margin: 8px auto; width: 120px;"></div>
+      <p style="font-family: var(--ff-m); font-size: 0.9rem; color: var(--text-d); margin-bottom: 20px;">
+        Select the suspect you believe is responsible for the murder of Kai Nakamura.
+      </p>
       
-      <div id="deduction-grid"></div>
-      
-      <div id="deduction-feedback" style="display: none; margin-bottom: 15px; padding: 12px; border-radius: 4px; font-family: var(--ff-m); font-size: 0.85rem; text-align: center; border: 1px solid rgba(196, 164, 101, 0.22);"></div>
-      
-      <div style="display: flex; gap: 12px; margin-top: 15px;">
-        <button class="btn-main" id="verify-deduction-btn" onclick="verifyDeductions()" style="flex: 1;">Verify Connections</button>
-        <button class="btn-main" id="accuse-btn" style="flex: 1; display: none;">Confront Suspect</button>
-      </div>
-      
-      <div id="accuse-form" style="display: none; margin-top: 20px;">
-        <h4 style="font-family: var(--ff-t); font-size: 0.85rem; color: var(--gold); margin-bottom: 10px;">Select Suspect</h4>
-        <div id="accuse-opts" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      <div id="accuse-suspect-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-top: 15px;">
+        <!-- Suspect lineup rendered dynamically here -->
       </div>
     </div>
   </div>
@@ -635,23 +681,23 @@
   </div>
 
   <!-- ━━━━━━━━━━━━━━━━━━━━ SCRIPTS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-  <script src="js/state.js?v=28"></script>
-  <script src="js/ui.js?v=28"></script>
-  <script src="js/dass.js?v=28"></script>
-  <script src="js/save.js?v=28"></script>
-  <script src="js/npc.js?v=28"></script>
-  <script src="js/dialogue.js?v=28"></script>
-  <script src="js/dossier.js?v=28"></script>
-  <script src="js/modules/module1.js?v=28"></script>
-  <script src="js/modules/module2.js?v=28"></script>
-  <script src="js/modules/module3.js?v=28"></script>
-  <script src="js/modules/module4.js?v=28"></script>
-  <script src="js/modules/module5.js?v=28"></script>
-  <script src="js/modules/module6.js?v=28"></script>
-  <script src="js/modules/module7.js?v=28"></script>
-  <script src="js/modules/module8.js?v=28"></script>
-  <script src="js/modules/module9.js?v=28"></script>
-  <script src="js/modules/module10.js?v=28"></script>
-  <script src="js/game.js?v=28"></script>
+  <script src="js/state.js?v=34"></script>
+  <script src="js/ui.js?v=34"></script>
+  <script src="js/dass.js?v=34"></script>
+  <script src="js/save.js?v=34"></script>
+  <script src="js/npc.js?v=34"></script>
+  <script src="js/dialogue.js?v=34"></script>
+  <script src="js/dossier.js?v=34"></script>
+  <script src="js/modules/module1.js?v=34"></script>
+  <script src="js/modules/module2.js?v=34"></script>
+  <script src="js/modules/module3.js?v=34"></script>
+  <script src="js/modules/module4.js?v=34"></script>
+  <script src="js/modules/module5.js?v=34"></script>
+  <script src="js/modules/module6.js?v=34"></script>
+  <script src="js/modules/module7.js?v=34"></script>
+  <script src="js/modules/module8.js?v=34"></script>
+  <script src="js/modules/module9.js?v=34"></script>
+  <script src="js/modules/module10.js?v=34"></script>
+  <script src="js/game.js?v=34"></script>
 </body>
 </html>

@@ -1960,3 +1960,29 @@ h2 { font-size: 1.4rem; margin-bottom: 16px; }
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 
+
+/* ━━━━━━━━━━━━━━━━━━━━ MODULE 10: CASE RECONSTRUCTION ━━━━━━━━━━━━ */
+#sc-pathfinder {
+  top: 60px !important;      /* below the fixed HUD */
+  padding: 0 !important;
+  overflow: hidden !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+/* Slim scrollbars for clue lists and suspect list */
+#pf-clue-list::-webkit-scrollbar,
+#pf-suspect-circles-list::-webkit-scrollbar,
+#pf-summary-list::-webkit-scrollbar {
+  width: 4px;
+}
+#pf-clue-list::-webkit-scrollbar-track,
+#pf-suspect-circles-list::-webkit-scrollbar-track,
+#pf-summary-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+#pf-clue-list::-webkit-scrollbar-thumb,
+#pf-suspect-circles-list::-webkit-scrollbar-thumb,
+#pf-summary-list::-webkit-scrollbar-thumb {
+  background: rgba(196,164,101,0.3);
+  border-radius: 2px;
+}

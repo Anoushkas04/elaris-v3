@@ -122,7 +122,7 @@ function showScreen(id) {
     const gp = el.querySelector('.game-panel');
     if (gp) gp.classList.add('on');
 
-    const GAME_SCREENS = ['sc-beach', 'sc-lighthouse', 'sc-room', 'sc-bonfire', 'sc-baggage', 'sc-forest', 'sc-evidence', 'sc-cctv', 'sc-storm', 'sc-pathfinder'];
+    const GAME_SCREENS = ['sc-beach', 'sc-lighthouse', 'sc-room', 'sc-bonfire', 'sc-baggage', 'sc-forest', 'sc-evidence', 'sc-cctv', 'sc-storm'];
     if (GAME_SCREENS.includes(id)) {
       el.classList.add('game-screen');
       // Inject/update field manual sidebar
