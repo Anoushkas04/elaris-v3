@@ -312,14 +312,14 @@ function startBeach() {
 
     // Define 8 pre-set sandy slots to guarantee items stay on the shore and do not overlap
     const slots = [
-      { left: '7%',  top: '60%' },
-      { left: '14%', top: '74%' },
-      { left: '22%', top: '86%' },
-      { left: '27%', top: '57%' },
-      { left: '33%', top: '65%' },
-      { left: '29%', top: '76%' },
-      { left: '9%',  top: '84%' },
-      { left: '42%', top: '68%' }
+      { left: '6%',  top: '55%' },
+      { left: '18%', top: '78%' },
+      { left: '30%', top: '60%' },
+      { left: '44%', top: '82%' },
+      { left: '57%', top: '56%' },
+      { left: '70%', top: '78%' },
+      { left: '82%', top: '60%' },
+      { left: '91%', top: '74%' }
     ];
 
     // Simple Durstenfeld shuffle for the slots

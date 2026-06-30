@@ -346,6 +346,13 @@ function getMemoryFragment(idx) {
   const victimId = GS.bonfireVictim || 'influencer';
   const vMeta = CHARACTER_META[victimId] || CHARACTER_META.influencer;
   
+  const t1Id = (window._bonfireTruthTellers && window._bonfireTruthTellers[0]) || 'doctor';
+  const t2Id = (window._bonfireTruthTellers && window._bonfireTruthTellers[1]) || 'ceo';
+  const t1Meta = CHARACTER_META[t1Id] || CHARACTER_META.doctor || { name: 'Dr. Avery Ross' };
+  const t2Meta = CHARACTER_META[t2Id] || CHARACTER_META.ceo || { name: 'Marcus Hale' };
+  const tName1 = t1Meta.name;
+  const tName2 = t2Meta.name;
+  
   const list = [
     // Module 1 (The Shoreline)
     {
@@ -364,8 +371,8 @@ function getMemoryFragment(idx) {
     },
     // Module 4 (The Bonfire)
     {
-      text: `"[Timeline analysis comparison]\n\n${meta.name} bonfire statement: '${meta.bonfireClaim}'\nSystem record: ${meta.bonfireContradiction}"`,
-      clue: `${meta.name} lied about their timeline: they claimed they were ${meta.bonfireClaim}, but ${meta.bonfireContradiction}.`
+      text: `the suspect who lied is dead. Someone doesnt like lies. \n\nNew Clue : Someone poisoned them intentionally. Could it be ${tName1} and ${tName2}`,
+      clue: `the suspect who lied is dead. Someone doesnt like lies. New Clue : Someone poisoned them intentionally. Could it be ${tName1} and ${tName2}`
     },
     // Module 5 (Lost Baggage)
     {
