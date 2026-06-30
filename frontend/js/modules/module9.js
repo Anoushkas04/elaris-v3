@@ -1,11 +1,15 @@
 function startStormShelter() {
+  if (typeof initializeRandomAlibis === 'function') {
+    initializeRandomAlibis();
+  }
+
   const clues = [
-    { q: "HR log: Month and Day Rachel Quinn signed her contract (MMDD).", a: "0512", suspectName: "Rachel Quinn" },
-    { q: "Security log: Maya Singh's RFID spa exit time (HHMM).", a: "1017", suspectName: "Maya Singh" },
-    { q: "Device log: Sarah Bennett's beach photoshoot end time (HHMM).", a: "0930", suspectName: "Sarah Bennett" },
-    { q: "Reservation log: Maya Singh's Spa inventory management end time (HHMM).", a: "1000", suspectName: "Maya Singh" },
-    { q: "Lobby router log: Rachel Quinn's laptop disconnect time (HHMM).", a: "0900", suspectName: "Rachel Quinn" },
-    { q: "Dock log: Daniel Price's escape vessel registry audit end time (HHMM).", a: "1015", suspectName: "Daniel Price" }
+    { q: "HR log: Month and Day Rachel Quinn signed her contract (MMDD).", a: GS.randomAlibis.rachelContractCode, suspectName: "Rachel Quinn" },
+    { q: "Security log: Maya Singh's RFID spa exit time (HHMM).", a: GS.randomAlibis.mayaExitCode, suspectName: "Maya Singh" },
+    { q: "Device log: Sarah Bennett's beach photoshoot end time (HHMM).", a: GS.randomAlibis.sarahPhotoshootCode, suspectName: "Sarah Bennett" },
+    { q: "Reservation log: Maya Singh's Spa inventory management end time (HHMM).", a: GS.randomAlibis.mayaInventoryCode, suspectName: "Maya Singh" },
+    { q: "Lobby router log: Rachel Quinn's laptop disconnect time (HHMM).", a: GS.randomAlibis.rachelLaptopCode, suspectName: "Rachel Quinn" },
+    { q: "Dock log: Daniel Price's escape vessel registry audit end time (HHMM).", a: GS.randomAlibis.danielDockCode, suspectName: "Daniel Price" }
   ];
   const activeClue = clues[Math.floor(Math.random()*clues.length)];
   const code = activeClue.a;

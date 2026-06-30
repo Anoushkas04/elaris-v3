@@ -427,3 +427,86 @@ const MODULES_DATA = [
   {id:'evidence',   title:'Evidence Challenge', icon:'📂', loc:'Resort',     intro:"The main server contains encrypted timeline fragments corrupted by visual noise. Decrypt the files before they are wiped.", task:'Match glitched logs with FILES Dossier', hint:'Read the corrupted character log. Open the FILES Dossier in the HUD, check the corresponding character\'s verified timeline, and select the option that correctly decrypts the missing value.'},
   {id:'pathfinder', title:'The Dock',         icon:'🚤', loc:'Dock',       intro:"The escape boat has been found — but the ignition lock is a sequence puzzle. Someone sabotaged it. This is the last chance.", task:'Complete the sequence under pressure', hint:'Tap the nodes in the exact alpha-numeric sequence: 1, 2, 3, A, 4, B, 5, C, 6, D. Avoid errors to unlock the ignition sequence.'},
 ];
+
+// Initialize randomized timeline alibis
+function initializeRandomAlibis() {
+  if (GS.randomAlibis) return; // already initialized
+  
+  // 1. Rachel Quinn contract date
+  const months = ['March', 'April', 'May', 'June'];
+  const monthIdx = Math.floor(Math.random() * 4); // 0 to 3
+  const monthName = months[monthIdx];
+  const monthNumStr = String(monthIdx + 3).padStart(2, '0');
+  const dayVal = Math.floor(Math.random() * 19) + 10; // 10 to 28
+  const dayNumStr = String(dayVal).padStart(2, '0');
+  
+  const rachelContractCode = monthNumStr + dayNumStr; // MMDD
+  const rachelContractText = `${monthName} ${dayVal}, 2026`;
+
+  // Helper for formatting time (HH:MM PM/AM and HHMM)
+  const getRandomTime = (startHour, endHour, startMin, endMin) => {
+    const hr = Math.floor(Math.random() * (endHour - startHour + 1)) + startHour;
+    const min = Math.floor(Math.random() * (endMin - startMin + 1)) + startMin;
+    const hrStr = String(hr).padStart(2, '0');
+    const minStr = String(min).padStart(2, '0');
+    return {
+      code: hrStr + minStr,
+      text: `${hr}:${minStr} PM`
+    };
+  };
+
+  // 2. Maya Singh RFID exit
+  const mayaExit = getRandomTime(10, 10, 10, 59); // e.g. "10:35 PM" and "1035"
+  
+  // 3. Sarah Bennett photosoot end
+  const sarahPhotoshoot = getRandomTime(9, 9, 10, 50); // e.g. "9:42 PM" and "0942"
+  
+  // 4. Maya Singh Spa Inventory end
+  const mayaInventory = getRandomTime(10, 10, 0, 30); // e.g. "10:15 PM" and "1015"
+  
+  // 5. Rachel Quinn Laptop disconnect
+  const rachelLaptop = getRandomTime(9, 9, 10, 50); // e.g. "9:25 PM" and "0925"
+  
+  // 6. Daniel Price Dock audit end
+  const danielDock = getRandomTime(10, 10, 10, 45); // e.g. "10:20 PM" and "1020"
+
+  GS.randomAlibis = {
+    rachelContractCode,
+    rachelContractText,
+    mayaExitCode: mayaExit.code,
+    mayaExitText: mayaExit.text,
+    sarahPhotoshootCode: sarahPhotoshoot.code,
+    sarahPhotoshootText: sarahPhotoshoot.text,
+    mayaInventoryCode: mayaInventory.code,
+    mayaInventoryText: mayaInventory.text,
+    rachelLaptopCode: rachelLaptop.code,
+    rachelLaptopText: rachelLaptop.text,
+    danielDockCode: danielDock.code,
+    danielDockText: danielDock.text
+  };
+
+  // Update alibi text fields in IDENTITIES & NPCS_BASE to reflect the randomized values
+  const rachel = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === 'rachel');
+  if (rachel) {
+    rachel.details = `Rachel Quinn, corporate lawyer. Composed and professional. She signed a 6-month contract with the resort on ${rachelContractText}. She drafted the legal agreements and strict non-disclosure contracts that prevented the victims of Project Echo from suing the organization.`;
+    rachel.alibi = `<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:45 PM - 10:15 PM:</strong> Drafting legal files in the resort lobby (Lobby router logs show laptop disconnected at ${rachelLaptop.text}).<br>• <strong>10:30 PM:</strong> Retired to Cabin 2.</div>`;
+  }
+
+  const therapist = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === 'therapist');
+  if (therapist) {
+    therapist.alibi = `<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>8:30 PM - ${mayaInventory.text}:</strong> Managing first aid inventory in the Spa (RFID badge logs show exit at ${mayaExit.text}).<br>• <strong>10:30 PM:</strong> Returned to Cabin 4.</div>`;
+  }
+
+  const influencer = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === 'influencer');
+  if (influencer) {
+    influencer.alibi = `<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - ${sarahPhotoshoot.text}:</strong> VIP beach photoshoot (Beach security log shows beach lights were shut off at ${sarahPhotoshoot.text}).<br>• <strong>9:45 PM:</strong> Retired to Cabin 7.</div>`;
+  }
+
+  const gamer = [...IDENTITIES, ...NPCS_BASE].find(c => c.id === 'gamer');
+  if (gamer) {
+    gamer.alibi = `<div style="font-family:var(--ff-m); line-height:1.4; color:var(--text-d);">• <strong>9:00 PM - ${danielDock.text}:</strong> Auditing registries at the escape vessel dock (Dock log contains no badge scans after 8:30 PM).<br>• <strong>10:30 PM:</strong> Returned to Cabin 10.</div>`;
+  }
+}
+
+// Auto-run at load
+initializeRandomAlibis();
